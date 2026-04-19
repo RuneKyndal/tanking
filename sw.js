@@ -5,7 +5,7 @@ const ASSETS = [
     './index.html',
     './manifest.json',
     './sw.js',
-    './icon.png'
+    './tank.png'
 ];
 
 // Install: pre-cache all assets
