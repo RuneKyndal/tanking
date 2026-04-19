@@ -5,53 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.45</title>
+    <title>HeliTimer v2.50</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .page { width: 100%; padding: 10px 10px 25px 10px; display: none; }
+        .page { width: 100%; padding: 8px 8px 20px 8px; display: none; }
         #calc-page { display: block; }
 
         /* --- Global Elements --- */
-        h2 { text-align: center; margin: 4px 0 10px 0; font-size: 1.2rem; text-transform: uppercase; }
+        h2 { text-align: center; margin: 4px 0 8px 0; font-size: 1.1rem; text-transform: uppercase; }
         button { font-weight: bold; border-radius: 6px; border: 2px solid #000; text-transform: uppercase; touch-action: manipulation; }
-        .btn-nav { background: #000; color: #fff; padding: 15px; width: 100%; font-size: 1.2rem; border-radius: 10px; margin-top: 5px; }
+        .btn-nav { background: #000; color: #fff; padding: 12px; width: 100%; font-size: 1.1rem; border-radius: 10px; margin-top: 5px; }
 
         /* --- Page 1 Styles --- */
-        .input-block { border: 2px solid #000; border-radius: 10px; margin-bottom: 10px; overflow: hidden; background: #fff; }
-        .input-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #ddd; gap: 8px; }
-        .input-label { font-size: 0.95rem; font-weight: bold; flex: 1; }
-        input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 6px; font-size: 1.1rem; font-weight: bold; padding: 6px; text-align: right; width: 110px; }
-        .fuel-section { border: 2px solid #000; border-radius: 10px; padding: 12px; margin-bottom: 10px; background: #fff; }
-        .fuel-big { font-size: 1.5rem; font-weight: bold; text-align: center; line-height: 1; }
-        .result-section { border: 2px solid #000; border-radius: 10px; overflow: hidden; margin-bottom: 10px; background: #fff; text-align: center; }
-        .result-title { background: #000; color: #fff; padding: 6px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+        .input-block { border: 2px solid #000; border-radius: 8px; margin-bottom: 8px; overflow: hidden; background: #fff; }
+        .input-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #ddd; gap: 8px; }
+        .input-label { font-size: 0.9rem; font-weight: bold; flex: 1; }
+        input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 6px; font-size: 1.1rem; font-weight: bold; padding: 5px; text-align: right; width: 100px; }
+        .fuel-section { border: 2px solid #000; border-radius: 8px; padding: 10px; margin-bottom: 8px; background: #fff; }
+        .fuel-big { font-size: 1.4rem; font-weight: bold; text-align: center; line-height: 1; }
+        .result-section { border: 2px solid #000; border-radius: 8px; overflow: hidden; margin-bottom: 8px; background: #fff; text-align: center; }
+        .result-title { background: #000; color: #fff; padding: 5px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
         .result-grid { display: grid; grid-template-columns: 1fr 1fr; }
-        .r-label { font-size: 0.7rem; color: #666; text-transform: uppercase; display: block; }
-        .r-val { font-size: 2.5rem; font-weight: bold; display: block; }
+        .r-label { font-size: 0.65rem; color: #666; text-transform: uppercase; display: block; }
+        .r-val { font-size: 2.2rem; font-weight: bold; display: block; }
 
         /* --- Page 2 Styles --- */
-        .timer-row { display: flex; align-items: center; width: 100%; border: 2px solid #000; border-radius: 10px; margin-bottom: 8px; padding: 8px; gap: 6px; }
-        .timer-name { font-size: 0.8rem; font-weight: bold; flex: 0 0 55px; text-transform: uppercase; }
+        .timer-row { display: flex; align-items: center; width: 100%; border: 2px solid #000; border-radius: 8px; margin-bottom: 6px; padding: 6px; gap: 5px; }
+        .timer-name { font-size: 0.75rem; font-weight: bold; flex: 0 0 50px; text-transform: uppercase; }
         .controls { flex: 1; display: flex; gap: 4px; }
-        .time-display { flex: 0 0 85px; font-family: monospace; font-size: 1.1rem; font-weight: bold; text-align: right; }
-        .btn-start { background: #0f0; flex: 2; height: 44px; }
-        .btn-stop { background: #f00; color: #fff; flex: 2; height: 44px; }
-        .btn-rst { background: #ccc; flex: 1; height: 44px; }
-        .stat-box { background: #f0f0f0; padding: 8px; border: 2px solid #000; border-radius: 10px; text-align: center; }
-        .total-hms { font-size: 1.2rem; font-family: monospace; display: block; border-top: 1px solid #000; margin-top: 5px; padding-top: 5px; font-weight: bold; }
+        .time-display { flex: 0 0 80px; font-family: monospace; font-size: 1.1rem; font-weight: bold; text-align: right; }
+        .btn-start { background: #0f0; flex: 2; height: 40px; }
+        .btn-stop { background: #f00; color: #fff; flex: 2; height: 40px; }
+        .btn-rst { background: #ccc; flex: 1; height: 40px; }
+        .stat-box { background: #f0f0f0; padding: 6px; border: 2px solid #000; border-radius: 8px; text-align: center; }
+        .total-hms { font-size: 1.1rem; font-family: monospace; display: block; border-top: 1px solid #000; margin-top: 4px; padding-top: 4px; font-weight: bold; }
 
-        /* --- Page 3 Styles --- */
-        .bubble-v198 { border: 2px solid #000; border-radius: 12px; margin-bottom: 12px; background: #fff; padding: 15px; text-align: center; }
+        /* --- Page 3 Styles (Compact) --- */
+        .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 8px; background: #fff; padding: 8px; text-align: center; }
         .val-lg-v198 { font-size: 3.2rem; font-weight: bold; display: block; line-height: 1; }
         .gauge-labels { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem; margin-bottom: 2px; padding: 0 5px; }
-        .gauge-container { position: relative; width: 100%; height: 35px; background: #eee; border: 2px solid #000; border-radius: 4px; margin: 10px 0 20px 0; }
+        .gauge-container { position: relative; width: 100%; height: 35px; background: #eee; border: 2px solid #000; border-radius: 4px; margin: 10px 0 15px 0; }
         .zone-y { position: absolute; height: 100%; width: 100%; background: #ffeb3b; }
         .zone-g { position: absolute; height: 100%; width: 30%; left: 35%; background: #4caf50; border-left: 1px solid #000; border-right: 1px solid #000; }
         .needle { position: absolute; top: -47px; width: 6px; height: 130px; background: #f00; transform: translateX(-50%); z-index: 10; border: 1px solid #000; }
 
         /* Helpers */
-        input[type="range"] { -webkit-appearance: none; width: 100%; height: 18px; background: #ddd; border-radius: 10px; margin: 15px 0; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 16px; background: #ddd; border-radius: 10px; margin: 12px 0; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 3px solid #fff; }
         .log-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; background: #fff; }
         .log-table th, .log-table td { border: 1px solid #000; padding: 4px; text-align: center; }
@@ -72,7 +72,7 @@
     </div>
     <div class="result-section">
         <div class="result-title">Weight Summary</div>
-        <div style="font-size:0.9rem; font-weight:bold; padding:5px; text-transform:uppercase;">Useful Load</div>
+        <div style="font-size:0.8rem; font-weight:bold; padding:4px; text-transform:uppercase;">Useful Load</div>
         <div class="result-grid">
             <div class="result-item"><span class="r-label">lbs</span><span class="r-val" id="res-lbs">--</span></div>
             <div class="result-item" style="border-left:1px solid #ddd;"><span class="r-label">liters</span><span class="r-val" id="res-liters">--</span></div>
@@ -110,57 +110,57 @@
         </div>
         <div class="time-display" id="fl-disp">00:00:00</div>
     </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
         <div class="stat-box">
-            <span style="font-size:0.6rem;">ENG RUN<br><span id="e-ts">--:-- to --:--</span></span>
+            <span style="font-size:0.55rem;">ENG RUN<br><span id="e-ts">--:-- to --:--</span></span>
             <span class="total-hms" id="e-hms">00:00:00</span>
         </div>
         <div class="stat-box" style="background:#eef;">
-            <span style="font-size:0.6rem;">FLIGHT<br><span id="f-ts">--:-- to --:--</span></span>
+            <span style="font-size:0.55rem;">FLIGHT<br><span id="f-ts">--:-- to --:--</span></span>
             <span class="total-hms" id="f-hms">00:00:00</span>
         </div>
     </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:10px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:8px;">
         <button class="btn-rst" style="background:#444; color:#fff;" onclick="showPage('calc-page')">BACK</button>
         <button class="btn-rst" style="background:#007bff; color:#fff;" onclick="saveLog()">SAVE</button>
         <button class="btn-rst" style="background:#666; color:#fff;" onclick="showLog()">LOGS</button>
     </div>
-    <button class="btn-nav" style="background:#d9534f; margin-bottom:5px;" onclick="resetAll()">RESET ALL TIMERS</button>
+    <button class="btn-nav" style="background:#d9534f; margin-bottom:4px;" onclick="resetAll()">RESET ALL TIMERS</button>
     <button class="btn-nav" style="background:#008800;" onclick="initFlightPage()">GO FLY</button>
 </div>
 
 <div id="flight-page" class="page">
-    <div style="display:flex; justify-content:space-between; margin-bottom:10px; gap:5px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:8px; gap:4px;">
         <div style="flex:1; text-align:center;">
-            <label style="font-size:0.6rem; font-weight:bold; display:block;">Fuel Burn</label>
-            <select id="burn-rate-select" style="width:100%; padding:8px; font-weight:bold;">
+            <label style="font-size:0.55rem; font-weight:bold; display:block;">Fuel Burn</label>
+            <select id="burn-rate-select" style="width:100%; padding:6px; font-weight:bold;">
                 <option value="600">600</option><option value="800" selected>800</option><option value="900">900</option>
             </select>
         </div>
         <div style="flex:1; text-align:center;">
-            <label style="font-size:0.6rem; font-weight:bold; display:block;">Target GS</label>
-            <select id="gs-target-select" onchange="updateGSUI()" style="width:100%; padding:8px; font-weight:bold;">
+            <label style="font-size:0.55rem; font-weight:bold; display:block;">Target GS</label>
+            <select id="gs-target-select" onchange="updateGSUI()" style="width:100%; padding:6px; font-weight:bold;">
                 </select>
         </div>
-        <button id="gps-btn" class="btn-start" style="flex:0 0 70px; font-size:0.6rem;" onclick="toggleGPS()">GPS OFF</button>
+        <button id="gps-btn" class="btn-start" style="flex:0 0 65px; font-size:0.55rem;" onclick="toggleGPS()">GPS OFF</button>
     </div>
 
-    <div class="bubble-v198" style="background:#fff; color:#000; padding:10px;">
-        <span class="val-lg-v198" id="flight-timer-main" style="font-family:monospace;">00:00:00</span>
+    <div class="bubble-v198" style="background:#fff; color:#000; padding:6px;">
+        <span class="val-lg-v198" id="flight-timer-main" style="font-family:monospace; font-size:2.8rem;">00:00:00</span>
     </div>
 
     <div class="bubble-v198">
         <span class="r-label">Fuel Load (lbs)</span>
-        <span class="val-lg-v198" id="fly-fuel-lbs">--</span>
+        <span class="val-lg-v198" id="fly-fuel-lbs" style="font-size:2.8rem;">--</span>
         <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value)">
     </div>
 
     <div class="bubble-v198">
         <span class="r-label">Payload Liters</span>
-        <span class="val-lg-v198" id="fly-ltr">--</span>
+        <span class="val-lg-v198" id="fly-ltr" style="font-size:2.8rem;">--</span>
     </div>
 
-    <div class="bubble-v198" style="padding-top:25px;">
+    <div class="bubble-v198" style="padding-top:20px;">
         <div class="gauge-labels">
             <span id="gs-lbl-min">--</span>
             <span id="gs-lbl-tgt">--</span>
@@ -171,9 +171,9 @@
             <div class="zone-g"></div>
             <div id="gs-needle" class="needle" style="left:50%;"></div>
         </div>
-        <div style="display:flex; flex-direction:column; align-items:center; margin-top:35px;">
-            <span class="val-lg-v198" id="fly-gs" style="font-size:4.5rem;">0</span>
-            <span class="r-label" style="font-size:1rem; color:#000;">Kts.</span>
+        <div style="display:flex; flex-direction:column; align-items:center; margin-top:30px;">
+            <span class="val-lg-v198" id="fly-gs" style="font-size:4.2rem;">0</span>
+            <span class="r-label" style="font-size:0.9rem; color:#000;">Kts.</span>
         </div>
     </div>
 
@@ -182,11 +182,11 @@
 
 <div id="log-page" class="page">
     <button class="btn-nav" onclick="hideLog()">BACK</button>
-    <table class="log-table" style="margin:10px 0;">
+    <table class="log-table" style="margin:8px 0;">
         <thead><tr><th>Date</th><th>Eng Block</th><th>H:M</th><th>Flt Block</th><th>H:M</th></tr></thead>
         <tbody id="log-body"></tbody>
     </table>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
         <button class="btn-rst" style="background:#28a745; color:#fff;" onclick="exportCSV()">SAVE CSV</button>
         <button class="btn-rst" style="background:#17a2b8; color:#fff;" onclick="exportTXT()">SAVE TXT</button>
     </div>
@@ -310,7 +310,13 @@
             watchID = navigator.geolocation.watchPosition(p => {
                 curGS = (p.coords.speed || 0) * 1.94384;
                 btn.innerText = "GPS LIVE"; btn.style.background = "#0f0";
-            }, null, { enableHighAccuracy: true });
+            }, err => {
+                console.error(err);
+                btn.innerText = "GPS ERR";
+            }, { 
+                enableHighAccuracy: true,
+                maximumAge: 0
+            });
         }
     }
 
@@ -352,7 +358,7 @@
     const gsS = document.getElementById('gs-target-select');
     for(let i=0; i<=30; i++) { 
         let o = document.createElement('option'); o.value = i; o.innerText = i; 
-        if(i===20) o.selected=true; 
+        if(i===18) o.selected=true; 
         gsS.appendChild(o); 
     }
     updateWB();
