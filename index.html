@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v3.2</title>
+    <title>HeliTimer v3.4</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow: hidden; }
@@ -18,10 +18,12 @@
 
         .input-block { border: 2px solid #000; border-radius: 8px; margin-bottom: 8px; overflow: hidden; background: #fff; }
         .input-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #ddd; }
-        input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 4px; font-size: 1.1rem; font-weight: bold; padding: 4px; text-align: right; width: 90px; }
+        input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 4px; font-size: 1.1rem; font-weight: bold; padding: 4px; text-align: right; width: 100px; }
         
         .fuel-section { border: 2px solid #000; border-radius: 8px; padding: 15px; margin-bottom: 8px; background: #fff; }
-        .fuel-big-p1 { font-size: 2.8rem; font-weight: bold; text-align: center; line-height: 1; margin-bottom: 20px; }
+        .fuel-header-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .fuel-label-text { font-size: 1.2rem; font-weight: bold; text-transform: uppercase; }
+        .fuel-big-p1 { font-size: 2.8rem; font-weight: bold; line-height: 1; }
         
         .timer-row { display: flex; align-items: center; border: 2px solid #000; border-radius: 8px; margin-bottom: 6px; padding: 6px; gap: 4px; }
         .time-display { flex: 0 0 78px; font-family: monospace; font-size: 1.05rem; font-weight: bold; text-align: right; }
@@ -31,6 +33,7 @@
         .val-xl-v198 { font-size: 5rem; font-weight: bold; display: inline-block; line-height: 1; }
         .unit-xl { font-size: 2.5rem; font-weight: bold; margin-left: 5px; }
         .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 6px; padding: 8px; text-align: center; background: #fff; }
+        .dec-small { display: block; font-size: 1.1rem; color: #333; margin-top: 2px; }
         
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 20px; background: #ddd; border-radius: 10px; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 3px solid #fff; }
@@ -45,14 +48,17 @@
 <body>
 
 <div id="calc-page" class="page">
-    <h2>214ST W&amp;B v3.2</h2>
+    <h2>214ST W&amp;B v3.4</h2>
     <div class="input-block">
-        <div class="input-row"><span>Max Gross</span><input type="number" id="max-gross" value="17500" oninput="updateWB()"></div>
-        <div class="input-row"><span>A/C Empty</span><input type="number" id="empty-weight" value="10000" oninput="updateWB()"></div>
+        <div class="input-row"><span>Max Gross Weight</span><input type="number" id="max-gross" value="17500" oninput="updateWB()"></div>
+        <div class="input-row"><span>A/C Empty Weight</span><input type="number" id="empty-weight" value="10000" oninput="updateWB()"></div>
         <div class="input-row"><span>Crew + Gear</span><input type="number" id="crew-gear" value="400" oninput="updateWB()"></div>
     </div>
     <div class="fuel-section">
-        <div class="fuel-big-p1" id="fuel-display">2,750 lbs</div>
+        <div class="fuel-header-row">
+            <span class="fuel-label-text">FUEL</span>
+            <div class="fuel-big-p1" id="fuel-display">2,750 lbs</div>
+        </div>
         <input type="range" id="fuel-slider" min="500" max="3000" step="50" value="2750" oninput="updateWB()">
     </div>
     <div class="bubble-v198">
@@ -72,8 +78,8 @@
     <div class="timer-row" style="background:#eef;"><span class="timer-label">FLT</span><button class="btn-timer" style="background:#0f0; flex:2;" id="fl-start" onclick="startT('fl')">START</button><button class="btn-timer" style="background:#f00; color:#fff; flex:2;" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button><button class="btn-timer" style="background:#ccc; flex:1;" onclick="resetRow('fl')">RST</button><div class="time-display" id="fl-disp">00:00:00</div></div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px;">
-        <div class="bubble-v198" style="background:#f0f0f0;"><small>ENG RUN</small><br><span id="e-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="e-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span></div>
-        <div class="bubble-v198" style="background:#eef;"><small>FLIGHT</small><br><span id="f-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="f-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span></div>
+        <div class="bubble-v198" style="background:#f0f0f0;"><small>ENG RUN</small><br><span id="e-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="e-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span><span class="dec-small" id="e-dec">0.00 hr</span></div>
+        <div class="bubble-v198" style="background:#eef;"><small>FLIGHT</small><br><span id="f-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="f-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span><span class="dec-small" id="f-dec">0.00 hr</span></div>
     </div>
 
     <div style="display:flex; gap:5px; margin-top:10px;">
@@ -82,14 +88,15 @@
         <button style="background:#666; color:#fff; flex:1; height:50px;" onclick="showLog()">LOGS</button>
     </div>
     <button class="btn-nav" style="background:#008800; height:50px; display:flex; align-items:center; justify-content:center;" onclick="initFlightPage()">GO FLY</button>
+    <button class="btn-nav" style="background:#dc3545; height:50px; margin-top:8px;" onclick="resetAllTimers()">RESET</button>
 </div>
 
 <div id="flight-page" class="page" style="flex-direction: column;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-        <button style="background:#d9534f; color:#fff; height:50px; flex:0 0 120px;" onclick="showPage('timer-page')">BACK</button>
-        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">BURN</label><select id="burn-rate-select" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;"><option value="600">600</option><option value="650">650</option><option value="700">700</option><option value="750">750</option><option value="800" selected>800</option><option value="850">850</option><option value="900">900</option></select></div>
-        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">GS</label><select id="gs-target-select" onchange="updateGSUI()" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;"></select></div>
-        <button id="gps-btn" style="background:#f00; color:#fff; height:50px; flex:0 0 90px;" onclick="toggleGPS()">GPS OFF</button>
+        <button style="background:#d9534f; color:#fff; height:50px; flex:0 0 100px;" onclick="showPage('timer-page')">BACK</button>
+        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">BURN</label><select id="burn-rate-select" style="font-size:1.1rem; display:block; border:2px solid #000; border-radius:4px;"><option value="600">600</option><option value="650">650</option><option value="700">700</option><option value="750">750</option><option value="800" selected>800</option><option value="850">850</option><option value="900">900</option><option value="950">950</option><option value="1000">1000</option></select></div>
+        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">GS</label><select id="gs-target-select" onchange="updateGSUI()" style="font-size:1.1rem; display:block; border:2px solid #000; border-radius:4px;"></select></div>
+        <button id="gps-btn" style="background:#f00; color:#fff; height:50px; flex:0 0 80px;" onclick="toggleGPS()">GPS OFF</button>
     </div>
 
     <div class="bubble-v198" style="padding:4px;"><span id="flight-timer-main" style="font-family:monospace; font-size:2.4rem; font-weight:bold;">00:00:00</span></div>
@@ -136,10 +143,10 @@
 
 <div id="confirm-overlay">
     <div id="confirm-box">
-        <p>Delete ALL logs? Cannot be undone.</p>
+        <p id="confirm-text">Delete ALL logs? Cannot be undone.</p>
         <div style="display:flex; gap:10px;">
-            <button onclick="clearLogs(true)" style="background:#dc3545; color:#fff; flex:1; padding:10px; border:2px solid #000; border-radius:6px; font-weight:bold;">DELETE</button>
-            <button onclick="clearLogs(false)" style="background:#ccc; flex:1; padding:10px; border:2px solid #000; border-radius:6px; font-weight:bold;">CANCEL</button>
+            <button id="confirm-yes" style="background:#dc3545; color:#fff; flex:1; padding:10px; border:2px solid #000; border-radius:6px; font-weight:bold;">DELETE</button>
+            <button id="confirm-no" style="background:#ccc; flex:1; padding:10px; border:2px solid #000; border-radius:6px; font-weight:bold;">CANCEL</button>
         </div>
     </div>
 </div>
@@ -164,7 +171,9 @@
     }
 
     function updateWB() {
-        let mg = 17500, empty = 10000, crew = 400;
+        let mg = parseFloat(document.getElementById('max-gross').value) || 0;
+        let empty = parseFloat(document.getElementById('empty-weight').value) || 0;
+        let crew = parseFloat(document.getElementById('crew-gear').value) || 0;
         curFuel = parseFloat(document.getElementById('fuel-slider').value);
         let p = mg - (empty + crew + curFuel);
         document.getElementById('fuel-display').innerText = curFuel.toLocaleString() + ' lbs';
@@ -203,11 +212,24 @@
         updateStats();
     }
 
+    function resetAllTimers() {
+        document.getElementById('confirm-text').innerText = "Reset ALL current timers?";
+        document.getElementById('confirm-overlay').style.display = 'flex';
+        document.getElementById('confirm-yes').onclick = () => {
+            ['e1','e2','fl'].forEach(resetRow);
+            document.getElementById('confirm-overlay').style.display = 'none';
+        };
+        document.getElementById('confirm-no').onclick = () => document.getElementById('confirm-overlay').style.display = 'none';
+    }
+
     function updateStats() {
         let eMs = (timers.engG.end || (timers.engG.start ? Date.now() : 0)) - (timers.engG.start || 0);
         document.getElementById('e-hms').innerText = format(Math.max(0, eMs));
+        document.getElementById('e-dec').innerText = (eMs / 3600000).toFixed(2) + " hr";
         document.getElementById('e-ts').innerText = (timers.engG.start ? getTimeStr(timers.engG.start) : "--:--") + " to " + (timers.engG.end ? getTimeStr(timers.engG.end) : "--:--");
+        
         document.getElementById('f-hms').innerText = format(timers.fl.elapsed);
+        document.getElementById('f-dec').innerText = (timers.fl.elapsed / 3600000).toFixed(2) + " hr";
         document.getElementById('f-ts').innerText = (timers.fl.tsS || "--:--") + " to " + (timers.fl.tsE || "--:--");
     }
 
@@ -222,41 +244,46 @@
             fhms: formatShort(timers.fl.elapsed),
             fh: (timers.fl.elapsed/3600000).toFixed(2)
         };
-        let log = JSON.parse(localStorage.getItem('hLogV130') || '[]');
+        let log = JSON.parse(localStorage.getItem('hLogV34') || '[]');
         log.push(entry);
-        localStorage.setItem('hLogV130', JSON.stringify(log));
+        localStorage.setItem('hLogV34', JSON.stringify(log));
         alert("Flight Saved");
     }
 
     function showLog() {
         showPage('log-page');
-        let log = JSON.parse(localStorage.getItem('hLogV130') || '[]').reverse();
+        let log = JSON.parse(localStorage.getItem('hLogV34') || '[]').reverse();
         let tbody = document.getElementById('log-body');
         tbody.innerHTML = '';
         if (!log.length) { tbody.innerHTML = '<tr><td colspan="7">No logs.</td></tr>'; return; }
         let html = '', dailyE = 0, dailyF = 0, lastDate = log[0].date, dayHtml = '';
         log.forEach((e, i) => {
             if (e.date !== lastDate) {
-                html += dayHtml + `<tr class="row-total"><td colspan="3">TOTAL ${lastDate}</td><td>${dailyE.toFixed(2)}</td><td colspan="2"></td><td>${dailyF.toFixed(2)}</td></tr>`;
+                html += dayHtml + `<tr style="background:#f0f0f0; font-weight:bold;"><td colspan="3">TOTAL ${lastDate}</td><td>${dailyE.toFixed(2)}</td><td colspan="2"></td><td>${dailyF.toFixed(2)}</td></tr>`;
                 dayHtml = ''; dailyE = 0; dailyF = 0; lastDate = e.date;
             }
             dayHtml += `<tr><td>${e.date}</td><td>${e.eb}</td><td>${e.ehms}</td><td>${e.eh}</td><td>${e.fb}</td><td>${e.fhms}</td><td>${e.fh}</td></tr>`;
             dailyE += parseFloat(e.eh); dailyF += parseFloat(e.fh);
             if (i === log.length - 1) {
-                html += dayHtml + `<tr class="row-total"><td colspan="3">TOTAL ${lastDate}</td><td>${dailyE.toFixed(2)}</td><td colspan="2"></td><td>${dailyF.toFixed(2)}</td></tr>`;
+                html += dayHtml + `<tr style="background:#f0f0f0; font-weight:bold;"><td colspan="3">TOTAL ${lastDate}</td><td>${dailyE.toFixed(2)}</td><td colspan="2"></td><td>${dailyF.toFixed(2)}</td></tr>`;
             }
         });
         tbody.innerHTML = html;
     }
 
-    function confirmClear() { document.getElementById('confirm-overlay').style.display = 'flex'; }
-    function clearLogs(yes) {
-        document.getElementById('confirm-overlay').style.display = 'none';
-        if(yes) { localStorage.removeItem('hLogV130'); showLog(); }
+    function confirmClear() {
+        document.getElementById('confirm-text').innerText = "Delete ALL logs? Cannot be undone.";
+        document.getElementById('confirm-overlay').style.display = 'flex';
+        document.getElementById('confirm-yes').onclick = () => {
+            localStorage.removeItem('hLogV34');
+            showLog();
+            document.getElementById('confirm-overlay').style.display = 'none';
+        };
+        document.getElementById('confirm-no').onclick = () => document.getElementById('confirm-overlay').style.display = 'none';
     }
 
     function exportData(type) {
-        let log = JSON.parse(localStorage.getItem('hLogV130') || '[]');
+        let log = JSON.parse(localStorage.getItem('hLogV34') || '[]');
         if (!log.length) return;
         let content, ext, mime;
         if (type === 'csv') {
@@ -282,8 +309,10 @@
             let rate = parseFloat(document.getElementById('burn-rate-select').value);
             curFuel -= ((now - burnRef) / 3600000) * rate;
             burnRef = now;
-            let mg = 17500, basic = 10400;
-            let p = mg - (basic + curFuel);
+            let mg = parseFloat(document.getElementById('max-gross').value) || 0;
+            let empty = parseFloat(document.getElementById('empty-weight').value) || 0;
+            let crew = parseFloat(document.getElementById('crew-gear').value) || 0;
+            let p = mg - (empty + crew + curFuel);
             document.getElementById('fly-ltr').innerText = p < 0 ? "0" : Math.round(p * 0.4536).toLocaleString();
             document.getElementById('fly-fuel-lbs').innerText = Math.round(curFuel).toLocaleString();
             document.getElementById('flight-timer-main').innerText = format(timers.fl.elapsed);
