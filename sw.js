@@ -1,5 +1,5 @@
 // sw.js — Bell 214ST W&B v1.0
-const CACHE_NAME = 'tanking-v1.2';
+const CACHE_NAME = 'tanking-v13';
 
 const ASSETS = [
     './index.html',
