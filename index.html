@@ -5,26 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.35</title>
+    <title>HeliTimer v2.40</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .page { width: 100%; padding: 10px 10px 25px 10px; display: none; }
         #calc-page { display: block; }
 
-        /* --- Page 1 Styles --- */
+        /* --- Global Elements --- */
         h2 { text-align: center; margin: 4px 0 10px 0; font-size: 1.2rem; text-transform: uppercase; }
+        button { font-weight: bold; border-radius: 6px; border: 2px solid #000; text-transform: uppercase; touch-action: manipulation; }
+        .btn-nav { background: #000; color: #fff; padding: 15px; width: 100%; font-size: 1.2rem; border-radius: 10px; margin-top: 5px; }
+
+        /* --- Page 1 Styles --- */
         .input-block { border: 2px solid #000; border-radius: 10px; margin-bottom: 10px; overflow: hidden; background: #fff; }
         .input-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #ddd; gap: 8px; }
         .input-label { font-size: 0.95rem; font-weight: bold; flex: 1; }
         input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 6px; font-size: 1.1rem; font-weight: bold; padding: 6px; text-align: right; width: 110px; }
-        
         .fuel-section { border: 2px solid #000; border-radius: 10px; padding: 12px; margin-bottom: 10px; background: #fff; }
-        .fuel-big { font-size: 1.5rem; font-weight: bold; text-align: center; line-height: 1; } /* Smaller font */
-        
+        .fuel-big { font-size: 1.5rem; font-weight: bold; text-align: center; line-height: 1; }
         .result-section { border: 2px solid #000; border-radius: 10px; overflow: hidden; margin-bottom: 10px; background: #fff; text-align: center; }
         .result-title { background: #000; color: #fff; padding: 6px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
-        .useful-load-text { font-size: 0.9rem; font-weight: bold; padding: 5px 0; color: #000; text-transform: uppercase; }
         .result-grid { display: grid; grid-template-columns: 1fr 1fr; }
         .r-label { font-size: 0.7rem; color: #666; text-transform: uppercase; display: block; }
         .r-val { font-size: 2.5rem; font-weight: bold; display: block; }
@@ -33,28 +34,26 @@
         .timer-row { display: flex; align-items: center; width: 100%; border: 2px solid #000; border-radius: 10px; margin-bottom: 8px; padding: 8px; gap: 6px; }
         .controls { flex: 1; display: flex; gap: 4px; }
         .time-display { flex: 0 0 90px; font-family: monospace; font-size: 1.2rem; font-weight: bold; text-align: right; }
-        button { font-weight: bold; border-radius: 6px; border: 2px solid #000; text-transform: uppercase; touch-action: manipulation; }
         .btn-start { background: #0f0; flex: 2; height: 44px; }
         .btn-stop { background: #f00; color: #fff; flex: 2; height: 44px; }
         .btn-rst { background: #ccc; flex: 1; height: 44px; }
         .stat-box { background: #f0f0f0; padding: 8px; border: 2px solid #000; border-radius: 10px; text-align: center; }
         .total-hms { font-size: 1.2rem; font-family: monospace; display: block; border-top: 1px solid #000; margin-top: 5px; padding-top: 5px; font-weight: bold; }
-        .action-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
 
         /* --- Page 3 Styles --- */
         .bubble-v198 { border: 2px solid #000; border-radius: 12px; margin-bottom: 12px; background: #fff; padding: 15px; text-align: center; }
         .val-lg-v198 { font-size: 3.2rem; font-weight: bold; display: block; line-height: 1; }
         
-        /* Taller Red Needle */
-        .gauge-container { position: relative; width: 100%; height: 35px; background: #eee; border: 2px solid #000; border-radius: 4px; margin: 25px 0 35px 0; }
+        /* GPS Gauge Layout */
+        .gauge-labels { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem; margin-bottom: 2px; padding: 0 5px; }
+        .gauge-container { position: relative; width: 100%; height: 35px; background: #eee; border: 2px solid #000; border-radius: 4px; margin: 10px 0 20px 0; }
         .zone-y { position: absolute; height: 100%; width: 100%; background: #ffeb3b; }
         .zone-g { position: absolute; height: 100%; width: 30%; left: 35%; background: #4caf50; border-left: 1px solid #000; border-right: 1px solid #000; }
-        .needle { position: absolute; top: -15px; width: 5px; height: 65px; background: #f00; transform: translateX(-50%); z-index: 10; border: 1px solid #000; }
+        .needle { position: absolute; top: -47px; width: 6px; height: 130px; background: #f00; transform: translateX(-50%); z-index: 10; border: 1px solid #000; }
 
-        /* UI Helpers */
+        /* Helpers */
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 18px; background: #ddd; border-radius: 10px; margin: 15px 0; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 3px solid #fff; }
-        .btn-nav { background: #000; color: #fff; padding: 15px; width: 100%; font-size: 1.2rem; border-radius: 10px; margin-top: 5px; }
         .log-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
         .log-table th, .log-table td { border: 1px solid #000; padding: 4px; text-align: center; }
     </style>
@@ -74,17 +73,17 @@
     </div>
     <div class="result-section">
         <div class="result-title">Weight Summary</div>
-        <div class="useful-load-text">USEFUL LOAD</div>
+        <div style="font-size:0.9rem; font-weight:bold; padding:5px; text-transform:uppercase;">Useful Load</div>
         <div class="result-grid">
             <div class="result-item"><span class="r-label">lbs</span><span class="r-val" id="res-lbs">--</span></div>
-            <div class="result-item" style="border-right:none;"><span class="r-label">liters</span><span class="r-val" id="res-liters">--</span></div>
+            <div class="result-item" style="border-left:1px solid #ddd;"><span class="r-label">liters</span><span class="r-val" id="res-liters">--</span></div>
         </div>
     </div>
     <button class="btn-nav" style="background:#28a745;" onclick="showPage('timer-page')">GO START</button>
 </div>
 
 <div id="timer-page" class="page">
-    <h2>FLIGHT TIMER v1.30</h2>
+    <h2>FLIGHT TIMER</h2>
     <div class="timer-row">
         <div class="controls">
             <button class="btn-start" id="e1-start" onclick="startT('e1')">START</button>
@@ -109,7 +108,7 @@
         </div>
         <div class="time-display" id="fl-disp">00:00:00</div>
     </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
         <div class="stat-box">
             <span style="font-size:0.6rem;">ENG RUN<br><span id="e-ts">--:-- to --:--</span></span>
             <span class="total-hms" id="e-hms">00:00:00</span>
@@ -119,7 +118,7 @@
             <span class="total-hms" id="f-hms">00:00:00</span>
         </div>
     </div>
-    <div class="action-row">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:10px;">
         <button class="btn-rst" style="background:#444; color:#fff;" onclick="showPage('calc-page')">BACK</button>
         <button class="btn-rst" style="background:#007bff; color:#fff;" onclick="saveLog()">SAVE</button>
         <button class="btn-rst" style="background:#666; color:#fff;" onclick="showLog()">LOGS</button>
@@ -128,49 +127,54 @@
 </div>
 
 <div id="flight-page" class="page">
-    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-        <div style="display:flex; flex-direction:column; align-items:center;">
-            <label style="font-size:0.6rem; font-weight:bold;">BURN</label>
-            <select id="burn-rate-select" style="padding:6px; font-weight:bold;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px; gap:5px;">
+        <div style="flex:1; text-align:center;">
+            <label style="font-size:0.6rem; font-weight:bold; display:block;">Fuel Burn</label>
+            <select id="burn-rate-select" style="width:100%; padding:8px; font-weight:bold;">
                 <option value="600">600</option><option value="800" selected>800</option><option value="900">900</option>
             </select>
         </div>
-        <div style="display:flex; flex-direction:column; align-items:center;">
-            <label style="font-size:0.6rem; font-weight:bold;">GS TGT</label>
-            <select id="gs-target-select" onchange="updateGSUI()" style="padding:6px; font-weight:bold;">
+        <div style="flex:1; text-align:center;">
+            <label style="font-size:0.6rem; font-weight:bold; display:block;">Target GS</label>
+            <select id="gs-target-select" onchange="updateGSUI()" style="width:100%; padding:8px; font-weight:bold;">
                 </select>
         </div>
-        <button id="gps-btn" class="btn-start" style="flex:none; padding:10px; font-size:0.7rem;" onclick="toggleGPS()">GPS OFF</button>
+        <button id="gps-btn" class="btn-start" style="flex:0 0 70px; font-size:0.6rem;" onclick="toggleGPS()">GPS OFF</button>
     </div>
 
-    <div class="bubble-v198" style="background:#fff; color:#000;">
+    <div class="bubble-v198" style="background:#fff; color:#000; padding:10px;">
         <span class="val-lg-v198" id="flight-timer-main" style="font-family:monospace;">00:00:00</span>
     </div>
 
     <div class="bubble-v198">
-        <span class="r-label">FUEL LOAD (lbs)</span>
-        <span class="val-lg-v198" id="fly-fuel-lbs" style="font-size:2rem;">--</span>
+        <span class="r-label">Fuel Load (lbs)</span>
+        <span class="val-lg-v198" id="fly-fuel-lbs">--</span>
         <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value)">
     </div>
 
     <div class="bubble-v198">
-        <span class="r-label">PAYLOAD LITERS</span>
+        <span class="r-label">Payload Liters</span>
         <span class="val-lg-v198" id="fly-ltr">--</span>
     </div>
 
-    <div class="bubble-v198" style="position:relative;">
-        <div style="display:flex; justify-content:center; align-items:baseline; width:100%;">
-            <span class="val-lg-v198" id="fly-gs" style="flex:1; text-align:center; padding-left:40px;">0</span>
-            <span class="r-label" style="flex:0; margin-left:10px;">ground speed</span>
+    <div class="bubble-v198" style="padding-top:25px;">
+        <div class="gauge-labels">
+            <span id="gs-lbl-min">--</span>
+            <span id="gs-lbl-tgt">--</span>
+            <span id="gs-lbl-max">--</span>
         </div>
         <div class="gauge-container">
             <div class="zone-y"></div>
             <div class="zone-g"></div>
             <div id="gs-needle" class="needle" style="left:50%;"></div>
         </div>
+        <div style="display:flex; flex-direction:column; align-items:center; margin-top:35px;">
+            <span class="val-lg-v198" id="fly-gs" style="font-size:4.5rem;">0</span>
+            <span class="r-label" style="font-size:1rem; color:#000;">Kts.</span>
+        </div>
     </div>
 
-    <button class="btn-nav" style="background:#d9534f;" onclick="showPage('timer-page')">STOP FLIGHT</button>
+    <button class="btn-nav" style="background:#d9534f;" onclick="showPage('timer-page')">STOP FLIGHT (BACK)</button>
 </div>
 
 <div id="log-page" class="page">
@@ -273,8 +277,13 @@
 
     function updateGSUI() {
         var tgt = parseFloat(document.getElementById('gs-target-select').value);
+        document.getElementById('gs-lbl-min').innerText = tgt - 10;
+        document.getElementById('gs-lbl-tgt').innerText = tgt;
+        document.getElementById('gs-lbl-max').innerText = tgt + 10;
+        
         document.getElementById('fly-gs').innerText = Math.round(curGS);
         var diff = curGS - tgt;
+        // Map +/- 10kts to 0-100% width
         var pos = 50 + (diff * 5); 
         document.getElementById('gs-needle').style.left = Math.max(0, Math.min(100, pos)) + "%";
     }
@@ -311,7 +320,12 @@
     function clearLogs() { if(confirm("Clear all?")) { localStorage.removeItem('hLog'); showLog(); } }
 
     const gsS = document.getElementById('gs-target-select');
-    for(let i=0; i<=30; i++) { let o = document.createElement('option'); o.value = i; o.innerText = i; if(i===20) o.selected=true; gsS.appendChild(o); }
+    for(let i=0; i<=30; i++) { 
+        let o = document.createElement('option'); 
+        o.value = i; o.innerText = i; 
+        if(i===20) o.selected=true; 
+        gsS.appendChild(o); 
+    }
     updateWB();
 </script>
 </body>
