@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.4</title>
+    <title>HeliTimer v2.5</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow: hidden; }
@@ -28,24 +28,23 @@
         .timer-row { display: flex; align-items: center; border: 2px solid #000; border-radius: 8px; margin-bottom: 6px; padding: 6px; gap: 5px; }
         .time-display { flex: 0 0 85px; font-family: monospace; font-size: 1.1rem; font-weight: bold; text-align: right; }
         .timer-label { font-size: 0.6rem; font-weight: bold; width: 55px; text-transform: uppercase; line-height: 1; }
-        .stat-box { background: #f0f0f0; padding: 8px; border: 2px solid #000; border-radius: 8px; text-align: center; margin-bottom: 5px; }
-        .total-hms { font-size: 1.2rem; font-family: monospace; font-weight: bold; display: block; border-top: 1px solid #999; margin-top: 4px; }
-
+        
         .val-xl-v198 { font-size: 5rem; font-weight: bold; display: inline-block; line-height: 1; }
         .unit-xl { font-size: 2.5rem; font-weight: bold; margin-left: 5px; }
         .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 6px; padding: 8px; text-align: center; background: #fff; }
-        .gs-container { display: flex; align-items: baseline; justify-content: center; margin-top: -10px; width: 100%; text-align: center; }
         
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 20px; background: #ddd; border-radius: 10px; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 3px solid #fff; }
 
-        .log-item { border-bottom: 1px solid #000; padding: 10px 0; font-family: monospace; font-size: 0.85rem; }
+        /* Log Styling */
+        .log-item { border: 2px solid #000; border-radius: 8px; padding: 10px; margin-bottom: 10px; font-family: monospace; background: #f9f9f9; }
+        .log-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div id="calc-page" class="page">
-    <h2>214ST W&amp;B v2.4</h2>
+    <h2>214ST W&amp;B v2.5</h2>
     <div class="input-block">
         <div class="input-row"><span>Max Gross</span><input type="number" id="max-gross" value="17500" oninput="updateWB()"></div>
         <div class="input-row"><span>A/C Empty</span><input type="number" id="empty-weight" value="10000" oninput="updateWB()"></div>
@@ -67,34 +66,13 @@
 
 <div id="timer-page" class="page">
     <h2>FLIGHT TIMER</h2>
-    <div class="timer-row">
-        <span class="timer-label">Engine 1</span>
-        <button style="background:#0f0; flex:1; height:40px;" id="e1-start" onclick="startT('e1')">START</button>
-        <button style="background:#f00; color:#fff; flex:1; height:40px;" id="e1-stop" onclick="stopT('e1')" disabled>STOP</button>
-        <div class="time-display" id="e1-disp">00:00:00</div>
-    </div>
-    <div class="timer-row">
-        <span class="timer-label">Engine 2</span>
-        <button style="background:#0f0; flex:1; height:40px;" id="e2-start" onclick="startT('e2')">START</button>
-        <button style="background:#f00; color:#fff; flex:1; height:40px;" id="e2-stop" onclick="stopT('e2')" disabled>STOP</button>
-        <div class="time-display" id="e2-disp">00:00:00</div>
-    </div>
-    <div class="timer-row" style="background:#eef;">
-        <span class="timer-label">Flight Timer</span>
-        <button style="background:#0f0; flex:1; height:40px;" id="fl-start" onclick="startT('fl')">START</button>
-        <button style="background:#f00; color:#fff; flex:1; height:40px;" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button>
-        <div class="time-display" id="fl-disp">00:00:00</div>
-    </div>
+    <div class="timer-row"><span class="timer-label">Engine 1</span><button style="background:#0f0; flex:1; height:40px;" id="e1-start" onclick="startT('e1')">START</button><button style="background:#f00; color:#fff; flex:1; height:40px;" id="e1-stop" onclick="stopT('e1')" disabled>STOP</button><div class="time-display" id="e1-disp">00:00:00</div></div>
+    <div class="timer-row"><span class="timer-label">Engine 2</span><button style="background:#0f0; flex:1; height:40px;" id="e2-start" onclick="startT('e2')">START</button><button style="background:#f00; color:#fff; flex:1; height:40px;" id="e2-stop" onclick="stopT('e2')" disabled>STOP</button><div class="time-display" id="e2-disp">00:00:00</div></div>
+    <div class="timer-row" style="background:#eef;"><span class="timer-label">Flight Timer</span><button style="background:#0f0; flex:1; height:40px;" id="fl-start" onclick="startT('fl')">START</button><button style="background:#f00; color:#fff; flex:1; height:40px;" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button><div class="time-display" id="fl-disp">00:00:00</div></div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px;">
-        <div class="stat-box">
-            <small>ENG RUN<br><span id="e-ts">--:-- to --:--</span></small>
-            <span class="total-hms" id="e-hms">00:00:00</span>
-        </div>
-        <div class="stat-box" style="background:#eef;">
-            <small>FLIGHT<br><span id="f-ts">--:-- to --:--</span></small>
-            <span class="total-hms" id="f-hms">00:00:00</span>
-        </div>
+        <div class="bubble-v198" style="background:#f0f0f0;"><small>ENG RUN</small><br><span id="e-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="e-hms" style="display:block; border-top:1px solid #999; margin-top:4px;">00:00:00</span></div>
+        <div class="bubble-v198" style="background:#eef;"><small>FLIGHT</small><br><span id="f-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="f-hms" style="display:block; border-top:1px solid #999; margin-top:4px;">00:00:00</span></div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-top:10px;">
@@ -108,16 +86,8 @@
 <div id="flight-page" class="page" style="flex-direction: column;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
         <button style="background:#d9534f; color:#fff; height:50px; flex:0 0 90px;" onclick="showPage('timer-page')">BACK</button>
-        <div style="text-align:center;">
-            <label style="font-size:0.7rem; font-weight:bold;">BURN</label>
-            <select id="burn-rate-select" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;">
-                <option value="800" selected>800</option><option value="850">850</option><option value="900">900</option>
-            </select>
-        </div>
-        <div style="text-align:center;">
-            <label style="font-size:0.7rem; font-weight:bold;">GS</label>
-            <select id="gs-target-select" onchange="updateGSUI()" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;"></select>
-        </div>
+        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">BURN</label><select id="burn-rate-select" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;"><option value="800" selected>800</option><option value="850">850</option><option value="900">900</option></select></div>
+        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">GS</label><select id="gs-target-select" onchange="updateGSUI()" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;"></select></div>
         <button id="gps-btn" style="background:#f00; color:#fff; height:50px; flex:0 0 90px;" onclick="toggleGPS()">GPS OFF</button>
     </div>
 
@@ -126,27 +96,22 @@
     <div class="bubble-v198">
         <small>FUEL LOAD</small><br>
         <span class="val-xl-v198" id="fly-fuel-lbs">--</span><span class="unit-xl">Lbs</span>
-        <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value)">
+        <div style="height:20px;"></div> <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value)">
     </div>
 
-    <div class="bubble-v198">
-        <small>PAYLOAD</small><br>
-        <span class="val-xl-v198" id="fly-ltr">--</span><span class="unit-xl">L</span>
-    </div>
+    <div class="bubble-v198"><small>PAYLOAD</small><br><span class="val-xl-v198" id="fly-ltr">--</span><span class="unit-xl">L</span></div>
 
     <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
         <svg viewBox="0 0 200 110" style="width:100vw; margin-left:-10px;">
             <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#ffeb3b" stroke-width="18" stroke-linecap="round"/>
             <path d="M 73 24 A 80 80 0 0 1 127 24" fill="none" stroke="#4caf50" stroke-width="18" />
-            
             <text x="100" y="24" font-size="10" font-weight="bold" id="gs-tgt-val" text-anchor="middle">--</text>
-            <text x="18" y="105" font-size="8" font-weight="bold" id="gs-min-val" text-anchor="middle">--</text>
-            <text x="182" y="105" font-size="8" font-weight="bold" id="gs-max-val" text-anchor="middle">--</text>
-            
+            <text x="28" y="105" font-size="8" font-weight="bold" id="gs-min-val" text-anchor="middle">--</text>
+            <text x="172" y="105" font-size="8" font-weight="bold" id="gs-max-val" text-anchor="middle">--</text>
             <line id="needle-ptr" x1="100" y1="100" x2="100" y2="8" stroke="#f00" stroke-width="4" stroke-linecap="round" />
             <circle cx="100" cy="100" r="7" fill="#000" />
         </svg>
-        <div class="gs-container">
+        <div style="display: flex; align-items: baseline; justify-content: center; width: 100%; margin-top: -10px;">
             <span id="fly-gs" style="font-size:5.5rem; font-weight:bold; line-height:1;">0</span>
             <span style="font-size:1.2rem; font-weight:bold; color:#444; margin-left:10px;">KTS</span>
         </div>
@@ -154,9 +119,13 @@
 </div>
 
 <div id="log-page" class="page">
-    <button class="btn-nav" onclick="showPage('timer-page')">BACK</button>
-    <div id="log-body" style="margin-top:15px;"></div>
-    <button class="btn-nav" style="background:#d9534f; margin-top:20px;" onclick="clearLogs()">CLEAR ALL</button>
+    <h2>FLIGHT HISTORY</h2>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <button style="background:#28a745; color:#fff; padding:12px;" onclick="downloadCSV()">DOWNLOAD CSV</button>
+        <button style="background:#000; color:#fff; padding:12px;" onclick="showPage('timer-page')">BACK</button>
+    </div>
+    <div id="log-body"></div>
+    <button class="btn-nav" style="background:#d9534f; margin-top:20px;" onclick="clearLogs()">CLEAR ALL HISTORY</button>
 </div>
 
 <script>
@@ -230,24 +199,44 @@
             payload: document.getElementById('res-lbs').innerText,
             eng: document.getElementById('e-hms').innerText,
             flt: document.getElementById('f-hms').innerText,
-            times: document.getElementById('f-ts').innerText
+            window: document.getElementById('f-ts').innerText
         };
         log.unshift(entry);
         localStorage.setItem('heliLogs', JSON.stringify(log));
-        alert("Flight Saved");
+        alert("Flight Saved to History");
     }
 
     function showLog() {
         let log = JSON.parse(localStorage.getItem('heliLogs') || '[]');
-        let html = log.length ? '' : '<p>No logs found.</p>';
+        let html = log.length ? '' : '<p style="text-align:center;">No flights recorded.</p>';
         log.forEach(e => {
-            html += `<div class="log-item"><b>${e.date}</b> [${e.times}]<br>ENG: ${e.eng} | FLT: ${e.flt}<br>FUEL: ${e.fuel} | PAYLOAD: ${e.payload}</div>`;
+            html += `<div class="log-item">
+                <div style="border-bottom:1px solid #ccc; padding-bottom:3px; margin-bottom:5px;"><b>${e.date}</b> <span style="float:right;">${e.window}</span></div>
+                <div class="log-grid">
+                    <div>ENG: <b>${e.eng}</b></div><div>FLT: <b>${e.flt}</b></div>
+                    <div>FUEL: <b>${e.fuel} lb</b></div><div>PAY: <b>${e.payload} lb</b></div>
+                </div>
+            </div>`;
         });
         document.getElementById('log-body').innerHTML = html;
         showPage('log-page');
     }
 
-    function clearLogs() { if(confirm("Clear all logs?")) { localStorage.removeItem('heliLogs'); showLog(); } }
+    function downloadCSV() {
+        let log = JSON.parse(localStorage.getItem('heliLogs') || '[]');
+        if(!log.length) return alert("No data to download");
+        let csv = "Date,Time Window,Engine Time,Flight Time,Fuel(lbs),Payload(lbs)\n";
+        log.forEach(e => {
+            csv += `"${e.date}","${e.window}","${e.eng}","${e.flt}","${e.fuel}","${e.payload}"\n`;
+        });
+        let blob = new Blob([csv], { type: 'text/csv' });
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `HeliTimer_Log_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+    }
+
+    function clearLogs() { if(confirm("Permanently clear all logs?")) { localStorage.removeItem('heliLogs'); showLog(); } }
 
     function initFlightPage() {
         if (!timers.fl.running) startT('fl');
