@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v3.10</title>
+    <title>HeliTimer v3.20</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow: hidden; }
@@ -16,9 +16,11 @@
         button { font-weight: bold; border-radius: 6px; border: 2px solid #000; text-transform: uppercase; touch-action: manipulation; }
         .btn-nav { background: #000; color: #fff; padding: 14px; width: 100%; font-size: 1.2rem; border-radius: 10px; margin-top: 10px; }
 
-        /* Page 1 */
+        /* Page 1 - Reverted Input Sizes */
         .input-block { border: 2px solid #000; border-radius: 8px; margin-bottom: 8px; overflow: hidden; background: #fff; }
-        .input-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #ddd; }
+        .input-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #ddd; }
+        input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 4px; font-size: 1.1rem; font-weight: bold; padding: 4px; text-align: right; width: 90px; }
+        
         .fuel-section { border: 2px solid #000; border-radius: 8px; padding: 15px; margin-bottom: 8px; background: #fff; }
         .fuel-big-p1 { font-size: 2.8rem; font-weight: bold; text-align: center; line-height: 1; margin-bottom: 20px; }
         .result-section { border: 2px solid #000; border-radius: 8px; overflow: hidden; margin-bottom: 8px; text-align: center; }
@@ -65,25 +67,23 @@
 
 <div id="timer-page" class="page">
     <h2>FLIGHT TIMER</h2>
-    <div id="timer-rows-container">
-        <div class="timer-row">
-            <span style="font-size:0.7rem; font-weight:bold; width:40px;">E1</span>
-            <button style="background:#0f0; flex:1; height:40px;" id="e1-start" onclick="startT('e1')">START</button>
-            <button style="background:#f00; color:#fff; flex:1; height:40px;" id="e1-stop" onclick="stopT('e1')" disabled>STOP</button>
-            <div class="time-display" id="e1-disp">00:00:00</div>
-        </div>
-        <div class="timer-row">
-            <span style="font-size:0.7rem; font-weight:bold; width:40px;">E2</span>
-            <button style="background:#0f0; flex:1; height:40px;" id="e2-start" onclick="startT('e2')">START</button>
-            <button style="background:#f00; color:#fff; flex:1; height:40px;" id="e2-stop" onclick="stopT('e2')" disabled>STOP</button>
-            <div class="time-display" id="e2-disp">00:00:00</div>
-        </div>
-        <div class="timer-row" style="background:#eef;">
-            <span style="font-size:0.7rem; font-weight:bold; width:40px;">FLT</span>
-            <button style="background:#0f0; flex:1; height:40px;" id="fl-start" onclick="startT('fl')">START</button>
-            <button style="background:#f00; color:#fff; flex:1; height:40px;" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button>
-            <div class="time-display" id="fl-disp">00:00:00</div>
-        </div>
+    <div class="timer-row">
+        <span style="font-size:0.7rem; font-weight:bold; width:40px;">E1</span>
+        <button style="background:#0f0; flex:1; height:40px;" id="e1-start" onclick="startT('e1')">START</button>
+        <button style="background:#f00; color:#fff; flex:1; height:40px;" id="e1-stop" onclick="stopT('e1')" disabled>STOP</button>
+        <div class="time-display" id="e1-disp">00:00:00</div>
+    </div>
+    <div class="timer-row">
+        <span style="font-size:0.7rem; font-weight:bold; width:40px;">E2</span>
+        <button style="background:#0f0; flex:1; height:40px;" id="e2-start" onclick="startT('e2')">START</button>
+        <button style="background:#f00; color:#fff; flex:1; height:40px;" id="e2-stop" onclick="stopT('e2')" disabled>STOP</button>
+        <div class="time-display" id="e2-disp">00:00:00</div>
+    </div>
+    <div class="timer-row" style="background:#eef;">
+        <span style="font-size:0.7rem; font-weight:bold; width:40px;">FLT</span>
+        <button style="background:#0f0; flex:1; height:40px;" id="fl-start" onclick="startT('fl')">START</button>
+        <button style="background:#f00; color:#fff; flex:1; height:40px;" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button>
+        <div class="time-display" id="fl-disp">00:00:00</div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px;">
@@ -139,11 +139,11 @@
             <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#ffeb3b" stroke-width="18" stroke-linecap="round"/>
             <path d="M 73 24 A 80 80 0 0 1 127 24" fill="none" stroke="#4caf50" stroke-width="18" />
             
-            <text x="100" y="31" font-size="10" font-weight="bold" id="gs-tgt-val" text-anchor="middle">--</text>
-            <text x="35" y="93" font-size="8" font-weight="bold" id="gs-min-val" text-anchor="middle">--</text>
-            <text x="165" y="93" font-size="8" font-weight="bold" id="gs-max-val" text-anchor="middle">--</text>
+            <text x="100" y="24" font-size="10" font-weight="bold" id="gs-tgt-val" text-anchor="middle">--</text>
+            <text x="32" y="98" font-size="8" font-weight="bold" id="gs-min-val" text-anchor="middle">--</text>
+            <text x="168" y="98" font-size="8" font-weight="bold" id="gs-max-val" text-anchor="middle">--</text>
             
-            <line id="needle-ptr" x1="100" y1="100" x2="100" y2="10" stroke="#f00" stroke-width="4" stroke-linecap="round" />
+            <line id="needle-ptr" x1="100" y1="100" x2="100" y2="8" stroke="#f00" stroke-width="4" stroke-linecap="round" />
             <circle cx="100" cy="100" r="7" fill="#000" />
         </svg>
         <div class="gs-container">
