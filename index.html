@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.5</title>
+    <title>HeliTimer v2.6</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow: hidden; }
@@ -36,7 +36,6 @@
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 20px; background: #ddd; border-radius: 10px; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 3px solid #fff; }
 
-        /* Log Styling */
         .log-item { border: 2px solid #000; border-radius: 8px; padding: 10px; margin-bottom: 10px; font-family: monospace; background: #f9f9f9; }
         .log-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; font-size: 0.8rem; }
     </style>
@@ -44,15 +43,15 @@
 <body>
 
 <div id="calc-page" class="page">
-    <h2>214ST W&amp;B v2.5</h2>
+    <h2>214ST W&amp;B v2.6</h2>
     <div class="input-block">
         <div class="input-row"><span>Max Gross</span><input type="number" id="max-gross" value="17500" oninput="updateWB()"></div>
         <div class="input-row"><span>A/C Empty</span><input type="number" id="empty-weight" value="10000" oninput="updateWB()"></div>
         <div class="input-row"><span>Crew + Gear</span><input type="number" id="crew-gear" value="400" oninput="updateWB()"></div>
     </div>
     <div class="fuel-section">
-        <div class="fuel-big-p1" id="fuel-display">2,000 lbs</div>
-        <input type="range" id="fuel-slider" min="500" max="3000" step="50" value="2000" oninput="updateWB()">
+        <div class="fuel-big-p1" id="fuel-display">2,750 lbs</div>
+        <input type="range" id="fuel-slider" min="500" max="3000" step="50" value="2750" oninput="updateWB()">
     </div>
     <div class="result-section">
         <div style="background:#000; color:#fff; padding:4px; font-size:0.8rem;">USEFUL PAYLOAD</div>
@@ -86,7 +85,7 @@
 <div id="flight-page" class="page" style="flex-direction: column;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
         <button style="background:#d9534f; color:#fff; height:50px; flex:0 0 90px;" onclick="showPage('timer-page')">BACK</button>
-        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">BURN</label><select id="burn-rate-select" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;"><option value="800" selected>800</option><option value="850">850</option><option value="900">900</option></select></div>
+        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">BURN</label><select id="burn-rate-select" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;"><option value="600">600</option><option value="650">650</option><option value="700">700</option><option value="750">750</option><option value="800" selected>800</option><option value="850">850</option><option value="900">900</option></select></div>
         <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">GS</label><select id="gs-target-select" onchange="updateGSUI()" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;"></select></div>
         <button id="gps-btn" style="background:#f00; color:#fff; height:50px; flex:0 0 90px;" onclick="toggleGPS()">GPS OFF</button>
     </div>
@@ -96,7 +95,8 @@
     <div class="bubble-v198">
         <small>FUEL LOAD</small><br>
         <span class="val-xl-v198" id="fly-fuel-lbs">--</span><span class="unit-xl">Lbs</span>
-        <div style="height:20px;"></div> <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value)">
+        <div style="height:20px;"></div>
+        <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value)">
     </div>
 
     <div class="bubble-v198"><small>PAYLOAD</small><br><span class="val-xl-v198" id="fly-ltr">--</span><span class="unit-xl">L</span></div>
@@ -135,7 +135,7 @@
         fl: { elapsed:0, start:null, interval:null, running:false, tsS:null, tsE:null },
         engG: { start:null, end:null }
     };
-    let curFuel = 2000, burnRef = null, flyTick = null, curGS = 0, watchID = null;
+    let curFuel = 2750, burnRef = null, flyTick = null, curGS = 0, watchID = null;
 
     function showPage(id) {
         cancelAnimationFrame(flyTick);
@@ -210,13 +210,7 @@
         let log = JSON.parse(localStorage.getItem('heliLogs') || '[]');
         let html = log.length ? '' : '<p style="text-align:center;">No flights recorded.</p>';
         log.forEach(e => {
-            html += `<div class="log-item">
-                <div style="border-bottom:1px solid #ccc; padding-bottom:3px; margin-bottom:5px;"><b>${e.date}</b> <span style="float:right;">${e.window}</span></div>
-                <div class="log-grid">
-                    <div>ENG: <b>${e.eng}</b></div><div>FLT: <b>${e.flt}</b></div>
-                    <div>FUEL: <b>${e.fuel} lb</b></div><div>PAY: <b>${e.payload} lb</b></div>
-                </div>
-            </div>`;
+            html += `<div class="log-item"><div style="border-bottom:1px solid #ccc; padding-bottom:3px; margin-bottom:5px;"><b>${e.date}</b> <span style="float:right;">${e.window}</span></div><div class="log-grid"><div>ENG: <b>${e.eng}</b></div><div>FLT: <b>${e.flt}</b></div><div>FUEL: <b>${e.fuel} lb</b></div><div>PAY: <b>${e.payload} lb</b></div></div></div>`;
         });
         document.getElementById('log-body').innerHTML = html;
         showPage('log-page');
@@ -226,9 +220,7 @@
         let log = JSON.parse(localStorage.getItem('heliLogs') || '[]');
         if(!log.length) return alert("No data to download");
         let csv = "Date,Time Window,Engine Time,Flight Time,Fuel(lbs),Payload(lbs)\n";
-        log.forEach(e => {
-            csv += `"${e.date}","${e.window}","${e.eng}","${e.flt}","${e.fuel}","${e.payload}"\n`;
-        });
+        log.forEach(e => { csv += `"${e.date}","${e.window}","${e.eng}","${e.flt}","${e.fuel}","${e.payload}"\n`; });
         let blob = new Blob([csv], { type: 'text/csv' });
         let a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
