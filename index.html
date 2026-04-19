@@ -5,14 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Tanking app v3.6</title>
+    <title>Tanking app v3.7</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
-        body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow: hidden; }
+        body { 
+            background: #fff; 
+            color: #000; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            position: fixed; 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+        }
         .page { width: 100%; padding: 10px; display: none; height: 100vh; position: absolute; top: 0; left: 0; background: #fff; z-index: 10; overflow-y: auto; }
         #calc-page { display: block; z-index: 20; }
 
-        h2 { text-align: center; margin: 4px 0 8px 0; font-size: 1.1rem; text-transform: uppercase; }
+        h2 { text-align: center; margin: 4px 0 8px 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
         button { font-weight: bold; border-radius: 6px; border: 2px solid #000; text-transform: uppercase; touch-action: manipulation; }
         .btn-nav { background: #000; color: #fff; padding: 14px; width: 100%; font-size: 1.2rem; border-radius: 10px; margin-top: 10px; }
 
@@ -21,7 +31,7 @@
 
         .input-block { border: 2px solid #000; border-radius: 8px; margin-bottom: 8px; overflow: hidden; background: #fff; }
         .input-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #ddd; }
-        input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 4px; font-size: 1.1rem; font-weight: bold; padding: 4px; text-align: right; width: 100px; }
+        input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 4px; font-size: 1.1rem; font-weight: bold; padding: 4px; text-align: right; width: 100px; font-family: inherit; }
         
         .fuel-section { border: 2px solid #000; border-radius: 8px; padding: 15px; margin-bottom: 8px; background: #fff; }
         .fuel-header-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
@@ -29,14 +39,14 @@
         .fuel-big-p1 { font-size: 2.8rem; font-weight: bold; line-height: 1; }
         
         .timer-row { display: flex; align-items: center; border: 2px solid #000; border-radius: 8px; margin-bottom: 6px; padding: 6px; gap: 4px; }
-        .time-display { flex: 0 0 78px; font-family: monospace; font-size: 1.05rem; font-weight: bold; text-align: right; }
+        .time-display { flex: 0 0 78px; font-family: 'Courier New', Courier, monospace; font-size: 1.05rem; font-weight: bold; text-align: right; }
         .timer-label { font-size: 0.6rem; font-weight: bold; width: 45px; text-transform: uppercase; line-height: 1; }
         .btn-timer { height: 40px; font-size: 0.75rem; }
 
-        .val-xl-v198 { font-size: 5rem; font-weight: bold; display: inline-block; line-height: 1; }
-        .unit-xl { font-size: 2.5rem; font-weight: bold; margin-left: 5px; }
+        .val-xl-v198 { font-size: 3.5rem; font-weight: bold; display: inline-block; line-height: 1; }
+        .unit-xl { font-size: 1.8rem; font-weight: bold; margin-left: 5px; }
         .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 6px; padding: 8px; text-align: center; background: #fff; }
-        .dec-small { display: block; font-size: 1.1rem; color: #333; margin-top: 2px; }
+        .dec-small { display: block; font-size: 1.1rem; color: #333; margin-top: 2px; font-weight: 500; }
         
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 20px; background: #ddd; border-radius: 10px; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 3px solid #fff; }
@@ -51,7 +61,7 @@
 <body>
 
 <div id="calc-page" class="page">
-    <h2>Tanking app v3.6</h2>
+    <h2>Tanking app v3.7</h2>
     
     <div class="preset-row">
         <button class="btn-preset" onclick="applyPreset(16000, 8000, 2500, 1000)">Bell 214B</button>
@@ -71,10 +81,10 @@
         <input type="range" id="fuel-slider" min="500" max="3000" step="50" value="2750" oninput="updateWB()">
     </div>
     <div class="bubble-v198">
-        <div style="background:#000; color:#fff; padding:4px; font-size:0.8rem; margin-bottom:5px;">USEFUL PAYLOAD</div>
+        <div style="background:#000; color:#fff; padding:4px; font-size:0.8rem; margin-bottom:5px; font-weight: bold;">USEFUL PAYLOAD</div>
         <div style="display:grid; grid-template-columns:1fr 1fr;">
-            <div><small>LBS</small><div id="res-lbs" style="font-size:1.8rem; font-weight:bold;">--</div></div>
-            <div style="border-left:1px solid #ddd;"><small>LITERS</small><div id="res-liters" style="font-size:1.8rem; font-weight:bold;">--</div></div>
+            <div><small style="font-weight:bold;">LBS</small><div id="res-lbs" style="font-size:1.8rem; font-weight:bold;">--</div></div>
+            <div style="border-left:1px solid #ddd;"><small style="font-weight:bold;">LITERS</small><div id="res-liters" style="font-size:1.8rem; font-weight:bold;">--</div></div>
         </div>
     </div>
     <button class="btn-nav" style="background:#28a745;" onclick="showPage('timer-page')">GO START</button>
@@ -87,8 +97,8 @@
     <div class="timer-row" style="background:#eef;"><span class="timer-label">FLT</span><button class="btn-timer" style="background:#0f0; flex:2;" id="fl-start" onclick="startT('fl')">START</button><button class="btn-timer" style="background:#f00; color:#fff; flex:2;" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button><button class="btn-timer" style="background:#ccc; flex:1;" onclick="resetRow('fl')">RST</button><div class="time-display" id="fl-disp">00:00:00</div></div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px;">
-        <div class="bubble-v198" style="background:#f0f0f0;"><small>ENG RUN</small><br><span id="e-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="e-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span><span class="dec-small" id="e-dec">0.00 hr</span></div>
-        <div class="bubble-v198" style="background:#eef;"><small>FLIGHT</small><br><span id="f-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="f-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span><span class="dec-small" id="f-dec">0.00 hr</span></div>
+        <div class="bubble-v198" style="background:#f0f0f0;"><small style="font-weight:bold;">ENG RUN</small><br><span id="e-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="e-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span><span class="dec-small" id="e-dec">0.00 hr</span></div>
+        <div class="bubble-v198" style="background:#eef;"><small style="font-weight:bold;">FLIGHT</small><br><span id="f-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="f-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span><span class="dec-small" id="f-dec">0.00 hr</span></div>
     </div>
 
     <div style="display:flex; gap:5px; margin-top:10px;">
@@ -96,28 +106,29 @@
         <button style="background:#007bff; color:#fff; flex:1; height:50px;" onclick="saveLog()">SAVE</button>
         <button style="background:#666; color:#fff; flex:1; height:50px;" onclick="showLog()">LOGS</button>
     </div>
-    <button class="btn-nav" style="background:#008800; height:50px; display:flex; align-items:center; justify-content:center;" onclick="initFlightPage()">GO FLY</button>
-    <button class="btn-nav" style="background:#dc3545; height:50px; margin-top:8px;" onclick="resetAllTimers()">RESET</button>
+    
+    <button class="btn-nav" style="background:#dc3545; height:50px; margin-top:15px;" onclick="resetAllTimers()">RESET</button>
+    <button class="btn-nav" style="background:#008800; height:60px; display:flex; align-items:center; justify-content:center; margin-top:8px;" onclick="initFlightPage()">GO FLY</button>
 </div>
 
 <div id="flight-page" class="page" style="flex-direction: column;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
         <button style="background:#d9534f; color:#fff; height:50px; flex:0 0 100px;" onclick="showPage('timer-page')">BACK</button>
-        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">BURN</label><select id="burn-rate-select" style="font-size:1.1rem; display:block; border:2px solid #000; border-radius:4px;"><option value="600">600</option><option value="650">650</option><option value="700">700</option><option value="750">750</option><option value="800">800</option><option value="850">850</option><option value="900">900</option><option value="950">950</option><option value="1000">1000</option></select></div>
-        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">GS</label><select id="gs-target-select" onchange="updateGSUI()" style="font-size:1.1rem; display:block; border:2px solid #000; border-radius:4px;"></select></div>
+        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">BURN</label><select id="burn-rate-select" style="font-size:1.1rem; display:block; border:2px solid #000; border-radius:4px; font-family:inherit;"><option value="600">600</option><option value="650">650</option><option value="700">700</option><option value="750">750</option><option value="800">800</option><option value="850">850</option><option value="900">900</option><option value="950">950</option><option value="1000">1000</option></select></div>
+        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">GS</label><select id="gs-target-select" onchange="updateGSUI()" style="font-size:1.1rem; display:block; border:2px solid #000; border-radius:4px; font-family:inherit;"></select></div>
         <button id="gps-btn" style="background:#f00; color:#fff; height:50px; flex:0 0 80px;" onclick="toggleGPS()">GPS OFF</button>
     </div>
 
     <div class="bubble-v198" style="padding:4px;"><span id="flight-timer-main" style="font-family:monospace; font-size:2.4rem; font-weight:bold;">00:00:00</span></div>
 
     <div class="bubble-v198">
-        <small>FUEL LOAD</small><br>
+        <small style="font-weight:bold;">FUEL LOAD</small><br>
         <span class="val-xl-v198" id="fly-fuel-lbs">--</span><span class="unit-xl">Lbs</span>
-        <div style="height:20px;"></div>
+        <div style="height:15px;"></div>
         <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value)">
     </div>
 
-    <div class="bubble-v198"><small>PAYLOAD</small><br><span class="val-xl-v198" id="fly-ltr">--</span><span class="unit-xl">L</span></div>
+    <div class="bubble-v198"><small style="font-weight:bold;">PAYLOAD</small><br><span class="val-xl-v198" id="fly-ltr">--</span><span class="unit-xl">L</span></div>
 
     <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
         <svg viewBox="0 0 200 145" style="width:100vw; margin-left:-10px;">
