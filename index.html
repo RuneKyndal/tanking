@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v3.20</title>
+    <title>HeliTimer v2.3</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow: hidden; }
@@ -16,7 +16,6 @@
         button { font-weight: bold; border-radius: 6px; border: 2px solid #000; text-transform: uppercase; touch-action: manipulation; }
         .btn-nav { background: #000; color: #fff; padding: 14px; width: 100%; font-size: 1.2rem; border-radius: 10px; margin-top: 10px; }
 
-        /* Page 1 - Reverted Input Sizes */
         .input-block { border: 2px solid #000; border-radius: 8px; margin-bottom: 8px; overflow: hidden; background: #fff; }
         .input-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #ddd; }
         input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 4px; font-size: 1.1rem; font-weight: bold; padding: 4px; text-align: right; width: 90px; }
@@ -26,13 +25,11 @@
         .result-section { border: 2px solid #000; border-radius: 8px; overflow: hidden; margin-bottom: 8px; text-align: center; }
         .r-val { font-size: 2.2rem; font-weight: bold; }
 
-        /* Page 2 */
         .timer-row { display: flex; align-items: center; border: 2px solid #000; border-radius: 8px; margin-bottom: 6px; padding: 6px; gap: 5px; }
         .time-display { flex: 0 0 85px; font-family: monospace; font-size: 1.1rem; font-weight: bold; text-align: right; }
         .stat-box { background: #f0f0f0; padding: 8px; border: 2px solid #000; border-radius: 8px; text-align: center; margin-bottom: 5px; }
         .total-hms { font-size: 1.2rem; font-family: monospace; font-weight: bold; display: block; border-top: 1px solid #999; margin-top: 4px; }
 
-        /* Page 3 */
         .val-xl-v198 { font-size: 5rem; font-weight: bold; display: inline-block; line-height: 1; }
         .unit-xl { font-size: 2.5rem; font-weight: bold; margin-left: 5px; }
         .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 6px; padding: 8px; text-align: center; background: #fff; }
@@ -45,7 +42,7 @@
 <body>
 
 <div id="calc-page" class="page">
-    <h2>214ST W&amp;B</h2>
+    <h2>214ST W&amp;B v2.3</h2>
     <div class="input-block">
         <div class="input-row"><span>Max Gross</span><input type="number" id="max-gross" value="17500" oninput="updateWB()"></div>
         <div class="input-row"><span>A/C Empty</span><input type="number" id="empty-weight" value="10000" oninput="updateWB()"></div>
@@ -140,8 +137,8 @@
             <path d="M 73 24 A 80 80 0 0 1 127 24" fill="none" stroke="#4caf50" stroke-width="18" />
             
             <text x="100" y="24" font-size="10" font-weight="bold" id="gs-tgt-val" text-anchor="middle">--</text>
-            <text x="32" y="98" font-size="8" font-weight="bold" id="gs-min-val" text-anchor="middle">--</text>
-            <text x="168" y="98" font-size="8" font-weight="bold" id="gs-max-val" text-anchor="middle">--</text>
+            <text x="24" y="105" font-size="8" font-weight="bold" id="gs-min-val" text-anchor="middle">--</text>
+            <text x="176" y="105" font-size="8" font-weight="bold" id="gs-max-val" text-anchor="middle">--</text>
             
             <line id="needle-ptr" x1="100" y1="100" x2="100" y2="8" stroke="#f00" stroke-width="4" stroke-linecap="round" />
             <circle cx="100" cy="100" r="7" fill="#000" />
