@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.80</title>
+    <title>HeliTimer v2.90</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .page { width: 100%; padding: 8px 8px 20px 8px; display: none; }
+        .page { width: 100%; padding: 8px 8px 20px 8px; display: none; height: 100vh; }
         #calc-page { display: block; }
 
         /* --- Global Elements --- */
@@ -43,19 +43,19 @@
         .total-hms { font-size: 1.1rem; font-family: monospace; display: block; border-top: 1px solid #000; margin-top: 4px; padding-top: 4px; font-weight: bold; }
 
         /* --- Page 3 Styles --- */
-        .flight-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 4px; }
+        .flight-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 4px; flex: 0 0 auto; }
         .hdr-box { flex: 0 0 85px; text-align: center; }
         .hdr-label { font-size: 0.8rem; font-weight: bold; display: block; text-transform: uppercase; }
         .hdr-select { width: 100%; padding: 4px; font-weight: bold; font-size: 1.3rem; border: 2px solid #000; border-radius: 4px; text-align: center; }
-        .btn-hdr { flex: 0 0 80px; height: 50px; font-size: 0.65rem; border: 2px solid #000; border-radius: 6px; }
+        .btn-hdr { flex: 0 0 95px; height: 50px; font-size: 0.75rem; border: 2px solid #000; border-radius: 6px; }
         
-        .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 8px; background: #fff; padding: 8px; text-align: center; }
-        .val-lg-v198 { font-size: 3rem; font-weight: bold; display: block; line-height: 1; }
-        .val-xl-v198 { font-size: 5rem; font-weight: bold; display: block; line-height: 1; color: #000; }
+        .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 6px; background: #fff; padding: 6px; text-align: center; flex: 0 0 auto; }
+        .val-lg-v198 { font-size: 2.2rem; font-weight: bold; display: block; line-height: 1; }
+        .val-xl-v198 { font-size: 5rem; font-weight: bold; display: inline-block; line-height: 1; vertical-align: baseline; }
+        .unit-xl { font-size: 2.5rem; font-weight: bold; margin-left: 5px; vertical-align: baseline; }
 
-        /* Analog Gauge */
-        .gauge-area { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin-top: 10px; width: 100%; }
-        .analog-svg { width: 100vw; height: auto; margin-left: -8px; } /* Pull left to counteract page padding */
+        .gauge-area { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%; overflow: hidden; }
+        .analog-svg { width: 100vw; height: auto; margin-left: -8px; margin-top: 10px; }
 
         /* Helpers */
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 16px; background: #ddd; border-radius: 10px; margin: 12px 0; }
@@ -137,7 +137,7 @@
     <button class="btn-nav" style="background:#008800;" onclick="initFlightPage()">GO FLY</button>
 </div>
 
-<div id="flight-page" class="page" style="height: 100vh; display: flex; flex-direction: column;">
+<div id="flight-page" class="page" style="display: none; flex-direction: column;">
     <div class="flight-hdr">
         <button id="gps-btn" class="btn-hdr" style="background:#f00; color:#fff;" onclick="toggleGPS()">GPS OFF</button>
         <div class="hdr-box">
@@ -158,33 +158,33 @@
     </div>
 
     <div class="bubble-v198" style="padding:4px;">
-        <span class="val-lg-v198" id="flight-timer-main" style="font-family:monospace; font-size:2.2rem;">00:00:00</span>
+        <span class="val-lg-v198" id="flight-timer-main" style="font-family:monospace;">00:00:00</span>
     </div>
 
-    <div class="bubble-v198">
-        <span class="r-label">Fuel Load (lbs)</span>
-        <span class="val-lg-v198" id="fly-fuel-lbs" style="font-size:2.5rem;">--</span>
+    <div class="bubble-v198" style="padding:10px 5px;">
+        <span class="r-label">Fuel Load</span>
+        <span class="val-xl-v198" id="fly-fuel-lbs">--</span><span class="unit-xl">Lbs</span>
         <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value)">
     </div>
 
-    <div class="bubble-v198" style="padding:15px 8px;">
-        <span class="r-label">Payload Liters</span>
-        <span class="val-xl-v198" id="fly-ltr">--</span>
+    <div class="bubble-v198" style="padding:10px 5px;">
+        <span class="r-label">Payload</span>
+        <span class="val-xl-v198" id="fly-ltr">--</span><span class="unit-xl">L</span>
     </div>
 
     <div class="gauge-area">
-        <svg class="analog-svg" viewBox="0 0 200 110">
+        <svg class="analog-svg" viewBox="0 0 200 115">
             <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#ffeb3b" stroke-width="14" stroke-linecap="round"/>
             <path d="M 73 24 A 80 80 0 0 1 127 24" fill="none" stroke="#4caf50" stroke-width="14" />
             
-            <text x="15" y="115" font-size="9" font-weight="bold" id="gs-min-val">--</text>
-            <text x="92" y="15" font-size="9" font-weight="bold" id="gs-tgt-val">--</text>
-            <text x="175" y="115" font-size="9" font-weight="bold" id="gs-max-val">--</text>
+            <text x="35" y="95" font-size="9" font-weight="bold" id="gs-min-val">--</text>
+            <text x="92" y="15" font-size="10" font-weight="bold" id="gs-tgt-val">--</text>
+            <text x="145" y="95" font-size="9" font-weight="bold" id="gs-max-val">--</text>
             
-            <line id="needle-ptr" x1="100" y1="100" x2="100" y2="22" stroke="#f00" stroke-width="4" stroke-linecap="round" transform="rotate(0, 100, 100)" />
+            <line id="needle-ptr" x1="100" y1="100" x2="100" y2="15" stroke="#f00" stroke-width="4" stroke-linecap="round" transform="rotate(0, 100, 100)" />
             <circle cx="100" cy="100" r="7" fill="#000" />
         </svg>
-        <div style="text-align:center; margin-top:-20px;">
+        <div style="text-align:center; margin-top:-18px;">
             <span id="fly-gs" style="font-size:5.5rem; font-weight:bold; display:block; line-height:1;">0</span>
             <span style="font-size:1.3rem; font-weight:bold; color:#444;">KTS GS</span>
         </div>
@@ -232,9 +232,13 @@
     }
 
     function showPage(id) {
+        // Reset scroll position and clear old tick
+        cancelAnimationFrame(flyTick);
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-        document.getElementById(id).style.display = (id === 'flight-page') ? 'flex' : 'block';
-        if(id !== 'flight-page') cancelAnimationFrame(flyTick);
+        
+        const target = document.getElementById(id);
+        target.style.display = (id === 'flight-page') ? 'flex' : 'block';
+        window.scrollTo(0, 0);
     }
 
     function updateWB() {
