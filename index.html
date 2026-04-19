@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v3.5</title>
+    <title>Tanking app v3.6</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow: hidden; }
@@ -51,11 +51,11 @@
 <body>
 
 <div id="calc-page" class="page">
-    <h2>HELI LOAD v3.5</h2>
+    <h2>Tanking app v3.6</h2>
     
     <div class="preset-row">
-        <button class="btn-preset" onclick="applyPreset(16000, 8000, 2500)">Bell 214B</button>
-        <button class="btn-preset" onclick="applyPreset(17500, 10000, 2750)">Bell 214ST</button>
+        <button class="btn-preset" onclick="applyPreset(16000, 8000, 2500, 1000)">Bell 214B</button>
+        <button class="btn-preset" onclick="applyPreset(17500, 10000, 2750, 800)">Bell 214ST</button>
     </div>
 
     <div class="input-block">
@@ -103,7 +103,7 @@
 <div id="flight-page" class="page" style="flex-direction: column;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
         <button style="background:#d9534f; color:#fff; height:50px; flex:0 0 100px;" onclick="showPage('timer-page')">BACK</button>
-        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">BURN</label><select id="burn-rate-select" style="font-size:1.1rem; display:block; border:2px solid #000; border-radius:4px;"><option value="600">600</option><option value="650">650</option><option value="700">700</option><option value="750">750</option><option value="800" selected>800</option><option value="850">850</option><option value="900">900</option><option value="950">950</option><option value="1000">1000</option></select></div>
+        <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">BURN</label><select id="burn-rate-select" style="font-size:1.1rem; display:block; border:2px solid #000; border-radius:4px;"><option value="600">600</option><option value="650">650</option><option value="700">700</option><option value="750">750</option><option value="800">800</option><option value="850">850</option><option value="900">900</option><option value="950">950</option><option value="1000">1000</option></select></div>
         <div style="text-align:center;"><label style="font-size:0.7rem; font-weight:bold;">GS</label><select id="gs-target-select" onchange="updateGSUI()" style="font-size:1.1rem; display:block; border:2px solid #000; border-radius:4px;"></select></div>
         <button id="gps-btn" style="background:#f00; color:#fff; height:50px; flex:0 0 80px;" onclick="toggleGPS()">GPS OFF</button>
     </div>
@@ -179,10 +179,11 @@
         document.getElementById(id).style.display = (id === 'flight-page') ? 'flex' : 'block';
     }
 
-    function applyPreset(mg, em, fuel) {
+    function applyPreset(mg, em, fuel, burn) {
         document.getElementById('max-gross').value = mg;
         document.getElementById('empty-weight').value = em;
         document.getElementById('fuel-slider').value = fuel;
+        document.getElementById('burn-rate-select').value = burn;
         updateWB();
     }
 
@@ -260,15 +261,15 @@
             fhms: formatShort(timers.fl.elapsed),
             fh: (timers.fl.elapsed/3600000).toFixed(2)
         };
-        let log = JSON.parse(localStorage.getItem('hLogV34') || '[]');
+        let log = JSON.parse(localStorage.getItem('hLogV36') || '[]');
         log.push(entry);
-        localStorage.setItem('hLogV34', JSON.stringify(log));
+        localStorage.setItem('hLogV36', JSON.stringify(log));
         alert("Flight Saved");
     }
 
     function showLog() {
         showPage('log-page');
-        let log = JSON.parse(localStorage.getItem('hLogV34') || '[]').reverse();
+        let log = JSON.parse(localStorage.getItem('hLogV36') || '[]').reverse();
         let tbody = document.getElementById('log-body');
         tbody.innerHTML = '';
         if (!log.length) { tbody.innerHTML = '<tr><td colspan="7">No logs.</td></tr>'; return; }
@@ -291,7 +292,7 @@
         document.getElementById('confirm-text').innerText = "Delete ALL logs? Cannot be undone.";
         document.getElementById('confirm-overlay').style.display = 'flex';
         document.getElementById('confirm-yes').onclick = () => {
-            localStorage.removeItem('hLogV34');
+            localStorage.removeItem('hLogV36');
             showLog();
             document.getElementById('confirm-overlay').style.display = 'none';
         };
@@ -299,7 +300,7 @@
     }
 
     function exportData(type) {
-        let log = JSON.parse(localStorage.getItem('hLogV34') || '[]');
+        let log = JSON.parse(localStorage.getItem('hLogV36') || '[]');
         if (!log.length) return;
         let content, ext, mime;
         if (type === 'csv') {
