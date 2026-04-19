@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.40</title>
+    <title>HeliTimer v2.45</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -32,8 +32,9 @@
 
         /* --- Page 2 Styles --- */
         .timer-row { display: flex; align-items: center; width: 100%; border: 2px solid #000; border-radius: 10px; margin-bottom: 8px; padding: 8px; gap: 6px; }
+        .timer-name { font-size: 0.8rem; font-weight: bold; flex: 0 0 55px; text-transform: uppercase; }
         .controls { flex: 1; display: flex; gap: 4px; }
-        .time-display { flex: 0 0 90px; font-family: monospace; font-size: 1.2rem; font-weight: bold; text-align: right; }
+        .time-display { flex: 0 0 85px; font-family: monospace; font-size: 1.1rem; font-weight: bold; text-align: right; }
         .btn-start { background: #0f0; flex: 2; height: 44px; }
         .btn-stop { background: #f00; color: #fff; flex: 2; height: 44px; }
         .btn-rst { background: #ccc; flex: 1; height: 44px; }
@@ -43,8 +44,6 @@
         /* --- Page 3 Styles --- */
         .bubble-v198 { border: 2px solid #000; border-radius: 12px; margin-bottom: 12px; background: #fff; padding: 15px; text-align: center; }
         .val-lg-v198 { font-size: 3.2rem; font-weight: bold; display: block; line-height: 1; }
-        
-        /* GPS Gauge Layout */
         .gauge-labels { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem; margin-bottom: 2px; padding: 0 5px; }
         .gauge-container { position: relative; width: 100%; height: 35px; background: #eee; border: 2px solid #000; border-radius: 4px; margin: 10px 0 20px 0; }
         .zone-y { position: absolute; height: 100%; width: 100%; background: #ffeb3b; }
@@ -54,7 +53,7 @@
         /* Helpers */
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 18px; background: #ddd; border-radius: 10px; margin: 15px 0; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 3px solid #fff; }
-        .log-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
+        .log-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; background: #fff; }
         .log-table th, .log-table td { border: 1px solid #000; padding: 4px; text-align: center; }
     </style>
 </head>
@@ -85,6 +84,7 @@
 <div id="timer-page" class="page">
     <h2>FLIGHT TIMER</h2>
     <div class="timer-row">
+        <div class="timer-name">Eng 1</div>
         <div class="controls">
             <button class="btn-start" id="e1-start" onclick="startT('e1')">START</button>
             <button class="btn-stop" id="e1-stop" onclick="stopT('e1')" disabled>STOP</button>
@@ -93,6 +93,7 @@
         <div class="time-display" id="e1-disp">00:00:00</div>
     </div>
     <div class="timer-row">
+        <div class="timer-name">Eng 2</div>
         <div class="controls">
             <button class="btn-start" id="e2-start" onclick="startT('e2')">START</button>
             <button class="btn-stop" id="e2-stop" onclick="stopT('e2')" disabled>STOP</button>
@@ -101,6 +102,7 @@
         <div class="time-display" id="e2-disp">00:00:00</div>
     </div>
     <div class="timer-row" style="background:#eef;">
+        <div class="timer-name">Flight</div>
         <div class="controls">
             <button class="btn-start" id="fl-start" onclick="startT('fl')">START</button>
             <button class="btn-stop" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button>
@@ -108,7 +110,7 @@
         </div>
         <div class="time-display" id="fl-disp">00:00:00</div>
     </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
         <div class="stat-box">
             <span style="font-size:0.6rem;">ENG RUN<br><span id="e-ts">--:-- to --:--</span></span>
             <span class="total-hms" id="e-hms">00:00:00</span>
@@ -118,11 +120,12 @@
             <span class="total-hms" id="f-hms">00:00:00</span>
         </div>
     </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:10px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:10px;">
         <button class="btn-rst" style="background:#444; color:#fff;" onclick="showPage('calc-page')">BACK</button>
         <button class="btn-rst" style="background:#007bff; color:#fff;" onclick="saveLog()">SAVE</button>
         <button class="btn-rst" style="background:#666; color:#fff;" onclick="showLog()">LOGS</button>
     </div>
+    <button class="btn-nav" style="background:#d9534f; margin-bottom:5px;" onclick="resetAll()">RESET ALL TIMERS</button>
     <button class="btn-nav" style="background:#008800;" onclick="initFlightPage()">GO FLY</button>
 </div>
 
@@ -179,10 +182,14 @@
 
 <div id="log-page" class="page">
     <button class="btn-nav" onclick="hideLog()">BACK</button>
-    <table class="log-table" style="margin-top:10px;">
+    <table class="log-table" style="margin:10px 0;">
         <thead><tr><th>Date</th><th>Eng Block</th><th>H:M</th><th>Flt Block</th><th>H:M</th></tr></thead>
         <tbody id="log-body"></tbody>
     </table>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+        <button class="btn-rst" style="background:#28a745; color:#fff;" onclick="exportCSV()">SAVE CSV</button>
+        <button class="btn-rst" style="background:#17a2b8; color:#fff;" onclick="exportTXT()">SAVE TXT</button>
+    </div>
     <button class="btn-nav" style="background:#dc3545;" onclick="clearLogs()">CLEAR ALL</button>
 </div>
 
@@ -212,6 +219,7 @@
     }
 
     function startT(id) {
+        if (timers[id].running) return;
         timers[id].running = true; timers[id].start = Date.now() - timers[id].elapsed;
         if (id === 'fl' && !timers.fl.tsS) timers.fl.tsS = new Date().toTimeString().slice(0,5);
         if ((id === 'e1' || id === 'e2') && !timers.engG.start) timers.engG.start = Date.now();
@@ -241,6 +249,12 @@
         updateStats();
     }
 
+    function resetAll() {
+        if (confirm("Reset all engine and flight timers?")) {
+            resetRow('e1'); resetRow('e2'); resetRow('fl');
+        }
+    }
+
     function fmtHms(ms) {
         var s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
         return [h,m,sec].map(v => v.toString().padStart(2,'0')).join(':');
@@ -255,6 +269,7 @@
     }
 
     function initFlightPage() {
+        if (!timers.fl.running) startT('fl');
         showPage('flight-page');
         document.getElementById('fly-fuel-slider').value = curFuel;
         burnRef = Date.now();
@@ -280,11 +295,8 @@
         document.getElementById('gs-lbl-min').innerText = tgt - 10;
         document.getElementById('gs-lbl-tgt').innerText = tgt;
         document.getElementById('gs-lbl-max').innerText = tgt + 10;
-        
         document.getElementById('fly-gs').innerText = Math.round(curGS);
-        var diff = curGS - tgt;
-        // Map +/- 10kts to 0-100% width
-        var pos = 50 + (diff * 5); 
+        var pos = 50 + ((curGS - tgt) * 5); 
         document.getElementById('gs-needle').style.left = Math.max(0, Math.min(100, pos)) + "%";
     }
 
@@ -310,6 +322,24 @@
         alert("Flight Saved");
     }
 
+    function exportCSV() {
+        var log = JSON.parse(localStorage.getItem('hLog') || '[]');
+        var csv = "Date,Eng Block,Eng Hrs,Flt Block,Flt Hrs\n" + log.map(e => `${e.date},${e.eb},${e.eh},${e.fb},${e.fh}`).join("\n");
+        downloadFile(csv, "HeliLog.csv", "text/csv");
+    }
+
+    function exportTXT() {
+        var log = JSON.parse(localStorage.getItem('hLog') || '[]');
+        var txt = log.map(e => `DATE: ${e.date} | ENG: ${e.eb} (${e.eh}) | FLT: ${e.fb} (${e.fh})`).join("\n");
+        downloadFile(txt, "HeliLog.txt", "text/plain");
+    }
+
+    function downloadFile(content, name, type) {
+        var blob = new Blob([content], { type: type });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    }
+
     function showLog() {
         showPage('log-page');
         var log = JSON.parse(localStorage.getItem('hLog') || '[]');
@@ -321,8 +351,7 @@
 
     const gsS = document.getElementById('gs-target-select');
     for(let i=0; i<=30; i++) { 
-        let o = document.createElement('option'); 
-        o.value = i; o.innerText = i; 
+        let o = document.createElement('option'); o.value = i; o.innerText = i; 
         if(i===20) o.selected=true; 
         gsS.appendChild(o); 
     }
