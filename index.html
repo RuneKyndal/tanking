@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.60</title>
+    <title>HeliTimer v2.65</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -137,6 +137,7 @@
 
 <div id="flight-page" class="page">
     <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:8px; gap:4px;">
+        <button id="gps-btn" class="btn-start" style="flex: 0 0 70px; height:50px; font-size:0.7rem; background:#f00; color:#fff;" onclick="toggleGPS()">GPS OFF</button>
         <div class="hdr-box">
             <label class="hdr-label">Burn</label>
             <select id="burn-rate-select" class="hdr-select">
@@ -147,11 +148,10 @@
             </select>
         </div>
         <div class="hdr-box">
-            <label class="hdr-label">Target</label>
+            <label class="hdr-label">GS</label>
             <select id="gs-target-select" onchange="updateGSUI()" class="hdr-select">
                 </select>
         </div>
-        <button id="gps-btn" class="btn-start" style="flex:1; height:50px; font-size:0.7rem;" onclick="toggleGPS()">GPS OFF</button>
     </div>
 
     <div class="bubble-v198" style="background:#fff; color:#000; padding:6px;">
@@ -211,6 +211,24 @@
     };
     var curFuel = 2000, burnRef = null, flyTick = null, curGS = 0, watchID = null;
 
+    function saveWBData() {
+        localStorage.setItem('wb_max', document.getElementById('max-gross').value);
+        localStorage.setItem('wb_empty', document.getElementById('empty-weight').value);
+        localStorage.setItem('wb_crew', document.getElementById('crew-gear').value);
+        localStorage.setItem('wb_fuel', document.getElementById('fuel-slider').value);
+    }
+
+    function loadWBData() {
+        if(localStorage.getItem('wb_max')) document.getElementById('max-gross').value = localStorage.getItem('wb_max');
+        if(localStorage.getItem('wb_empty')) document.getElementById('empty-weight').value = localStorage.getItem('wb_empty');
+        if(localStorage.getItem('wb_crew')) document.getElementById('crew-gear').value = localStorage.getItem('wb_crew');
+        if(localStorage.getItem('wb_fuel')) {
+            document.getElementById('fuel-slider').value = localStorage.getItem('wb_fuel');
+            curFuel = parseFloat(localStorage.getItem('wb_fuel'));
+        }
+        updateWB();
+    }
+
     function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
         document.getElementById(id).style.display = 'block';
@@ -228,6 +246,7 @@
         document.getElementById('fuel-display').innerText = 'Fuel ' + curFuel.toLocaleString() + ' lbs';
         document.getElementById('res-lbs').innerText = p < 0 ? "OVER" : p.toLocaleString();
         document.getElementById('res-liters').innerText = p < 0 ? "--" : Math.round(p * 0.4536).toLocaleString();
+        saveWBData();
     }
 
     function startT(id) {
@@ -369,7 +388,8 @@
         if(i===18) o.selected=true; 
         gsS.appendChild(o); 
     }
-    updateWB();
+    
+    loadWBData();
 </script>
 </body>
 </html>
