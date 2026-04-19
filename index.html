@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.55</title>
+    <title>HeliTimer v2.60</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -43,6 +43,10 @@
         .total-hms { font-size: 1.1rem; font-family: monospace; display: block; border-top: 1px solid #000; margin-top: 4px; padding-top: 4px; font-weight: bold; }
 
         /* --- Page 3 Styles --- */
+        .hdr-box { flex: 0 0 85px; text-align: center; }
+        .hdr-label { font-size: 0.8rem; font-weight: bold; display: block; text-transform: uppercase; }
+        .hdr-select { width: 100%; padding: 4px; font-weight: bold; font-size: 1.3rem; border: 2px solid #000; border-radius: 4px; text-align: center; }
+        
         .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 8px; background: #fff; padding: 8px; text-align: center; }
         .val-lg-v198 { font-size: 3.2rem; font-weight: bold; display: block; line-height: 1; }
         .gauge-labels { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem; margin-bottom: 2px; padding: 0 5px; }
@@ -132,37 +136,37 @@
 </div>
 
 <div id="flight-page" class="page">
-    <div style="display:flex; justify-content:space-between; margin-bottom:8px; gap:4px;">
-        <div style="flex:1; text-align:center;">
-            <label style="font-size:0.55rem; font-weight:bold; display:block;">Fuel Burn</label>
-            <select id="burn-rate-select" style="width:100%; padding:6px; font-weight:bold;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:8px; gap:4px;">
+        <div class="hdr-box">
+            <label class="hdr-label">Burn</label>
+            <select id="burn-rate-select" class="hdr-select">
                 <option value="600">600</option><option value="650">650</option>
                 <option value="700">700</option><option value="750">750</option>
                 <option value="800" selected>800</option><option value="850">850</option>
                 <option value="900">900</option>
             </select>
         </div>
-        <div style="flex:1; text-align:center;">
-            <label style="font-size:0.55rem; font-weight:bold; display:block;">Target GS</label>
-            <select id="gs-target-select" onchange="updateGSUI()" style="width:100%; padding:6px; font-weight:bold;">
+        <div class="hdr-box">
+            <label class="hdr-label">Target</label>
+            <select id="gs-target-select" onchange="updateGSUI()" class="hdr-select">
                 </select>
         </div>
-        <button id="gps-btn" class="btn-start" style="flex:0 0 65px; font-size:0.55rem;" onclick="toggleGPS()">GPS OFF</button>
+        <button id="gps-btn" class="btn-start" style="flex:1; height:50px; font-size:0.7rem;" onclick="toggleGPS()">GPS OFF</button>
     </div>
 
     <div class="bubble-v198" style="background:#fff; color:#000; padding:6px;">
-        <span class="val-lg-v198" id="flight-timer-main" style="font-family:monospace; font-size:2.8rem;">00:00:00</span>
+        <span class="val-lg-v198" id="flight-timer-main" style="font-family:monospace; font-size:3rem;">00:00:00</span>
     </div>
 
     <div class="bubble-v198">
         <span class="r-label">Fuel Load (lbs)</span>
-        <span class="val-lg-v198" id="fly-fuel-lbs" style="font-size:2.8rem;">--</span>
+        <span class="val-lg-v198" id="fly-fuel-lbs" style="font-size:3rem;">--</span>
         <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value)">
     </div>
 
     <div class="bubble-v198">
         <span class="r-label">Payload Liters</span>
-        <span class="val-lg-v198" id="fly-ltr" style="font-size:2.8rem;">--</span>
+        <span class="val-lg-v198" id="fly-ltr" style="font-size:3rem;">--</span>
     </div>
 
     <div class="bubble-v198" style="padding-top:20px;">
@@ -177,8 +181,8 @@
             <div id="gs-needle" class="needle" style="left:50%;"></div>
         </div>
         <div style="display:flex; flex-direction:column; align-items:center; margin-top:30px;">
-            <span class="val-lg-v198" id="fly-gs" style="font-size:4.2rem;">0</span>
-            <span class="r-label" style="font-size:0.9rem; color:#000;">Kts.</span>
+            <span class="val-lg-v198" id="fly-gs" style="font-size:4.8rem;">0</span>
+            <span class="r-label" style="font-size:1.1rem; color:#000;">Kts.</span>
         </div>
     </div>
 
@@ -218,9 +222,7 @@
         var empty = parseFloat(document.getElementById('empty-weight').value) || 0;
         var crew = parseFloat(document.getElementById('crew-gear').value) || 0;
         var basic = empty + crew;
-        
         document.getElementById('basic-ac-display').innerText = basic.toLocaleString() + ' lbs';
-        
         curFuel = parseFloat(document.getElementById('fuel-slider').value);
         var p = mg - (basic + curFuel);
         document.getElementById('fuel-display').innerText = 'Fuel ' + curFuel.toLocaleString() + ' lbs';
@@ -322,10 +324,7 @@
             watchID = navigator.geolocation.watchPosition(p => {
                 curGS = (p.coords.speed || 0) * 1.94384;
                 btn.innerText = "GPS LIVE"; btn.style.background = "#0f0";
-            }, null, { 
-                enableHighAccuracy: true,
-                maximumAge: 0
-            });
+            }, null, { enableHighAccuracy: true, maximumAge: 0 });
         }
     }
 
