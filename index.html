@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.6</title>
+    <title>HeliTimer v2.7</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow: hidden; }
@@ -22,9 +22,7 @@
         
         .fuel-section { border: 2px solid #000; border-radius: 8px; padding: 15px; margin-bottom: 8px; background: #fff; }
         .fuel-big-p1 { font-size: 2.8rem; font-weight: bold; text-align: center; line-height: 1; margin-bottom: 20px; }
-        .result-section { border: 2px solid #000; border-radius: 8px; overflow: hidden; margin-bottom: 8px; text-align: center; }
-        .r-val { font-size: 2.2rem; font-weight: bold; }
-
+        
         .timer-row { display: flex; align-items: center; border: 2px solid #000; border-radius: 8px; margin-bottom: 6px; padding: 6px; gap: 5px; }
         .time-display { flex: 0 0 85px; font-family: monospace; font-size: 1.1rem; font-weight: bold; text-align: right; }
         .timer-label { font-size: 0.6rem; font-weight: bold; width: 55px; text-transform: uppercase; line-height: 1; }
@@ -36,14 +34,21 @@
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 20px; background: #ddd; border-radius: 10px; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 3px solid #fff; }
 
-        .log-item { border: 2px solid #000; border-radius: 8px; padding: 10px; margin-bottom: 10px; font-family: monospace; background: #f9f9f9; }
-        .log-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; font-size: 0.8rem; }
+        /* Log Table Styling */
+        .log-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; margin-top: 10px; }
+        .log-table th, .log-table td { border: 1px solid #000; padding: 4px 2px; text-align: center; }
+        .row-total { background: #e0e0e0; font-weight: bold; }
+        .btn-export { padding: 12px 0; font-size: 0.8rem; border-radius: 8px; border: 2px solid #000; width: 100%; font-weight: bold; }
+
+        /* Confirm Overlay */
+        #confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9998; justify-content: center; align-items: center; }
+        #confirm-box { background: #fff; border: 2px solid #000; border-radius: 12px; padding: 24px; text-align: center; width: 280px; }
     </style>
 </head>
 <body>
 
 <div id="calc-page" class="page">
-    <h2>214ST W&amp;B v2.6</h2>
+    <h2>214ST W&amp;B v2.7</h2>
     <div class="input-block">
         <div class="input-row"><span>Max Gross</span><input type="number" id="max-gross" value="17500" oninput="updateWB()"></div>
         <div class="input-row"><span>A/C Empty</span><input type="number" id="empty-weight" value="10000" oninput="updateWB()"></div>
@@ -53,11 +58,11 @@
         <div class="fuel-big-p1" id="fuel-display">2,750 lbs</div>
         <input type="range" id="fuel-slider" min="500" max="3000" step="50" value="2750" oninput="updateWB()">
     </div>
-    <div class="result-section">
-        <div style="background:#000; color:#fff; padding:4px; font-size:0.8rem;">USEFUL PAYLOAD</div>
+    <div class="bubble-v198">
+        <div style="background:#000; color:#fff; padding:4px; font-size:0.8rem; margin-bottom:5px;">USEFUL PAYLOAD</div>
         <div style="display:grid; grid-template-columns:1fr 1fr;">
-            <div><small>LBS</small><div class="r-val" id="res-lbs">--</div></div>
-            <div style="border-left:1px solid #ddd;"><small>LITERS</small><div class="r-val" id="res-liters">--</div></div>
+            <div><small>LBS</small><div id="res-lbs" style="font-size:1.8rem; font-weight:bold;">--</div></div>
+            <div style="border-left:1px solid #ddd;"><small>LITERS</small><div id="res-liters" style="font-size:1.8rem; font-weight:bold;">--</div></div>
         </div>
     </div>
     <button class="btn-nav" style="background:#28a745;" onclick="showPage('timer-page')">GO START</button>
@@ -67,11 +72,11 @@
     <h2>FLIGHT TIMER</h2>
     <div class="timer-row"><span class="timer-label">Engine 1</span><button style="background:#0f0; flex:1; height:40px;" id="e1-start" onclick="startT('e1')">START</button><button style="background:#f00; color:#fff; flex:1; height:40px;" id="e1-stop" onclick="stopT('e1')" disabled>STOP</button><div class="time-display" id="e1-disp">00:00:00</div></div>
     <div class="timer-row"><span class="timer-label">Engine 2</span><button style="background:#0f0; flex:1; height:40px;" id="e2-start" onclick="startT('e2')">START</button><button style="background:#f00; color:#fff; flex:1; height:40px;" id="e2-stop" onclick="stopT('e2')" disabled>STOP</button><div class="time-display" id="e2-disp">00:00:00</div></div>
-    <div class="timer-row" style="background:#eef;"><span class="timer-label">Flight Timer</span><button style="background:#0f0; flex:1; height:40px;" id="fl-start" onclick="startT('fl')">START</button><button style="background:#f00; color:#fff; flex:1; height:40px;" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button><div class="time-display" id="fl-disp">00:00:00</div></div>
+    <div class="timer-row" style="background:#eef;"><span class="timer-label">Flight</span><button style="background:#0f0; flex:1; height:40px;" id="fl-start" onclick="startT('fl')">START</button><button style="background:#f00; color:#fff; flex:1; height:40px;" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button><div class="time-display" id="fl-disp">00:00:00</div></div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px;">
-        <div class="bubble-v198" style="background:#f0f0f0;"><small>ENG RUN</small><br><span id="e-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="e-hms" style="display:block; border-top:1px solid #999; margin-top:4px;">00:00:00</span></div>
-        <div class="bubble-v198" style="background:#eef;"><small>FLIGHT</small><br><span id="f-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="f-hms" style="display:block; border-top:1px solid #999; margin-top:4px;">00:00:00</span></div>
+        <div class="bubble-v198" style="background:#f0f0f0;"><small>ENG RUN</small><br><span id="e-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="e-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span></div>
+        <div class="bubble-v198" style="background:#eef;"><small>FLIGHT</small><br><span id="f-ts" style="font-size:0.7rem;">--:-- to --:--</span><span class="total-hms" id="f-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span></div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-top:10px;">
@@ -119,13 +124,28 @@
 </div>
 
 <div id="log-page" class="page">
-    <h2>FLIGHT HISTORY</h2>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-        <button style="background:#28a745; color:#fff; padding:12px;" onclick="downloadCSV()">DOWNLOAD CSV</button>
-        <button style="background:#000; color:#fff; padding:12px;" onclick="showPage('timer-page')">BACK</button>
+    <button onclick="showPage('timer-page')" style="background:#28a745; color:#fff; width:100%; padding:16px; margin-bottom:12px;">BACK</button>
+    <table class="log-table">
+        <thead>
+            <tr><th>Date</th><th>Eng Block</th><th>HH:MM</th><th>Eng</th><th>Flt Block</th><th>HH:MM</th><th>Flt</th></tr>
+        </thead>
+        <tbody id="log-body"></tbody>
+    </table>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px;">
+        <button class="btn-export" style="background:#217346; color:#fff;" onclick="exportData('csv')">SAVE .CSV</button>
+        <button class="btn-export" style="background:#444; color:#fff;" onclick="exportData('txt')">SAVE .TXT</button>
     </div>
-    <div id="log-body"></div>
-    <button class="btn-nav" style="background:#d9534f; margin-top:20px;" onclick="clearLogs()">CLEAR ALL HISTORY</button>
+    <button class="btn-nav" style="background:#dc3545; margin-top:25px;" onclick="confirmClear()">DELETE ALL</button>
+</div>
+
+<div id="confirm-overlay">
+    <div id="confirm-box">
+        <p>Delete ALL logs? Cannot be undone.</p>
+        <div style="display:flex; gap:10px;">
+            <button onclick="clearLogs(true)" style="background:#dc3545; color:#fff; flex:1; padding:10px;">DELETE</button>
+            <button onclick="clearLogs(false)" style="background:#ccc; flex:1; padding:10px;">CANCEL</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -137,6 +157,10 @@
     };
     let curFuel = 2750, burnRef = null, flyTick = null, curGS = 0, watchID = null;
 
+    function getTimeStr(d) { return (d ? new Date(d) : new Date()).toTimeString().slice(0, 5); }
+    function format(ms) { let s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60; return [h,m,sec].map(v => v.toString().padStart(2,'0')).join(':'); }
+    function formatShort(ms) { let s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60); return [h,m].map(v => v.toString().padStart(2,'0')).join(':'); }
+
     function showPage(id) {
         cancelAnimationFrame(flyTick);
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
@@ -144,12 +168,9 @@
     }
 
     function updateWB() {
-        let mg = parseFloat(document.getElementById('max-gross').value) || 0;
-        let empty = parseFloat(document.getElementById('empty-weight').value) || 0;
-        let crew = parseFloat(document.getElementById('crew-gear').value) || 0;
+        let mg = 17500, empty = 10000, crew = 400;
         curFuel = parseFloat(document.getElementById('fuel-slider').value);
-        let basic = empty + crew;
-        let p = mg - (basic + curFuel);
+        let p = mg - (empty + crew + curFuel);
         document.getElementById('fuel-display').innerText = curFuel.toLocaleString() + ' lbs';
         document.getElementById('res-lbs').innerText = p < 0 ? "OVER" : p.toLocaleString();
         document.getElementById('res-liters').innerText = p < 0 ? "0" : Math.round(p * 0.4536).toLocaleString();
@@ -158,11 +179,11 @@
     function startT(id) {
         if (timers[id].running) return;
         timers[id].running = true; timers[id].start = Date.now() - timers[id].elapsed;
-        if (id === 'fl' && !timers.fl.tsS) timers.fl.tsS = new Date().toTimeString().slice(0,5);
+        if (id === 'fl' && !timers.fl.tsS) timers.fl.tsS = getTimeStr();
         if ((id === 'e1' || id === 'e2') && !timers.engG.start) timers.engG.start = Date.now();
         timers[id].interval = setInterval(() => {
             timers[id].elapsed = Date.now() - timers[id].start;
-            document.getElementById(id + '-disp').innerText = fmtHms(timers[id].elapsed);
+            document.getElementById(id + '-disp').innerText = format(timers[id].elapsed);
             updateStats();
         }, 1000);
         document.getElementById(id + '-start').disabled = true;
@@ -171,7 +192,7 @@
 
     function stopT(id) {
         timers[id].running = false; clearInterval(timers[id].interval);
-        if (id === 'fl') timers.fl.tsE = new Date().toTimeString().slice(0,5);
+        if (id === 'fl') timers.fl.tsE = getTimeStr();
         if (!timers.e1.running && !timers.e2.running) timers.engG.end = Date.now();
         document.getElementById(id + '-start').disabled = false;
         document.getElementById(id + '-stop').disabled = true;
@@ -180,55 +201,72 @@
 
     function updateStats() {
         let eMs = (timers.engG.end || (timers.engG.start ? Date.now() : 0)) - (timers.engG.start || 0);
-        document.getElementById('e-hms').innerText = fmtHms(Math.max(0, eMs));
-        document.getElementById('e-ts').innerText = (timers.engG.start ? new Date(timers.engG.start).toTimeString().slice(0,5) : "--:--") + " to " + (timers.engG.end ? new Date(timers.engG.end).toTimeString().slice(0,5) : "--:--");
-        document.getElementById('f-hms').innerText = fmtHms(timers.fl.elapsed);
+        document.getElementById('e-hms').innerText = format(Math.max(0, eMs));
+        document.getElementById('e-ts').innerText = (timers.engG.start ? getTimeStr(timers.engG.start) : "--:--") + " to " + (timers.engG.end ? getTimeStr(timers.engG.end) : "--:--");
+        document.getElementById('f-hms').innerText = format(timers.fl.elapsed);
         document.getElementById('f-ts').innerText = (timers.fl.tsS || "--:--") + " to " + (timers.fl.tsE || "--:--");
     }
 
-    function fmtHms(ms) {
-        let s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
-        return [h,m,sec].map(v => v.toString().padStart(2,'0')).join(':');
-    }
-
     function saveLog() {
-        let log = JSON.parse(localStorage.getItem('heliLogs') || '[]');
+        let engMs = (timers.engG.end || (timers.engG.start ? Date.now() : 0)) - (timers.engG.start || 0);
         let entry = {
             date: new Date().toLocaleDateString(),
-            fuel: Math.round(curFuel),
-            payload: document.getElementById('res-lbs').innerText,
-            eng: document.getElementById('e-hms').innerText,
-            flt: document.getElementById('f-hms').innerText,
-            window: document.getElementById('f-ts').innerText
+            eb: document.getElementById('e-ts').innerText,
+            ehms: formatShort(engMs),
+            eh: (engMs/3600000).toFixed(2),
+            fb: document.getElementById('f-ts').innerText,
+            fhms: formatShort(timers.fl.elapsed),
+            fh: (timers.fl.elapsed/3600000).toFixed(2)
         };
-        log.unshift(entry);
-        localStorage.setItem('heliLogs', JSON.stringify(log));
-        alert("Flight Saved to History");
+        let log = JSON.parse(localStorage.getItem('hLogV130') || '[]');
+        log.push(entry);
+        localStorage.setItem('hLogV130', JSON.stringify(log));
+        alert("Flight Saved");
     }
 
     function showLog() {
-        let log = JSON.parse(localStorage.getItem('heliLogs') || '[]');
-        let html = log.length ? '' : '<p style="text-align:center;">No flights recorded.</p>';
-        log.forEach(e => {
-            html += `<div class="log-item"><div style="border-bottom:1px solid #ccc; padding-bottom:3px; margin-bottom:5px;"><b>${e.date}</b> <span style="float:right;">${e.window}</span></div><div class="log-grid"><div>ENG: <b>${e.eng}</b></div><div>FLT: <b>${e.flt}</b></div><div>FUEL: <b>${e.fuel} lb</b></div><div>PAY: <b>${e.payload} lb</b></div></div></div>`;
-        });
-        document.getElementById('log-body').innerHTML = html;
         showPage('log-page');
+        let log = JSON.parse(localStorage.getItem('hLogV130') || '[]').reverse();
+        let tbody = document.getElementById('log-body');
+        tbody.innerHTML = '';
+        if (!log.length) { tbody.innerHTML = '<tr><td colspan="7">No logs.</td></tr>'; return; }
+        let html = '', dailyE = 0, dailyF = 0, lastDate = log[0].date, dayHtml = '';
+        log.forEach((e, i) => {
+            if (e.date !== lastDate) {
+                html += dayHtml + `<tr class="row-total"><td colspan="3">TOTAL ${lastDate}</td><td>${dailyE.toFixed(2)}</td><td colspan="2"></td><td>${dailyF.toFixed(2)}</td></tr>`;
+                dayHtml = ''; dailyE = 0; dailyF = 0; lastDate = e.date;
+            }
+            dayHtml += `<tr><td>${e.date}</td><td>${e.eb}</td><td>${e.ehms}</td><td>${e.eh}</td><td>${e.fb}</td><td>${e.fhms}</td><td>${e.fh}</td></tr>`;
+            dailyE += parseFloat(e.eh); dailyF += parseFloat(e.fh);
+            if (i === log.length - 1) {
+                html += dayHtml + `<tr class="row-total"><td colspan="3">TOTAL ${lastDate}</td><td>${dailyE.toFixed(2)}</td><td colspan="2"></td><td>${dailyF.toFixed(2)}</td></tr>`;
+            }
+        });
+        tbody.innerHTML = html;
     }
 
-    function downloadCSV() {
-        let log = JSON.parse(localStorage.getItem('heliLogs') || '[]');
-        if(!log.length) return alert("No data to download");
-        let csv = "Date,Time Window,Engine Time,Flight Time,Fuel(lbs),Payload(lbs)\n";
-        log.forEach(e => { csv += `"${e.date}","${e.window}","${e.eng}","${e.flt}","${e.fuel}","${e.payload}"\n`; });
-        let blob = new Blob([csv], { type: 'text/csv' });
+    function confirmClear() { document.getElementById('confirm-overlay').style.display = 'flex'; }
+    function clearLogs(yes) {
+        document.getElementById('confirm-overlay').style.display = 'none';
+        if(yes) { localStorage.removeItem('hLogV130'); showLog(); }
+    }
+
+    function exportData(type) {
+        let log = JSON.parse(localStorage.getItem('hLogV130') || '[]');
+        if (!log.length) return;
+        let content, ext, mime;
+        if (type === 'csv') {
+            content = "Date,Eng Block,Eng HHMM,Eng Dec,Flt Block,Flt HHMM,Flt Dec\n" + log.map(e => [e.date,e.eb,e.ehms,e.eh,e.fb,e.fhms,e.fh].join(',')).join('\n');
+            ext = ".csv"; mime = "text/csv";
+        } else {
+            content = "HELI LOG\n" + log.map(e => `${e.date} | ENG: ${e.eb} [${e.ehms}] (${e.eh}h) | FLT: ${e.fb} [${e.fhms}] (${e.fh}h)`).join('\n');
+            ext = ".txt"; mime = "text/plain";
+        }
         let a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `HeliTimer_Log_${new Date().toISOString().slice(0,10)}.csv`;
+        a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+        a.download = "HeliLog_" + new Date().toISOString().slice(0,10) + ext;
         a.click();
     }
-
-    function clearLogs() { if(confirm("Permanently clear all logs?")) { localStorage.removeItem('heliLogs'); showLog(); } }
 
     function initFlightPage() {
         if (!timers.fl.running) startT('fl');
@@ -240,12 +278,11 @@
             let rate = parseFloat(document.getElementById('burn-rate-select').value);
             curFuel -= ((now - burnRef) / 3600000) * rate;
             burnRef = now;
-            let mg = parseFloat(document.getElementById('max-gross').value);
-            let basic = parseFloat(document.getElementById('empty-weight').value) + parseFloat(document.getElementById('crew-gear').value);
+            let mg = 17500, basic = 10400;
             let p = mg - (basic + curFuel);
             document.getElementById('fly-ltr').innerText = p < 0 ? "0" : Math.round(p * 0.4536).toLocaleString();
             document.getElementById('fly-fuel-lbs').innerText = Math.round(curFuel).toLocaleString();
-            document.getElementById('flight-timer-main').innerText = fmtHms(timers.fl.elapsed);
+            document.getElementById('flight-timer-main').innerText = format(timers.fl.elapsed);
             updateGSUI();
             flyTick = requestAnimationFrame(loop);
         }
