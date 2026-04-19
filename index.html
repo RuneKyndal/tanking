@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.65</title>
+    <title>HeliTimer v2.70</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -43,17 +43,20 @@
         .total-hms { font-size: 1.1rem; font-family: monospace; display: block; border-top: 1px solid #000; margin-top: 4px; padding-top: 4px; font-weight: bold; }
 
         /* --- Page 3 Styles --- */
-        .hdr-box { flex: 0 0 85px; text-align: center; }
-        .hdr-label { font-size: 0.8rem; font-weight: bold; display: block; text-transform: uppercase; }
-        .hdr-select { width: 100%; padding: 4px; font-weight: bold; font-size: 1.3rem; border: 2px solid #000; border-radius: 4px; text-align: center; }
+        .flight-hdr { display: flex; justify-content: space-between; align-items: stretch; margin-bottom: 8px; gap: 4px; height: 55px; }
+        .hdr-box { flex: 1; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .hdr-label { font-size: 0.65rem; font-weight: bold; display: block; text-transform: uppercase; margin-bottom: 2px; }
+        .hdr-select { width: 100%; padding: 2px; font-weight: bold; font-size: 1.1rem; border: 2px solid #000; border-radius: 4px; text-align: center; }
+        .btn-hdr { flex: 0 0 65px; font-size: 0.7rem; border: 2px solid #000; border-radius: 6px; }
         
-        .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 8px; background: #fff; padding: 8px; text-align: center; }
-        .val-lg-v198 { font-size: 3.2rem; font-weight: bold; display: block; line-height: 1; }
-        .gauge-labels { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem; margin-bottom: 2px; padding: 0 5px; }
-        .gauge-container { position: relative; width: 100%; height: 35px; background: #eee; border: 2px solid #000; border-radius: 4px; margin: 10px 0 15px 0; }
-        .zone-y { position: absolute; height: 100%; width: 100%; background: #ffeb3b; }
-        .zone-g { position: absolute; height: 100%; width: 30%; left: 35%; background: #4caf50; border-left: 1px solid #000; border-right: 1px solid #000; }
-        .needle { position: absolute; top: -47px; width: 6px; height: 130px; background: #f00; transform: translateX(-50%); z-index: 10; border: 1px solid #000; }
+        .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 6px; background: #fff; padding: 6px; text-align: center; }
+        .val-lg-v198 { font-size: 2.8rem; font-weight: bold; display: block; line-height: 1; }
+
+        /* Analog Gauge */
+        .gauge-wrap { position: relative; width: 100%; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin-top: 10px; }
+        .analog-svg { width: 90%; max-width: 400px; height: auto; }
+        .gauge-text-val { font-size: 4.8rem; font-weight: bold; margin-top: -30px; }
+        .gauge-unit { font-size: 1rem; text-transform: uppercase; font-weight: bold; color: #444; margin-top: -10px; }
 
         /* Helpers */
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 16px; background: #ddd; border-radius: 10px; margin: 12px 0; }
@@ -135,9 +138,9 @@
     <button class="btn-nav" style="background:#008800;" onclick="initFlightPage()">GO FLY</button>
 </div>
 
-<div id="flight-page" class="page">
-    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:8px; gap:4px;">
-        <button id="gps-btn" class="btn-start" style="flex: 0 0 70px; height:50px; font-size:0.7rem; background:#f00; color:#fff;" onclick="toggleGPS()">GPS OFF</button>
+<div id="flight-page" class="page" style="height: 100vh; display: flex; flex-direction: column;">
+    <div class="flight-hdr">
+        <button id="gps-btn" class="btn-hdr" style="background:#f00; color:#fff;" onclick="toggleGPS()">GPS OFF</button>
         <div class="hdr-box">
             <label class="hdr-label">Burn</label>
             <select id="burn-rate-select" class="hdr-select">
@@ -152,41 +155,37 @@
             <select id="gs-target-select" onchange="updateGSUI()" class="hdr-select">
                 </select>
         </div>
+        <button class="btn-hdr" style="background:#d9534f; color:#fff;" onclick="showPage('timer-page')">STOP</button>
     </div>
 
-    <div class="bubble-v198" style="background:#fff; color:#000; padding:6px;">
-        <span class="val-lg-v198" id="flight-timer-main" style="font-family:monospace; font-size:3rem;">00:00:00</span>
+    <div class="bubble-v198" style="padding:4px;">
+        <span class="val-lg-v198" id="flight-timer-main" style="font-family:monospace; font-size:2.4rem;">00:00:00</span>
     </div>
 
     <div class="bubble-v198">
-        <span class="r-label">Fuel Load (lbs)</span>
-        <span class="val-lg-v198" id="fly-fuel-lbs" style="font-size:3rem;">--</span>
+        <span class="r-label">Fuel (lbs)</span>
+        <span class="val-lg-v198" id="fly-fuel-lbs" style="font-size:2.4rem;">--</span>
         <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value)">
     </div>
 
     <div class="bubble-v198">
         <span class="r-label">Payload Liters</span>
-        <span class="val-lg-v198" id="fly-ltr" style="font-size:3rem;">--</span>
+        <span class="val-lg-v198" id="fly-ltr" style="font-size:2.4rem;">--</span>
     </div>
 
-    <div class="bubble-v198" style="padding-top:20px;">
-        <div class="gauge-labels">
-            <span id="gs-lbl-min">--</span>
-            <span id="gs-lbl-tgt">--</span>
-            <span id="gs-lbl-max">--</span>
-        </div>
-        <div class="gauge-container">
-            <div class="zone-y"></div>
-            <div class="zone-g"></div>
-            <div id="gs-needle" class="needle" style="left:50%;"></div>
-        </div>
-        <div style="display:flex; flex-direction:column; align-items:center; margin-top:30px;">
-            <span class="val-lg-v198" id="fly-gs" style="font-size:4.8rem;">0</span>
-            <span class="r-label" style="font-size:1.1rem; color:#000;">Kts.</span>
-        </div>
+    <div class="gauge-wrap">
+        <svg class="analog-svg" viewBox="0 0 200 120">
+            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#ddd" stroke-width="12" stroke-linecap="round"/>
+            <path d="M 80 23.5 A 80 80 0 0 1 120 23.5" fill="none" stroke="#4caf50" stroke-width="12" />
+            <text x="15" y="115" font-size="8" font-weight="bold" id="gs-min-val">--</text>
+            <text x="92" y="15" font-size="8" font-weight="bold" id="gs-tgt-val">--</text>
+            <text x="175" y="115" font-size="8" font-weight="bold" id="gs-max-val">--</text>
+            <line id="needle-ptr" x1="100" y1="100" x2="100" y2="25" stroke="#f00" stroke-width="3" stroke-linecap="round" transform="rotate(0, 100, 100)" />
+            <circle cx="100" cy="100" r="5" fill="#000" />
+        </svg>
+        <span class="gauge-text-val" id="fly-gs">0</span>
+        <span class="gauge-unit">KTS GS</span>
     </div>
-
-    <button class="btn-nav" style="background:#d9534f;" onclick="showPage('timer-page')">STOP FLIGHT (BACK)</button>
 </div>
 
 <div id="log-page" class="page">
@@ -196,8 +195,8 @@
         <tbody id="log-body"></tbody>
     </table>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
-        <button class="btn-rst" style="background:#28a745; color:#fff;" onclick="exportCSV()">SAVE CSV</button>
-        <button class="btn-rst" style="background:#17a2b8; color:#fff;" onclick="exportTXT()">SAVE TXT</button>
+        <button class="btn-rst" style="background:#28a745; color:#fff;" onclick="exportCSV()">CSV</button>
+        <button class="btn-rst" style="background:#17a2b8; color:#fff;" onclick="exportTXT()">TXT</button>
     </div>
     <button class="btn-nav" style="background:#dc3545;" onclick="clearLogs()">CLEAR ALL</button>
 </div>
@@ -231,165 +230,4 @@
 
     function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
-        if(id !== 'flight-page') cancelAnimationFrame(flyTick);
-    }
-
-    function updateWB() {
-        var mg = parseFloat(document.getElementById('max-gross').value) || 0;
-        var empty = parseFloat(document.getElementById('empty-weight').value) || 0;
-        var crew = parseFloat(document.getElementById('crew-gear').value) || 0;
-        var basic = empty + crew;
-        document.getElementById('basic-ac-display').innerText = basic.toLocaleString() + ' lbs';
-        curFuel = parseFloat(document.getElementById('fuel-slider').value);
-        var p = mg - (basic + curFuel);
-        document.getElementById('fuel-display').innerText = 'Fuel ' + curFuel.toLocaleString() + ' lbs';
-        document.getElementById('res-lbs').innerText = p < 0 ? "OVER" : p.toLocaleString();
-        document.getElementById('res-liters').innerText = p < 0 ? "--" : Math.round(p * 0.4536).toLocaleString();
-        saveWBData();
-    }
-
-    function startT(id) {
-        if (timers[id].running) return;
-        timers[id].running = true; timers[id].start = Date.now() - timers[id].elapsed;
-        if (id === 'fl' && !timers.fl.tsS) timers.fl.tsS = new Date().toTimeString().slice(0,5);
-        if ((id === 'e1' || id === 'e2') && !timers.engG.start) timers.engG.start = Date.now();
-        timers[id].interval = setInterval(() => {
-            timers[id].elapsed = Date.now() - timers[id].start;
-            document.getElementById(id + '-disp').innerText = fmtHms(timers[id].elapsed);
-            updateStats();
-        }, 1000);
-        document.getElementById(id + '-start').disabled = true;
-        document.getElementById(id + '-stop').disabled = false;
-    }
-
-    function stopT(id) {
-        timers[id].running = false; clearInterval(timers[id].interval);
-        if (id === 'fl') timers.fl.tsE = new Date().toTimeString().slice(0,5);
-        if (!timers.e1.running && !timers.e2.running) timers.engG.end = Date.now();
-        document.getElementById(id + '-start').disabled = false;
-        document.getElementById(id + '-stop').disabled = true;
-        updateStats();
-    }
-
-    function resetRow(id) {
-        stopT(id); timers[id].elapsed = 0;
-        document.getElementById(id + '-disp').innerText = "00:00:00";
-        if (id === 'fl') { timers.fl.tsS = null; timers.fl.tsE = null; }
-        if (id !== 'fl' && !timers.e1.running && !timers.e2.running) { timers.engG.start = null; timers.engG.end = null; }
-        updateStats();
-    }
-
-    function resetAll() {
-        if (confirm("Reset all engine and flight timers?")) {
-            resetRow('e1'); resetRow('e2'); resetRow('fl');
-        }
-    }
-
-    function fmtHms(ms) {
-        var s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
-        return [h,m,sec].map(v => v.toString().padStart(2,'0')).join(':');
-    }
-
-    function updateStats() {
-        var eMs = (timers.engG.end || (timers.engG.start ? Date.now() : 0)) - timers.engG.start;
-        document.getElementById('e-hms').innerText = fmtHms(Math.max(0, eMs));
-        document.getElementById('e-ts').innerText = (timers.engG.start ? new Date(timers.engG.start).toTimeString().slice(0,5) : "--:--") + " to " + (timers.engG.end ? new Date(timers.engG.end).toTimeString().slice(0,5) : "--:--");
-        document.getElementById('f-hms').innerText = fmtHms(timers.fl.elapsed);
-        document.getElementById('f-ts').innerText = (timers.fl.tsS || "--:--") + " to " + (timers.fl.tsE || "--:--");
-    }
-
-    function initFlightPage() {
-        if (!timers.fl.running) startT('fl');
-        showPage('flight-page');
-        document.getElementById('fly-fuel-slider').value = curFuel;
-        burnRef = Date.now();
-        function loop() {
-            var now = Date.now();
-            var rate = parseFloat(document.getElementById('burn-rate-select').value);
-            curFuel -= ((now - burnRef) / 3600000) * rate;
-            burnRef = now;
-            var mg = parseFloat(document.getElementById('max-gross').value);
-            var empty = parseFloat(document.getElementById('empty-weight').value) || 0;
-            var crew = parseFloat(document.getElementById('crew-gear').value) || 0;
-            var basic = empty + crew;
-            var ltr = Math.round((mg - (basic + curFuel)) * 0.4536);
-            document.getElementById('fly-ltr').innerText = ltr < 0 ? "OVER" : ltr.toLocaleString();
-            document.getElementById('fly-fuel-lbs').innerText = Math.round(curFuel).toLocaleString();
-            document.getElementById('flight-timer-main').innerText = fmtHms(timers.fl.elapsed);
-            updateGSUI();
-            flyTick = requestAnimationFrame(loop);
-        }
-        flyTick = requestAnimationFrame(loop);
-    }
-
-    function updateGSUI() {
-        var tgt = parseFloat(document.getElementById('gs-target-select').value);
-        document.getElementById('gs-lbl-min').innerText = tgt - 10;
-        document.getElementById('gs-lbl-tgt').innerText = tgt;
-        document.getElementById('gs-lbl-max').innerText = tgt + 10;
-        document.getElementById('fly-gs').innerText = Math.round(curGS);
-        var pos = 50 + ((curGS - tgt) * 5); 
-        document.getElementById('gs-needle').style.left = Math.max(0, Math.min(100, pos)) + "%";
-    }
-
-    function toggleGPS() {
-        var btn = document.getElementById('gps-btn');
-        if (watchID) {
-            navigator.geolocation.clearWatch(watchID); watchID = null;
-            btn.innerText = "GPS OFF"; btn.style.background = "#f00";
-        } else {
-            btn.innerText = "WAIT...";
-            watchID = navigator.geolocation.watchPosition(p => {
-                curGS = (p.coords.speed || 0) * 1.94384;
-                btn.innerText = "GPS LIVE"; btn.style.background = "#0f0";
-            }, null, { enableHighAccuracy: true, maximumAge: 0 });
-        }
-    }
-
-    function saveLog() {
-        var eMs = (timers.engG.end || (timers.engG.start ? Date.now() : 0)) - timers.engG.start;
-        var entry = { date: new Date().toLocaleDateString(), eb: document.getElementById('e-ts').innerText, eh: fmtHms(eMs).slice(0,5), fb: document.getElementById('f-ts').innerText, fh: fmtHms(timers.fl.elapsed).slice(0,5) };
-        var log = JSON.parse(localStorage.getItem('hLog') || '[]');
-        log.push(entry); localStorage.setItem('hLog', JSON.stringify(log));
-        alert("Flight Saved");
-    }
-
-    function exportCSV() {
-        var log = JSON.parse(localStorage.getItem('hLog') || '[]');
-        var csv = "Date,Eng Block,Eng Hrs,Flt Block,Flt Hrs\n" + log.map(e => `${e.date},${e.eb},${e.eh},${e.fb},${e.fh}`).join("\n");
-        downloadFile(csv, "HeliLog.csv", "text/csv");
-    }
-
-    function exportTXT() {
-        var log = JSON.parse(localStorage.getItem('hLog') || '[]');
-        var txt = log.map(e => `DATE: ${e.date} | ENG: ${e.eb} (${e.eh}) | FLT: ${e.fb} (${e.fh})`).join("\n");
-        downloadFile(txt, "HeliLog.txt", "text/plain");
-    }
-
-    function downloadFile(content, name, type) {
-        var blob = new Blob([content], { type: type });
-        var a = document.createElement("a");
-        a.href = URL.createObjectURL(blob); a.download = name; a.click();
-    }
-
-    function showLog() {
-        showPage('log-page');
-        var log = JSON.parse(localStorage.getItem('hLog') || '[]');
-        document.getElementById('log-body').innerHTML = log.map(e => `<tr><td>${e.date}</td><td>${e.eb}</td><td>${e.eh}</td><td>${e.fb}</td><td>${e.fh}</td></tr>`).join('');
-    }
-
-    function hideLog() { showPage('timer-page'); }
-    function clearLogs() { if(confirm("Clear all?")) { localStorage.removeItem('hLog'); showLog(); } }
-
-    const gsS = document.getElementById('gs-target-select');
-    for(let i=0; i<=30; i++) { 
-        let o = document.createElement('option'); o.value = i; o.innerText = i; 
-        if(i===18) o.selected=true; 
-        gsS.appendChild(o); 
-    }
-    
-    loadWBData();
-</script>
-</body>
-</html>
+        document.getElementById(
