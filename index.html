@@ -5,88 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="timer.png">
     <link rel="manifest" href="manifest.json">
-    <title>HeliTimer v2.10</title>
+    <title>HeliTimer v2.20</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; padding: 0; background: #fff; color: #000; font-family: sans-serif; position: fixed; width: 100%; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .page { width: 100%; padding: 12px 10px 30px 10px; display: none; }
-        #calc-page { display: block; }
         
-        /* --- Global UI --- */
-        h2 { text-align: center; margin: 4px 0 12px 0; font-size: 1.2rem; }
+        /* --- Page 1 & Global UI --- */
+        h2 { text-align: center; margin: 4px 0 12px 0; font-size: 1.2rem; text-transform: uppercase; }
         .input-block { border: 2px solid #000; border-radius: 10px; margin-bottom: 10px; overflow: hidden; background: #fff; }
         .input-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #ddd; }
-        input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 6px; font-size: 1.1rem; font-weight: bold; padding: 6px; text-align: right; width: 100px; }
+        .input-label { font-weight: bold; font-size: 0.9rem; }
+        input[type="number"] { background: #f5f5f5; border: 2px solid #000; border-radius: 6px; font-size: 1.1rem; font-weight: bold; padding: 6px; text-align: right; width: 110px; }
+        .fixed-val { font-weight: bold; font-size: 1.1rem; }
         
-        /* --- Page 3 Specifics --- */
-        .header-strip { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 5px; }
-        .controls-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; background: #eee; padding: 10px; border-radius: 10px; border: 1px solid #000; }
-        .sel-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .sel-group label { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
-        select { padding: 8px; font-weight: bold; border: 2px solid #000; border-radius: 6px; background: #fff; }
-
+        /* --- Page 2 Timer UI --- */
+        .timer-row { display: flex; align-items: center; width: 100%; border: 2px solid #000; border-radius: 10px; margin-bottom: 8px; padding: 8px; gap: 6px; background: #fff; }
+        .label { flex: 0 0 50px; font-size: 0.8rem; font-weight: bold; }
+        .controls { flex: 1; display: flex; gap: 4px; }
+        .time-display { flex: 0 0 85px; font-family: monospace; font-size: 1.1rem; font-weight: bold; text-align: right; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .stat-box { background: #f0f0f0; padding: 8px; border: 2px solid #000; border-radius: 10px; text-align: center; }
+        .total-hms { font-size: 1.1rem; font-family: monospace; display: block; border-top: 1px solid #000; margin-top: 5px; padding-top: 5px; font-weight: bold; }
+        
+        /* --- Page 3 GPS & Gauge --- */
+        .controls-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 12px; background: #f0f0f0; padding: 10px; border-radius: 10px; border: 2px solid #000; }
+        .sel-group { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .sel-group label { font-size: 0.6rem; font-weight: bold; text-transform: uppercase; }
+        select { padding: 8px; font-weight: bold; border: 2px solid #000; border-radius: 6px; background: #fff; font-size: 1rem; }
+        
         .full-bubble { border: 2px solid #000; border-radius: 12px; margin-bottom: 12px; background: #fff; padding: 15px; text-align: center; position: relative; }
-        .label-sm { font-size: 0.8rem; font-weight: bold; color: #666; text-transform: uppercase; display: block; margin-bottom: 4px; }
-        .val-lg { font-size: 3.2rem; font-weight: bold; display: block; line-height: 1; letter-spacing: -1px; }
+        .val-lg { font-size: 3.2rem; font-weight: bold; display: block; line-height: 1; }
         
-        /* --- GS Deviation Gauge --- */
-        .gauge-container { position: relative; width: 100%; height: 40px; background: #eee; border: 2px solid #000; border-radius: 4px; margin: 10px 0 25px 0; overflow: visible; }
-        .zone { position: absolute; height: 100%; top: 0; }
-        .zone-yellow { background: #ffeb3b; width: 100%; left: 0; }
-        .zone-green { background: #4caf50; width: 30%; left: 35%; border-left: 1px solid rgba(0,0,0,0.2); border-right: 1px solid rgba(0,0,0,0.2); }
-        .center-line { position: absolute; left: 50%; height: 110%; width: 2px; background: #000; top: -5%; z-index: 2; }
-        .needle { position: absolute; top: -5%; width: 6px; height: 110%; background: #cc0000; transform: translateX(-50%); transition: left 0.1s linear; z-index: 3; box-shadow: 0 0 4px rgba(0,0,0,0.5); }
+        .gauge-container { position: relative; width: 100%; height: 40px; background: #eee; border: 2px solid #000; border-radius: 4px; margin: 15px 0 30px 0; }
+        .zone-yellow { position: absolute; height: 100%; width: 100%; background: #ffeb3b; }
+        .zone-green { position: absolute; height: 100%; width: 30%; left: 35%; background: #4caf50; border-left: 1px solid #000; border-right: 1px solid #000; }
+        .center-line { position: absolute; left: 50%; height: 120%; width: 2px; background: #000; top: -10%; z-index: 2; }
+        .needle { position: absolute; top: -10%; width: 6px; height: 120%; background: #f00; transform: translateX(-50%); transition: left 0.1s linear; z-index: 3; }
+        .gauge-labels { position: absolute; width: 100%; top: 45px; display: flex; justify-content: space-between; font-weight: bold; font-family: monospace; }
         
-        .gauge-labels { position: absolute; width: 100%; top: 42px; display: flex; justify-content: space-between; font-weight: bold; font-family: monospace; font-size: 0.9rem; padding: 0 2px; }
-        .target-val { position: absolute; left: 50%; transform: translateX(-50%); top: 42px; font-size: 1.1rem; font-weight: bold; color: #000; }
+        /* --- Buttons --- */
+        .btn-go { width: 100%; background: #000; color: #fff; padding: 22px; font-size: 1.5rem; font-weight: bold; border-radius: 12px; border: none; margin-top: 10px; }
+        .btn-nav { background: #444; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; }
+        .btn-start { background: #0f0; flex: 2; font-weight: bold; border: 2px solid #000; border-radius: 6px; }
+        .btn-stop { background: #f00; color: #fff; flex: 2; font-weight: bold; border: 2px solid #000; border-radius: 6px; }
+        .btn-rst { background: #ccc; flex: 1; font-weight: bold; border: 2px solid #000; border-radius: 6px; }
 
-        .btn-go { width: 100%; background: #000; color: #fff; padding: 20px; font-size: 1.4rem; font-weight: bold; border-radius: 12px; border: none; }
-        .btn-nav { background: #444; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
-        .btn-gps { background: #007bff; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; }
-        
-        input[type="range"] { -webkit-appearance: none; width: 100%; height: 15px; background: #ddd; margin: 15px 0; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 40px; height: 40px; background: #000; border-radius: 50%; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 18px; background: #ddd; border-radius: 9px; margin: 15px 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 2px solid #fff; }
     </style>
 </head>
 <body>
 
-<div id="calc-page" class="page">
+<div id="calc-page" class="page" style="display:block;">
     <h2>214ST W&B</h2>
     <div class="input-block">
-        <div class="input-row"><span>Max Gross</span><input type="number" id="max-gross" value="17500" oninput="updateWB()"></div>
-        <div class="input-row"><span>Empty Wt</span><input type="number" id="empty-weight" value="10000" oninput="updateWB()"></div>
-        <div class="input-row"><span>Crew/Gear</span><input type="number" id="crew-gear" value="400" oninput="updateWB()"></div>
+        <div class="input-row"><span class="input-label">Max Gross</span><input type="number" id="max-gross" value="17500"></div>
+        <div class="input-row"><span class="input-label">Empty Wt</span><input type="number" id="empty-weight" value="10000"></div>
+        <div class="input-row"><span class="input-label">Crew/Gear</span><input type="number" id="crew-gear" value="400"></div>
+        <div class="input-row"><span class="input-label">Basic A/C</span><span class="fixed-val" id="basic-ac">10,400</span></div>
     </div>
-    <div class="full-bubble" style="padding:10px;">
-        <span id="fuel-display">Fuel 2,000 lbs</span>
-        <input type="range" id="fuel-slider" min="500" max="3000" step="50" value="2000" oninput="updateWB()">
+    <div class="full-bubble">
+        <span id="fuel-display" style="font-size:1.5rem; font-weight:bold;">Fuel 2,000 lbs</span>
+        <input type="range" id="fuel-slider" min="500" max="3000" step="50" value="2000">
+        <div style="display:flex; justify-content:space-between; font-weight:bold; margin-top:5px;">
+            <span id="res-lbs">-- lbs</span><span id="res-liters">-- Ltr</span>
+        </div>
     </div>
     <button class="btn-go" onclick="showPage('timer-page')">GO START</button>
 </div>
 
 <div id="timer-page" class="page">
-    <div class="header-strip">
+    <div class="header-strip" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <button class="btn-nav" onclick="showPage('calc-page')">BACK</button>
-        <h2>TIMERS</h2>
-        <div style="width:50px"></div>
+        <h2>FLIGHT TIMER</h2>
+        <button class="btn-nav" style="background:#666;" onclick="showLog()">LOGS</button>
     </div>
-    <div style="text-align:center; padding:20px; border:2px dashed #ccc; margin-bottom:20px;">
-        [Timer logic active in background]
+
+    <div class="timer-row">
+        <div class="label">ENG 1</div>
+        <div class="controls">
+            <button class="btn-start" id="e1-start" onclick="startT('e1')">START</button>
+            <button class="btn-stop" id="e1-stop" onclick="stopT('e1')" disabled>STOP</button>
+            <button class="btn-rst" onclick="resetRow('e1')">RST</button>
+        </div>
+        <div class="time-display" id="e1-disp">00:00:00</div>
+    </div>
+    <div class="timer-row">
+        <div class="label">ENG 2</div>
+        <div class="controls">
+            <button class="btn-start" id="e2-start" onclick="startT('e2')">START</button>
+            <button class="btn-stop" id="e2-stop" onclick="stopT('e2')" disabled>STOP</button>
+            <button class="btn-rst" onclick="resetRow('e2')">RST</button>
+        </div>
+        <div class="time-display" id="e2-disp">00:00:00</div>
+    </div>
+    <div class="timer-row" style="background:#eef;">
+        <div class="label">FLIGHT</div>
+        <div class="controls">
+            <button class="btn-start" id="fl-start" onclick="startT('fl')">START</button>
+            <button class="btn-stop" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button>
+            <button class="btn-rst" onclick="resetRow('fl')">RST</button>
+        </div>
+        <div class="time-display" id="fl-disp">00:00:00</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <span style="font-size:0.6rem;">ENG RUN</span>
+            <span class="total-hms" id="e-hms">00:00:00</span>
+            <span id="e-ts" style="font-size:0.7rem;">--:-- to --:--</span>
+        </div>
+        <div class="stat-box" style="background:#eef;">
+            <span style="font-size:0.6rem;">FLIGHT</span>
+            <span class="total-hms" id="f-hms">00:00:00</span>
+            <span id="f-ts" style="font-size:0.7rem;">--:-- to --:--</span>
+        </div>
     </div>
     <button class="btn-go" style="background:#008800;" onclick="initFlightPage()">GO FLY</button>
 </div>
 
 <div id="flight-page" class="page">
-    <div class="header-strip">
+    <div class="header-strip" style="display:flex; justify-content:space-between; margin-bottom:10px;">
         <button class="btn-nav" onclick="showPage('timer-page')">BACK</button>
-        <button class="btn-gps" id="gps-btn" onclick="toggleGPS()">CONNECT GPS</button>
-        <button class="btn-nav" style="background:#cc0000;" onclick="showPage('timer-page')">STOP</button>
+        <button class="btn-nav" style="background:#007bff;" id="gps-btn" onclick="toggleGPS()">GPS CONNECT</button>
+        <button class="btn-nav" style="background:#c00;" onclick="showPage('timer-page')">STOP</button>
     </div>
 
     <div class="controls-row">
         <div class="sel-group">
-            <label>Fuel Burn</label>
+            <label>Burn Rate</label>
             <select id="burn-rate-select">
                 <option value="600">600</option><option value="700">700</option><option value="800" selected>800</option><option value="900">900</option>
             </select>
@@ -94,97 +144,153 @@
         <div class="sel-group">
             <label>Target GS</label>
             <select id="target-gs-select" onchange="updateGSUI()">
-                <option value="10">10</option><option value="15">15</option><option value="20" selected>20</option><option value="25">25</option><option value="30">30</option>
-            </select>
+                </select>
         </div>
     </div>
 
     <div class="full-bubble">
-        <span class="label-sm">Payload Liters</span>
+        <span style="font-size:0.8rem; font-weight:bold; color:#666;">PAYLOAD LITERS</span>
         <span class="val-lg" id="fly-ltr">-- Ltr</span>
     </div>
 
     <div class="full-bubble">
-        <span class="label-sm">Ground Speed (KTS)</span>
+        <span style="font-size:0.8rem; font-weight:bold; color:#666;">GROUND SPEED (KTS)</span>
         <span class="val-lg" id="fly-gs">0 KTS</span>
-        
         <div class="gauge-container">
-            <div class="zone zone-yellow"></div>
-            <div class="zone zone-green"></div>
+            <div class="zone-yellow"></div>
+            <div class="zone-green"></div>
             <div class="center-line"></div>
-            <div id="gs-needle" class="needle" style="left: 50%;"></div>
-            
+            <div id="gs-needle" class="needle" style="left:50%;"></div>
             <div class="gauge-labels">
                 <span id="low-label">-10</span>
+                <span id="ideal-label" style="position:absolute; left:50%; transform:translateX(-50%);">20</span>
                 <span id="high-label">+10</span>
             </div>
-            <div class="target-val" id="ideal-label">20</div>
         </div>
     </div>
 
     <div class="full-bubble">
-        <span class="label-sm">Adjust Fuel Load</span>
+        <span style="font-size:0.7rem; font-weight:bold;">MANUAL FUEL ADJUST</span>
         <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="manualFuelAdj(this.value)">
     </div>
 </div>
 
+<div id="log-page" class="page">
+    <button class="btn-nav" onclick="showPage('timer-page')" style="width:100%; padding:15px; margin-bottom:10px;">BACK</button>
+    <div id="log-content" style="font-family:monospace; font-size:0.7rem;"></div>
+</div>
+
 <script>
+    // --- State ---
+    var timers = {
+        e1: { elapsed:0, start:null, interval:null, running:false },
+        e2: { elapsed:0, start:null, interval:null, running:false },
+        fl: { elapsed:0, start:null, interval:null, running:false, tsS:null, tsE:null },
+        engGlobal: { start:null, end:null }
+    };
     var currentFuel = 2000;
     var burnRefTime = null;
-    var burnTimer = null;
-    var watchID = null;
+    var burnTick = null;
     var currentGS = 0;
+    var watchID = null;
 
+    // --- Page Routing ---
     function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
         document.getElementById(id).style.display = 'block';
-        if(id !== 'flight-page') clearInterval(burnTimer);
+        if (id !== 'flight-page') clearInterval(burnTick);
     }
 
+    // --- Page 1 Logic ---
     function updateWB() {
-        var fuel = document.getElementById('fuel-slider').value;
-        currentFuel = parseFloat(fuel);
-        document.getElementById('fuel-display').textContent = 'Fuel ' + fuel.toLocaleString() + ' lbs';
+        var mg = parseFloat(document.getElementById('max-gross').value) || 0;
+        var empty = parseFloat(document.getElementById('empty-weight').value) || 0;
+        var crew = parseFloat(document.getElementById('crew-gear').value) || 0;
+        var basic = empty + crew;
+        currentFuel = parseFloat(document.getElementById('fuel-slider').value);
+        
+        var payload = mg - (basic + currentFuel);
+        document.getElementById('basic-ac').textContent = basic.toLocaleString();
+        document.getElementById('fuel-display').textContent = 'Fuel ' + currentFuel.toLocaleString() + ' lbs';
+        document.getElementById('res-lbs').textContent = (payload < 0 ? "OVER" : payload.toLocaleString()) + " lbs";
+        document.getElementById('res-liters').textContent = (payload < 0 ? "--" : Math.round(payload * 0.4536).toLocaleString()) + " Ltr";
     }
 
+    // --- Page 2 Logic ---
+    function startT(id) {
+        timers[id].running = true;
+        timers[id].start = Date.now() - timers[id].elapsed;
+        if (id === 'fl' && !timers.fl.tsS) timers.fl.tsS = new Date().toTimeString().slice(0,5);
+        if ((id === 'e1' || id === 'e2') && !timers.engGlobal.start) timers.engGlobal.start = Date.now();
+        timers[id].interval = setInterval(() => {
+            timers[id].elapsed = Date.now() - timers[id].start;
+            document.getElementById(id + '-disp').innerText = formatTime(timers[id].elapsed);
+            updateStats();
+        }, 1000);
+        document.getElementById(id + '-start').disabled = true;
+        document.getElementById(id + '-stop').disabled = false;
+    }
+
+    function stopT(id) {
+        timers[id].running = false;
+        clearInterval(timers[id].interval);
+        if (id === 'fl') timers.fl.tsE = new Date().toTimeString().slice(0,5);
+        if (!timers.e1.running && !timers.e2.running) timers.engGlobal.end = Date.now();
+        document.getElementById(id + '-start').disabled = false;
+        document.getElementById(id + '-stop').disabled = true;
+        updateStats();
+    }
+
+    function resetRow(id) {
+        stopT(id);
+        timers[id].elapsed = 0;
+        document.getElementById(id + '-disp').innerText = "00:00:00";
+        updateStats();
+    }
+
+    function formatTime(ms) {
+        var s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+        return [h,m,sec].map(v => v.toString().padStart(2,'0')).join(':');
+    }
+
+    function updateStats() {
+        var engMs = (timers.engGlobal.end || (timers.engGlobal.start ? Date.now() : 0)) - timers.engGlobal.start;
+        if (!timers.engGlobal.start) engMs = 0;
+        document.getElementById('e-hms').innerText = formatTime(engMs);
+        document.getElementById('f-hms').innerText = formatTime(timers.fl.elapsed);
+    }
+
+    // --- Page 3 Logic ---
     function initFlightPage() {
         showPage('flight-page');
+        document.getElementById('fly-fuel-slider').value = currentFuel;
         burnRefTime = Date.now();
         updateGSUI();
-        burnTimer = setInterval(tick, 200); // Fast refresh for calculations
-    }
-
-    function tick() {
-        // Burn Calculation
-        var now = Date.now();
-        var rate = parseFloat(document.getElementById('burn-rate-select').value);
-        var elapsed = (now - burnRefTime) / 3600000;
-        currentFuel = Math.max(0, currentFuel - (elapsed * rate));
-        burnRefTime = now;
-        
-        // Update Liter Readout
-        var mg = parseFloat(document.getElementById('max-gross').value);
-        var basic = parseFloat(document.getElementById('empty-weight').value) + parseFloat(document.getElementById('crew-gear').value);
-        var payloadLbs = mg - (basic + currentFuel);
-        var liters = Math.round(payloadLbs * 0.4536);
-        document.getElementById('fly-ltr').textContent = (payloadLbs < 0 ? "OVER" : liters.toLocaleString()) + " Ltr";
-        
-        updateGSUI();
+        burnTick = setInterval(() => {
+            var now = Date.now();
+            var rate = parseFloat(document.getElementById('burn-rate-select').value);
+            currentFuel -= ((now - burnRefTime) / 3600000) * rate;
+            burnRefTime = now;
+            
+            var mg = parseFloat(document.getElementById('max-gross').value);
+            var basic = parseFloat(document.getElementById('basic-ac').innerText.replace(/,/g,''));
+            var ltr = Math.round((mg - (basic + currentFuel)) * 0.4536);
+            document.getElementById('fly-ltr').innerText = (ltr < 0 ? "OVER" : ltr.toLocaleString()) + " Ltr";
+            document.getElementById('fly-fuel-slider').value = currentFuel;
+            updateGSUI();
+        }, 500);
     }
 
     function updateGSUI() {
         var target = parseFloat(document.getElementById('target-gs-select').value);
-        document.getElementById('fly-gs').textContent = Math.round(currentGS) + " KTS";
-        document.getElementById('ideal-label').textContent = target;
-        document.getElementById('low-label').textContent = target - 10;
-        document.getElementById('high-label').textContent = target + 10;
-
-        // Calculate needle position
-        // Deviation range is +/- 10 kts. 50% is center. 
+        document.getElementById('fly-gs').innerText = Math.round(currentGS) + " KTS";
+        document.getElementById('ideal-label').innerText = target;
+        document.getElementById('low-label').innerText = target - 10;
+        document.getElementById('high-label').innerText = target + 10;
+        
         var diff = currentGS - target;
-        var percent = 50 + (diff * 5); // 5% per knot
-        percent = Math.max(0, Math.min(100, percent));
-        document.getElementById('gs-needle').style.left = percent + "%";
+        var pos = 50 + (diff * 5); // 5% per knot
+        document.getElementById('gs-needle').style.left = Math.max(0, Math.min(100, pos)) + "%";
     }
 
     function toggleGPS() {
@@ -192,23 +298,35 @@
         if (watchID) {
             navigator.geolocation.clearWatch(watchID);
             watchID = null;
-            btn.textContent = "CONNECT GPS";
             btn.style.background = "#007bff";
+            btn.innerText = "GPS CONNECT";
         } else {
-            btn.textContent = "SEARCHING...";
-            watchID = navigator.geolocation.watchPosition(pos => {
-                btn.textContent = "GPS LIVE";
-                btn.style.background = "#008800";
-                currentGS = (pos.coords.speed || 0) * 1.94384; // m/s to knots
-            }, err => { alert("GPS Access Denied"); watchID = null; }, 
-            { enableHighAccuracy: true, maximumAge: 0 });
+            btn.innerText = "WAITING...";
+            watchID = navigator.geolocation.watchPosition(p => {
+                currentGS = (p.coords.speed || 0) * 1.94384;
+                btn.style.background = "#080";
+                btn.innerText = "GPS LIVE";
+            }, null, { enableHighAccuracy: true });
         }
     }
 
-    function manualFuelAdj(val) {
-        currentFuel = parseFloat(val);
-        burnRefTime = Date.now();
+    function manualFuelAdj(v) { currentFuel = parseFloat(v); burnRefTime = Date.now(); }
+
+    function showLog() {
+        showPage('log-page');
+        document.getElementById('log-content').innerText = "Storage placeholder - Add log logic as needed.";
     }
+
+    // --- Init ---
+    const gsSel = document.getElementById('target-gs-select');
+    for(let i=0; i<=30; i++) {
+        let opt = document.createElement('option');
+        opt.value = i; opt.innerText = i;
+        if(i===20) opt.selected = true;
+        gsSel.appendChild(opt);
+    }
+    document.querySelectorAll('#calc-page input').forEach(i => i.oninput = updateWB);
+    updateWB();
 </script>
 </body>
 </html>
