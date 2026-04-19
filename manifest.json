@@ -9,13 +9,13 @@
     "theme_color": "#1a1a2e",
     "icons": [
         {
-            "src": "icon.png",
+            "src": "tank.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "icon.png",
+            "src": "tank.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
