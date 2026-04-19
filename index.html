@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v3.4</title>
+    <title>HeliTimer v3.5</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow: hidden; }
@@ -15,6 +15,9 @@
         h2 { text-align: center; margin: 4px 0 8px 0; font-size: 1.1rem; text-transform: uppercase; }
         button { font-weight: bold; border-radius: 6px; border: 2px solid #000; text-transform: uppercase; touch-action: manipulation; }
         .btn-nav { background: #000; color: #fff; padding: 14px; width: 100%; font-size: 1.2rem; border-radius: 10px; margin-top: 10px; }
+
+        .preset-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .btn-preset { flex: 1; padding: 12px 5px; background: #f0f0f0; font-size: 0.9rem; }
 
         .input-block { border: 2px solid #000; border-radius: 8px; margin-bottom: 8px; overflow: hidden; background: #fff; }
         .input-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid #ddd; }
@@ -48,7 +51,13 @@
 <body>
 
 <div id="calc-page" class="page">
-    <h2>214ST W&amp;B v3.4</h2>
+    <h2>HELI LOAD v3.5</h2>
+    
+    <div class="preset-row">
+        <button class="btn-preset" onclick="applyPreset(16000, 8000, 2500)">Bell 214B</button>
+        <button class="btn-preset" onclick="applyPreset(17500, 10000, 2750)">Bell 214ST</button>
+    </div>
+
     <div class="input-block">
         <div class="input-row"><span>Max Gross Weight</span><input type="number" id="max-gross" value="17500" oninput="updateWB()"></div>
         <div class="input-row"><span>A/C Empty Weight</span><input type="number" id="empty-weight" value="10000" oninput="updateWB()"></div>
@@ -143,10 +152,10 @@
 
 <div id="confirm-overlay">
     <div id="confirm-box">
-        <p id="confirm-text">Delete ALL logs? Cannot be undone.</p>
+        <p id="confirm-text">Confirm action?</p>
         <div style="display:flex; gap:10px;">
-            <button id="confirm-yes" style="background:#dc3545; color:#fff; flex:1; padding:10px; border:2px solid #000; border-radius:6px; font-weight:bold;">DELETE</button>
-            <button id="confirm-no" style="background:#ccc; flex:1; padding:10px; border:2px solid #000; border-radius:6px; font-weight:bold;">CANCEL</button>
+            <button id="confirm-yes" style="background:#dc3545; color:#fff; flex:1; padding:10px; border:2px solid #000; border-radius:6px; font-weight:bold;">YES</button>
+            <button id="confirm-no" style="background:#ccc; flex:1; padding:10px; border:2px solid #000; border-radius:6px; font-weight:bold;">NO</button>
         </div>
     </div>
 </div>
@@ -168,6 +177,13 @@
         cancelAnimationFrame(flyTick);
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
         document.getElementById(id).style.display = (id === 'flight-page') ? 'flex' : 'block';
+    }
+
+    function applyPreset(mg, em, fuel) {
+        document.getElementById('max-gross').value = mg;
+        document.getElementById('empty-weight').value = em;
+        document.getElementById('fuel-slider').value = fuel;
+        updateWB();
     }
 
     function updateWB() {
