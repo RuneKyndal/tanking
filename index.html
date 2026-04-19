@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HeliTimer v2.3</title>
+    <title>HeliTimer v2.4</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { background: #fff; color: #000; font-family: sans-serif; margin: 0; padding: 0; position: fixed; width: 100%; height: 100%; overflow: hidden; }
@@ -27,22 +27,25 @@
 
         .timer-row { display: flex; align-items: center; border: 2px solid #000; border-radius: 8px; margin-bottom: 6px; padding: 6px; gap: 5px; }
         .time-display { flex: 0 0 85px; font-family: monospace; font-size: 1.1rem; font-weight: bold; text-align: right; }
+        .timer-label { font-size: 0.6rem; font-weight: bold; width: 55px; text-transform: uppercase; line-height: 1; }
         .stat-box { background: #f0f0f0; padding: 8px; border: 2px solid #000; border-radius: 8px; text-align: center; margin-bottom: 5px; }
         .total-hms { font-size: 1.2rem; font-family: monospace; font-weight: bold; display: block; border-top: 1px solid #999; margin-top: 4px; }
 
         .val-xl-v198 { font-size: 5rem; font-weight: bold; display: inline-block; line-height: 1; }
         .unit-xl { font-size: 2.5rem; font-weight: bold; margin-left: 5px; }
         .bubble-v198 { border: 2px solid #000; border-radius: 10px; margin-bottom: 6px; padding: 8px; text-align: center; background: #fff; }
-        .gs-container { display: flex; align-items: baseline; justify-content: center; margin-top: -10px; }
+        .gs-container { display: flex; align-items: baseline; justify-content: center; margin-top: -10px; width: 100%; text-align: center; }
         
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 20px; background: #ddd; border-radius: 10px; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 3px solid #fff; }
+
+        .log-item { border-bottom: 1px solid #000; padding: 10px 0; font-family: monospace; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
 <div id="calc-page" class="page">
-    <h2>214ST W&amp;B v2.3</h2>
+    <h2>214ST W&amp;B v2.4</h2>
     <div class="input-block">
         <div class="input-row"><span>Max Gross</span><input type="number" id="max-gross" value="17500" oninput="updateWB()"></div>
         <div class="input-row"><span>A/C Empty</span><input type="number" id="empty-weight" value="10000" oninput="updateWB()"></div>
@@ -65,19 +68,19 @@
 <div id="timer-page" class="page">
     <h2>FLIGHT TIMER</h2>
     <div class="timer-row">
-        <span style="font-size:0.7rem; font-weight:bold; width:40px;">E1</span>
+        <span class="timer-label">Engine 1</span>
         <button style="background:#0f0; flex:1; height:40px;" id="e1-start" onclick="startT('e1')">START</button>
         <button style="background:#f00; color:#fff; flex:1; height:40px;" id="e1-stop" onclick="stopT('e1')" disabled>STOP</button>
         <div class="time-display" id="e1-disp">00:00:00</div>
     </div>
     <div class="timer-row">
-        <span style="font-size:0.7rem; font-weight:bold; width:40px;">E2</span>
+        <span class="timer-label">Engine 2</span>
         <button style="background:#0f0; flex:1; height:40px;" id="e2-start" onclick="startT('e2')">START</button>
         <button style="background:#f00; color:#fff; flex:1; height:40px;" id="e2-stop" onclick="stopT('e2')" disabled>STOP</button>
         <div class="time-display" id="e2-disp">00:00:00</div>
     </div>
     <div class="timer-row" style="background:#eef;">
-        <span style="font-size:0.7rem; font-weight:bold; width:40px;">FLT</span>
+        <span class="timer-label">Flight Timer</span>
         <button style="background:#0f0; flex:1; height:40px;" id="fl-start" onclick="startT('fl')">START</button>
         <button style="background:#f00; color:#fff; flex:1; height:40px;" id="fl-stop" onclick="stopT('fl')" disabled>STOP</button>
         <div class="time-display" id="fl-disp">00:00:00</div>
@@ -104,7 +107,7 @@
 
 <div id="flight-page" class="page" style="flex-direction: column;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-        <button id="gps-btn" style="background:#f00; color:#fff; height:50px; flex:0 0 90px;" onclick="toggleGPS()">GPS OFF</button>
+        <button style="background:#d9534f; color:#fff; height:50px; flex:0 0 90px;" onclick="showPage('timer-page')">BACK</button>
         <div style="text-align:center;">
             <label style="font-size:0.7rem; font-weight:bold;">BURN</label>
             <select id="burn-rate-select" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;">
@@ -112,10 +115,10 @@
             </select>
         </div>
         <div style="text-align:center;">
-            <label style="font-size:0.7rem; font-weight:bold;">TGT GS</label>
+            <label style="font-size:0.7rem; font-weight:bold;">GS</label>
             <select id="gs-target-select" onchange="updateGSUI()" style="font-size:1.2rem; display:block; border:2px solid #000; border-radius:4px;"></select>
         </div>
-        <button style="background:#d9534f; color:#fff; height:50px; flex:0 0 90px;" onclick="showPage('timer-page')">STOP/BACK</button>
+        <button id="gps-btn" style="background:#f00; color:#fff; height:50px; flex:0 0 90px;" onclick="toggleGPS()">GPS OFF</button>
     </div>
 
     <div class="bubble-v198" style="padding:4px;"><span id="flight-timer-main" style="font-family:monospace; font-size:2.4rem; font-weight:bold;">00:00:00</span></div>
@@ -137,22 +140,23 @@
             <path d="M 73 24 A 80 80 0 0 1 127 24" fill="none" stroke="#4caf50" stroke-width="18" />
             
             <text x="100" y="24" font-size="10" font-weight="bold" id="gs-tgt-val" text-anchor="middle">--</text>
-            <text x="24" y="105" font-size="8" font-weight="bold" id="gs-min-val" text-anchor="middle">--</text>
-            <text x="176" y="105" font-size="8" font-weight="bold" id="gs-max-val" text-anchor="middle">--</text>
+            <text x="18" y="105" font-size="8" font-weight="bold" id="gs-min-val" text-anchor="middle">--</text>
+            <text x="182" y="105" font-size="8" font-weight="bold" id="gs-max-val" text-anchor="middle">--</text>
             
             <line id="needle-ptr" x1="100" y1="100" x2="100" y2="8" stroke="#f00" stroke-width="4" stroke-linecap="round" />
             <circle cx="100" cy="100" r="7" fill="#000" />
         </svg>
         <div class="gs-container">
             <span id="fly-gs" style="font-size:5.5rem; font-weight:bold; line-height:1;">0</span>
-            <span style="font-size:1.2rem; font-weight:bold; color:#444; margin-left:10px;">KTS GS</span>
+            <span style="font-size:1.2rem; font-weight:bold; color:#444; margin-left:10px;">KTS</span>
         </div>
     </div>
 </div>
 
 <div id="log-page" class="page">
     <button class="btn-nav" onclick="showPage('timer-page')">BACK</button>
-    <div id="log-body" style="margin-top:15px; font-family:monospace; font-size:0.9rem;"></div>
+    <div id="log-body" style="margin-top:15px;"></div>
+    <button class="btn-nav" style="background:#d9534f; margin-top:20px;" onclick="clearLogs()">CLEAR ALL</button>
 </div>
 
 <script>
@@ -167,8 +171,7 @@
     function showPage(id) {
         cancelAnimationFrame(flyTick);
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-        const target = document.getElementById(id);
-        target.style.display = (id === 'flight-page') ? 'flex' : 'block';
+        document.getElementById(id).style.display = (id === 'flight-page') ? 'flex' : 'block';
     }
 
     function updateWB() {
@@ -218,6 +221,33 @@
         let s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
         return [h,m,sec].map(v => v.toString().padStart(2,'0')).join(':');
     }
+
+    function saveLog() {
+        let log = JSON.parse(localStorage.getItem('heliLogs') || '[]');
+        let entry = {
+            date: new Date().toLocaleDateString(),
+            fuel: Math.round(curFuel),
+            payload: document.getElementById('res-lbs').innerText,
+            eng: document.getElementById('e-hms').innerText,
+            flt: document.getElementById('f-hms').innerText,
+            times: document.getElementById('f-ts').innerText
+        };
+        log.unshift(entry);
+        localStorage.setItem('heliLogs', JSON.stringify(log));
+        alert("Flight Saved");
+    }
+
+    function showLog() {
+        let log = JSON.parse(localStorage.getItem('heliLogs') || '[]');
+        let html = log.length ? '' : '<p>No logs found.</p>';
+        log.forEach(e => {
+            html += `<div class="log-item"><b>${e.date}</b> [${e.times}]<br>ENG: ${e.eng} | FLT: ${e.flt}<br>FUEL: ${e.fuel} | PAYLOAD: ${e.payload}</div>`;
+        });
+        document.getElementById('log-body').innerHTML = html;
+        showPage('log-page');
+    }
+
+    function clearLogs() { if(confirm("Clear all logs?")) { localStorage.removeItem('heliLogs'); showLog(); } }
 
     function initFlightPage() {
         if (!timers.fl.running) startT('fl');
