@@ -1,12 +1,12 @@
 {
     "name": "Tanking App",
     "short_name": "Tanking",
-    "description": "tanking payload calculator",
+    "description": "Bell 214 tanking payload calculator",
     "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",
-    "background_color": "#0f0f1a",
-    "theme_color": "#1a1a2e",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
     "icons": [
         {
             "src": "tank.png",
