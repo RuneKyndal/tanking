@@ -1,5 +1,5 @@
-// sw.js — Bell 214ST W&B v1.0
-const CACHE_NAME = 'tanking-v13';
+// sw.js — Tanking App v3.7
+const CACHE_NAME = 'tanking-v37';
 
 const ASSETS = [
     './index.html',
