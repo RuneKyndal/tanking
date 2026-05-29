@@ -9,15 +9,14 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app v4.0</title>
+    <title>Tanking app v3.8</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
             background: #fff; color: #000;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0; padding: 0;
-            position: fixed; width: 100%; height: 100%;
-            overflow: hidden;
+            position: fixed; width: 100%; height: 100%; overflow: hidden;
         }
         .page { width: 100%; padding: 10px; display: none; height: 100vh; position: absolute; top: 0; left: 0; background: #fff; z-index: 10; overflow-y: auto; }
         #calc-page { display: block; z-index: 20; }
@@ -55,27 +54,29 @@
         .log-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; margin-top: 10px; }
         .log-table th, .log-table td { border: 1px solid #000; padding: 4px 2px; text-align: center; }
 
-        /* Confirm overlay */
+        /* GPS button states */
+        #gps-btn { transition: background 0.2s; }
+        #gps-btn.gps-off      { background: #cc0000 !important; color: #fff !important; }
+        #gps-btn.gps-waiting  { background: #ff9900 !important; color: #000 !important; }
+        #gps-btn.gps-live     { background: #00cc00 !important; color: #000 !important; }
+
+        /* Confirm / alert overlay */
         #confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9998; justify-content: center; align-items: center; }
         #confirm-overlay.show { display: flex; }
-        #confirm-box { background: #fff; border: 2px solid #000; border-radius: 12px; padding: 24px; text-align: center; width: min(280px, 85vw); }
-        #confirm-box p { margin: 0 0 16px 0; font-weight: bold; }
+        #confirm-box { background: #fff; border: 2px solid #000; border-radius: 12px; padding: 24px; text-align: center; width: min(300px, 88vw); }
+        #confirm-box p { margin: 0 0 16px 0; font-weight: bold; font-size: 0.9rem; line-height: 1.4; }
         #confirm-box .btn-row { display: flex; gap: 10px; }
+        #confirm-box button { flex: 1; padding: 12px; border: 2px solid #000; border-radius: 6px; font-weight: bold; font-size: 0.9rem; }
 
         /* Toast — replaces alert() for iOS standalone */
         #toast { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #222; color: #fff; padding: 10px 22px; border-radius: 10px; font-size: 0.9rem; z-index: 9999; white-space: nowrap; pointer-events: none; }
-
-        /* GPS status indicator */
-        #gps-btn.live { background: #00cc00 !important; color: #000 !important; }
-        #gps-btn.waiting { background: #ff9900 !important; color: #000 !important; }
-        #gps-btn.off { background: #f00 !important; color: #fff !important; }
     </style>
 </head>
 <body>
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app v4.0</h2>
+    <h2>Tanking app v3.8</h2>
 
     <div class="preset-row">
         <button class="btn-preset" onclick="applyPreset(16000, 8000, 2500, 1000)">Bell 214B</button>
@@ -134,8 +135,18 @@
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px;">
-        <div class="bubble-v198" style="background:#f0f0f0;"><small style="font-weight:bold;">ENG RUN</small><br><span id="e-ts" style="font-size:0.7rem;">--:-- to --:--</span><span id="e-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span><span class="dec-small" id="e-dec">0.00 hr</span></div>
-        <div class="bubble-v198" style="background:#eef;"><small style="font-weight:bold;">FLIGHT</small><br><span id="f-ts" style="font-size:0.7rem;">--:-- to --:--</span><span id="f-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span><span class="dec-small" id="f-dec">0.00 hr</span></div>
+        <div class="bubble-v198" style="background:#f0f0f0;">
+            <small style="font-weight:bold;">ENG RUN</small><br>
+            <span id="e-ts" style="font-size:0.7rem;">--:-- to --:--</span>
+            <span id="e-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span>
+            <span class="dec-small" id="e-dec">0.00 hr</span>
+        </div>
+        <div class="bubble-v198" style="background:#eef;">
+            <small style="font-weight:bold;">FLIGHT</small><br>
+            <span id="f-ts" style="font-size:0.7rem;">--:-- to --:--</span>
+            <span id="f-hms" style="display:block; border-top:1px solid #999; margin-top:4px; font-weight:bold;">00:00:00</span>
+            <span class="dec-small" id="f-dec">0.00 hr</span>
+        </div>
     </div>
 
     <div style="display:flex; gap:5px; margin-top:10px;">
@@ -161,11 +172,11 @@
             </select>
         </div>
         <div style="text-align:center;">
-            <label style="font-size:0.7rem; font-weight:bold;">GS</label>
+            <label style="font-size:0.7rem; font-weight:bold;">GS TARGET</label>
             <select id="gs-target-select" onchange="updateGSUI()" style="font-size:1.1rem; display:block; border:2px solid #000; border-radius:4px; font-family:inherit;"></select>
         </div>
-        <!-- GPS button — starts automatically on page load -->
-        <button id="gps-btn" class="off" style="height:50px; flex:0 0 80px;" onclick="toggleGPS()">GPS OFF</button>
+        <!-- GPS button: tap to start/stop. Shows permission instructions if denied. -->
+        <button id="gps-btn" class="gps-off" style="height:50px; flex:0 0 80px;" onclick="toggleGPS()">GPS OFF</button>
     </div>
 
     <div class="bubble-v198" style="padding:4px;">
@@ -188,7 +199,7 @@
         <svg viewBox="0 0 200 145" style="width:100vw; margin-left:-10px;">
             <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#ffeb3b" stroke-width="18" stroke-linecap="round"/>
             <path d="M 73 24 A 80 80 0 0 1 127 24" fill="none" stroke="#4caf50" stroke-width="18"/>
-            <text x="100" y="24" font-size="10" font-weight="bold" id="gs-tgt-val" text-anchor="middle">--</text>
+            <text x="100" y="24"  font-size="10" font-weight="bold" id="gs-tgt-val" text-anchor="middle">--</text>
             <text x="18"  y="105" font-size="8"  font-weight="bold" id="gs-min-val" text-anchor="middle">--</text>
             <text x="182" y="105" font-size="8"  font-weight="bold" id="gs-max-val" text-anchor="middle">--</text>
             <text x="100" y="115" font-size="42" font-weight="bold" id="fly-gs-svg" text-anchor="middle">0</text>
@@ -214,13 +225,13 @@
     <button class="btn-nav" style="background:#dc3545; margin-top:25px;" onclick="confirmClear()">DELETE ALL</button>
 </div>
 
-<!-- ── CONFIRM OVERLAY ── -->
+<!-- ── CONFIRM / ALERT OVERLAY ── -->
 <div id="confirm-overlay">
     <div id="confirm-box">
         <p id="confirm-text">Confirm action?</p>
         <div class="btn-row">
-            <button id="confirm-yes" style="background:#dc3545; color:#fff; flex:1; padding:10px; border:2px solid #000; border-radius:6px; font-weight:bold;">YES</button>
-            <button id="confirm-no"  style="background:#ccc; flex:1; padding:10px; border:2px solid #000; border-radius:6px; font-weight:bold;">NO</button>
+            <button id="confirm-yes" style="background:#dc3545; color:#fff;">YES</button>
+            <button id="confirm-no"  style="background:#ccc;">NO</button>
         </div>
     </div>
 </div>
@@ -247,19 +258,59 @@
         setTimeout(function() { t.style.display = 'none'; }, duration);
     }
 
+    // ── Confirm / info dialog ─────────────────────────────────────────────────
+    // Pass yesCallback=null for a single OK-button info dialog
+    function showDialog(msg, yesCallback, noCallback) {
+        document.getElementById('confirm-text').innerText = msg;
+        var overlay = document.getElementById('confirm-overlay');
+        var yesBtn  = document.getElementById('confirm-yes');
+        var noBtn   = document.getElementById('confirm-no');
+
+        if (yesCallback === null) {
+            // Info-only mode: hide NO, rename YES to OK
+            yesBtn.textContent = 'OK';
+            yesBtn.style.background = '#000';
+            yesBtn.style.color = '#fff';
+            noBtn.style.display = 'none';
+        } else {
+            yesBtn.textContent = 'YES';
+            yesBtn.style.background = '#dc3545';
+            yesBtn.style.color = '#fff';
+            noBtn.style.display = '';
+        }
+
+        overlay.classList.add('show');
+
+        yesBtn.onclick = function() {
+            overlay.classList.remove('show');
+            noBtn.style.display = '';
+            if (yesCallback) yesCallback();
+        };
+        noBtn.onclick = function() {
+            overlay.classList.remove('show');
+            if (noCallback) noCallback();
+        };
+    }
+
     // ── State ─────────────────────────────────────────────────────────────────
     var timers = {
-        e1: { elapsed:0, start:null, interval:null, running:false },
-        e2: { elapsed:0, start:null, interval:null, running:false },
-        fl: { elapsed:0, start:null, interval:null, running:false, tsS:null, tsE:null },
+        e1:   { elapsed:0, start:null, interval:null, running:false },
+        e2:   { elapsed:0, start:null, interval:null, running:false },
+        fl:   { elapsed:0, start:null, interval:null, running:false, tsS:null, tsE:null },
         engG: { start:null, end:null }
     };
     var curFuel = 2750, burnRef = null, flyTick = null, curGS = 0, watchID = null;
 
     // ── Helpers ───────────────────────────────────────────────────────────────
-    function getTimeStr(d) { return (d ? new Date(d) : new Date()).toTimeString().slice(0, 5); }
-    function format(ms) { var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60; return [h,m,sec].map(function(v){return v.toString().padStart(2,'0');}).join(':'); }
-    function formatShort(ms) { var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60); return [h,m].map(function(v){return v.toString().padStart(2,'0');}).join(':'); }
+    function getTimeStr(d) { return (d ? new Date(d) : new Date()).toTimeString().slice(0,5); }
+    function format(ms) {
+        var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+        return [h,m,sec].map(function(v){return v.toString().padStart(2,'0');}).join(':');
+    }
+    function formatShort(ms) {
+        var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60);
+        return [h,m].map(function(v){return v.toString().padStart(2,'0');}).join(':');
+    }
 
     // ── Page navigation ───────────────────────────────────────────────────────
     function showPage(id) {
@@ -270,9 +321,9 @@
 
     // ── Presets ───────────────────────────────────────────────────────────────
     function applyPreset(mg, em, fuel, burn) {
-        document.getElementById('max-gross').value = mg;
-        document.getElementById('empty-weight').value = em;
-        document.getElementById('fuel-slider').value = fuel;
+        document.getElementById('max-gross').value       = mg;
+        document.getElementById('empty-weight').value   = em;
+        document.getElementById('fuel-slider').value    = fuel;
         document.getElementById('burn-rate-select').value = burn;
         updateWB();
     }
@@ -283,13 +334,13 @@
         var empty = parseFloat(document.getElementById('empty-weight').value) || 0;
         var crew  = parseFloat(document.getElementById('crew-gear').value)    || 0;
         curFuel   = parseFloat(document.getElementById('fuel-slider').value);
-        var p = mg - (empty + crew + curFuel);
+        var p     = mg - (empty + crew + curFuel);
         document.getElementById('fuel-display').innerText  = curFuel.toLocaleString() + ' lbs';
-        document.getElementById('res-lbs').innerText       = p < 0 ? "OVER" : Math.round(p).toLocaleString();
-        document.getElementById('res-liters').innerText    = p < 0 ? "0"    : Math.round(p * 0.4536).toLocaleString();
+        document.getElementById('res-lbs').innerText       = p < 0 ? "OVER"  : Math.round(p).toLocaleString();
+        document.getElementById('res-liters').innerText    = p < 0 ? "0"     : Math.round(p * 0.4536).toLocaleString();
     }
 
-    // ── Timer functions ───────────────────────────────────────────────────────
+    // ── Timers ────────────────────────────────────────────────────────────────
     function startT(id) {
         if (timers[id].running) return;
         timers[id].running = true;
@@ -298,11 +349,11 @@
         if ((id === 'e1' || id === 'e2') && !timers.engG.start) timers.engG.start = Date.now();
         timers[id].interval = setInterval(function() {
             timers[id].elapsed = Date.now() - timers[id].start;
-            document.getElementById(id + '-disp').innerText = format(timers[id].elapsed);
+            document.getElementById(id+'-disp').innerText = format(timers[id].elapsed);
             updateStats();
         }, 1000);
-        document.getElementById(id + '-start').disabled = true;
-        document.getElementById(id + '-stop').disabled  = false;
+        document.getElementById(id+'-start').disabled = true;
+        document.getElementById(id+'-stop').disabled  = false;
     }
 
     function stopT(id) {
@@ -310,39 +361,32 @@
         clearInterval(timers[id].interval);
         if (id === 'fl') timers.fl.tsE = getTimeStr();
         if (!timers.e1.running && !timers.e2.running) timers.engG.end = Date.now();
-        document.getElementById(id + '-start').disabled = false;
-        document.getElementById(id + '-stop').disabled  = true;
+        document.getElementById(id+'-start').disabled = false;
+        document.getElementById(id+'-stop').disabled  = true;
         updateStats();
     }
 
     function resetRow(id) {
-        stopT(id);
-        timers[id].elapsed = 0;
-        document.getElementById(id + '-disp').innerText = "00:00:00";
+        stopT(id); timers[id].elapsed = 0;
+        document.getElementById(id+'-disp').innerText = "00:00:00";
         if (id === 'fl') { timers.fl.tsS = null; timers.fl.tsE = null; }
         if (id !== 'fl' && !timers.e1.running && !timers.e2.running) { timers.engG.start = null; timers.engG.end = null; }
         updateStats();
     }
 
     function resetAllTimers() {
-        document.getElementById('confirm-text').innerText = "Reset ALL current timers?";
-        document.getElementById('confirm-overlay').classList.add('show');
-        document.getElementById('confirm-yes').onclick = function() {
+        showDialog("Reset ALL current timers?", function() {
             ['e1','e2','fl'].forEach(resetRow);
-            document.getElementById('confirm-overlay').classList.remove('show');
-        };
-        document.getElementById('confirm-no').onclick = function() {
-            document.getElementById('confirm-overlay').classList.remove('show');
-        };
+        }, null);
     }
 
     function updateStats() {
         var eMs = (timers.engG.end || (timers.engG.start ? Date.now() : 0)) - (timers.engG.start || 0);
         document.getElementById('e-hms').innerText = format(Math.max(0, eMs));
-        document.getElementById('e-dec').innerText = (eMs / 3600000).toFixed(2) + " hr";
+        document.getElementById('e-dec').innerText = (eMs/3600000).toFixed(2) + " hr";
         document.getElementById('e-ts').innerText  = (timers.engG.start ? getTimeStr(timers.engG.start) : "--:--") + " to " + (timers.engG.end ? getTimeStr(timers.engG.end) : "--:--");
         document.getElementById('f-hms').innerText = format(timers.fl.elapsed);
-        document.getElementById('f-dec').innerText = (timers.fl.elapsed / 3600000).toFixed(2) + " hr";
+        document.getElementById('f-dec').innerText = (timers.fl.elapsed/3600000).toFixed(2) + " hr";
         document.getElementById('f-ts').innerText  = (timers.fl.tsS || "--:--") + " to " + (timers.fl.tsE || "--:--");
     }
 
@@ -353,15 +397,15 @@
             date: new Date().toLocaleDateString(),
             eb:   document.getElementById('e-ts').innerText,
             ehms: formatShort(engMs),
-            eh:   (engMs / 3600000).toFixed(2),
+            eh:   (engMs/3600000).toFixed(2),
             fb:   document.getElementById('f-ts').innerText,
             fhms: formatShort(timers.fl.elapsed),
-            fh:   (timers.fl.elapsed / 3600000).toFixed(2)
+            fh:   (timers.fl.elapsed/3600000).toFixed(2)
         };
         var log = JSON.parse(localStorage.getItem('hLogV36') || '[]');
         log.push(entry);
         localStorage.setItem('hLogV36', JSON.stringify(log));
-        showToast("✓ Flight Saved");   // was alert() — blocked on iOS standalone
+        showToast("✓ Flight Saved");  // replaces alert() — blocked on iOS standalone
     }
 
     function showLog() {
@@ -373,31 +417,25 @@
         var html = '', dailyE = 0, dailyF = 0, lastDate = log[0].date, dayHtml = '';
         log.forEach(function(e, i) {
             if (e.date !== lastDate) {
-                html += dayHtml + '<tr style="background:#f0f0f0; font-weight:bold;"><td colspan="3">TOTAL ' + lastDate + '</td><td>' + dailyE.toFixed(2) + '</td><td colspan="2"></td><td>' + dailyF.toFixed(2) + '</td></tr>';
+                html += dayHtml + '<tr style="background:#f0f0f0;font-weight:bold;"><td colspan="3">TOTAL ' + lastDate + '</td><td>' + dailyE.toFixed(2) + '</td><td colspan="2"></td><td>' + dailyF.toFixed(2) + '</td></tr>';
                 dayHtml = ''; dailyE = 0; dailyF = 0; lastDate = e.date;
             }
             dayHtml += '<tr><td>' + e.date + '</td><td>' + e.eb + '</td><td>' + e.ehms + '</td><td>' + e.eh + '</td><td>' + e.fb + '</td><td>' + e.fhms + '</td><td>' + e.fh + '</td></tr>';
             dailyE += parseFloat(e.eh);
             dailyF += parseFloat(e.fh);
             if (i === log.length - 1) {
-                html += dayHtml + '<tr style="background:#f0f0f0; font-weight:bold;"><td colspan="3">TOTAL ' + lastDate + '</td><td>' + dailyE.toFixed(2) + '</td><td colspan="2"></td><td>' + dailyF.toFixed(2) + '</td></tr>';
+                html += dayHtml + '<tr style="background:#f0f0f0;font-weight:bold;"><td colspan="3">TOTAL ' + lastDate + '</td><td>' + dailyE.toFixed(2) + '</td><td colspan="2"></td><td>' + dailyF.toFixed(2) + '</td></tr>';
             }
         });
         tbody.innerHTML = html;
     }
 
     function confirmClear() {
-        document.getElementById('confirm-text').innerText = "Delete ALL logs? Cannot be undone.";
-        document.getElementById('confirm-overlay').classList.add('show');
-        document.getElementById('confirm-yes').onclick = function() {
+        showDialog("Delete ALL logs? Cannot be undone.", function() {
             localStorage.removeItem('hLogV36');
-            document.getElementById('confirm-overlay').classList.remove('show');
             showLog();
             showToast("All logs deleted");
-        };
-        document.getElementById('confirm-no').onclick = function() {
-            document.getElementById('confirm-overlay').classList.remove('show');
-        };
+        }, null);
     }
 
     function exportData(type) {
@@ -405,15 +443,17 @@
         if (!log.length) { showToast("No logs found."); return; }
         var content, ext, mime;
         if (type === 'csv') {
-            content = "Date,Eng Block,Eng HHMM,Eng Dec,Flt Block,Flt HHMM,Flt Dec\n" + log.map(function(e){ return [e.date,e.eb,e.ehms,e.eh,e.fb,e.fhms,e.fh].join(','); }).join('\n');
+            content = "Date,Eng Block,Eng HHMM,Eng Dec,Flt Block,Flt HHMM,Flt Dec\n" +
+                log.map(function(e){return [e.date,e.eb,e.ehms,e.eh,e.fb,e.fhms,e.fh].join(',');}).join('\n');
             ext = ".csv"; mime = "text/csv";
         } else {
-            content = "HELI LOG\n" + log.map(function(e){ return e.date + " | ENG: " + e.eb + " [" + e.ehms + "] (" + e.eh + "h) | FLT: " + e.fb + " [" + e.fhms + "] (" + e.fh + "h)"; }).join('\n');
+            content = "HELI LOG\n" +
+                log.map(function(e){return e.date+" | ENG: "+e.eb+" ["+e.ehms+"] ("+e.eh+"h) | FLT: "+e.fb+" ["+e.fhms+"] ("+e.fh+"h)";}).join('\n');
             ext = ".txt"; mime = "text/plain";
         }
         var a = document.createElement('a');
-        a.href     = URL.createObjectURL(new Blob([content], { type: mime }));
-        a.download = "HeliLog_" + new Date().toISOString().slice(0, 10) + ext;
+        a.href = URL.createObjectURL(new Blob([content],{type:mime}));
+        a.download = "HeliLog_" + new Date().toISOString().slice(0,10) + ext;
         a.click();
     }
 
@@ -424,9 +464,6 @@
         document.getElementById('fly-fuel-slider').value = curFuel;
         burnRef = Date.now();
 
-        // Auto-start GPS when entering flight page
-        startGPS();
-
         function loop() {
             var now  = Date.now();
             var rate = parseFloat(document.getElementById('burn-rate-select').value);
@@ -435,7 +472,7 @@
             var mg    = parseFloat(document.getElementById('max-gross').value)    || 0;
             var empty = parseFloat(document.getElementById('empty-weight').value) || 0;
             var crew  = parseFloat(document.getElementById('crew-gear').value)    || 0;
-            var p = mg - (empty + crew + curFuel);
+            var p     = mg - (empty + crew + curFuel);
             document.getElementById('fly-ltr').innerText      = p < 0 ? "0" : Math.round(p * 0.4536).toLocaleString();
             document.getElementById('fly-fuel-lbs').innerText = Math.round(curFuel).toLocaleString();
             document.getElementById('flight-timer-main').innerText = format(timers.fl.elapsed);
@@ -450,34 +487,82 @@
         showPage('timer-page');
     }
 
-    // ── GPS — improved refresh rate and error handling ────────────────────────
-    function startGPS() {
-        if (watchID !== null) return; // already running
-        var btn = document.getElementById('gps-btn');
-        btn.innerText = "GPS...";
-        btn.className = "waiting";
+    // ── GPS ───────────────────────────────────────────────────────────────────
+    // iOS PWA GPS notes:
+    //   - Permission granted to Safari does NOT carry over to the installed PWA
+    //   - The PWA needs its own permission — granted via a direct user tap
+    //   - If denied: user must go to Settings → Privacy → Location Services
+    //     → scroll to this app (or Safari Websites) → set to "While Using"
+    //   - We check permission state first (where supported) before calling watchPosition
 
+    function setGPSBtn(state, label) {
+        var btn = document.getElementById('gps-btn');
+        btn.className = 'gps-' + state;
+        btn.innerText = label;
+    }
+
+    function startGPS() {
+        if (watchID !== null) return;
+
+        if (!navigator.geolocation) {
+            setGPSBtn('off', 'NO GPS');
+            return;
+        }
+
+        setGPSBtn('waiting', 'GPS...');
+
+        // Check permission state first if Permissions API is available (Android/newer iOS)
+        if (navigator.permissions && navigator.permissions.query) {
+            navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+                if (result.state === 'denied') {
+                    // Permission already hard-denied — show instructions
+                    setGPSBtn('off', 'GPS DENIED');
+                    showDialog(
+                        "Location access is denied.\n\niOS: Settings → Privacy & Security → Location Services → find this app or Safari → set to \"While Using\".\n\nAndroid: Settings → Apps → Browser → Permissions → Location → Allow.",
+                        null, null
+                    );
+                } else {
+                    // 'granted' or 'prompt' — try to start
+                    doWatchPosition();
+                }
+            }).catch(function() {
+                // Permissions API failed — try anyway
+                doWatchPosition();
+            });
+        } else {
+            // Permissions API not available (older iOS) — try directly
+            doWatchPosition();
+        }
+    }
+
+    function doWatchPosition() {
         watchID = navigator.geolocation.watchPosition(
             function(pos) {
+                // Success
                 curGS = (pos.coords.speed || 0) * 1.94384;
-                btn.innerText = "GPS LIVE";
-                btn.className = "live";
+                setGPSBtn('live', 'GPS LIVE');
                 updateGSUI();
             },
             function(err) {
-                var msgs = {
-                    1: "GPS denied",
-                    2: "GPS unavailable",
-                    3: "GPS timeout"
-                };
-                btn.innerText = msgs[err.code] || "GPS ERR";
-                btn.className = "off";
+                // Error handler — was null before, which silently swallowed all GPS failures
                 watchID = null;
+                if (err.code === 1) {
+                    // PERMISSION_DENIED
+                    setGPSBtn('off', 'GPS DENIED');
+                    showDialog(
+                        "Location access denied.\n\niOS: Settings → Privacy & Security → Location Services → find this app → set to \"While Using\".\n\nThen tap GPS OFF to try again.",
+                        null, null
+                    );
+                } else if (err.code === 2) {
+                    setGPSBtn('off', 'NO SIGNAL');
+                } else {
+                    setGPSBtn('off', 'GPS ERR');
+                }
             },
             {
-                enableHighAccuracy: true,  // use GPS chip, not wifi/cell
-                maximumAge: 0,             // never serve a cached position
-                timeout: 10000             // fail after 10s if no fix
+                enableHighAccuracy: true,  // use GPS chip
+                maximumAge:         0,     // never use cached position
+                timeout:            10000  // give up after 10s if no fix
             }
         );
     }
@@ -487,11 +572,12 @@
             navigator.geolocation.clearWatch(watchID);
             watchID = null;
         }
-        var btn = document.getElementById('gps-btn');
-        if (btn) { btn.innerText = "GPS OFF"; btn.className = "off"; }
         curGS = 0;
+        setGPSBtn('off', 'GPS OFF');
     }
 
+    // GPS button: tap toggles on/off
+    // Must be a direct user gesture for iOS permission prompt to fire
     function toggleGPS() {
         if (watchID !== null) {
             stopGPS();
@@ -502,13 +588,12 @@
 
     // ── GS gauge ──────────────────────────────────────────────────────────────
     function updateGSUI() {
-        var tgt      = parseFloat(document.getElementById('gs-target-select').value);
-        var rotation = (curGS - tgt) * 9;
-        rotation     = Math.max(-95, Math.min(95, rotation));
+        var tgt = parseFloat(document.getElementById('gs-target-select').value);
         document.getElementById('gs-min-val').textContent = tgt - 10;
         document.getElementById('gs-tgt-val').textContent = tgt;
         document.getElementById('gs-max-val').textContent = tgt + 10;
         document.getElementById('fly-gs-svg').textContent = Math.round(curGS);
+        var rotation = Math.max(-95, Math.min(95, (curGS - tgt) * 9));
         document.getElementById('needle-ptr').setAttribute('transform', 'rotate(' + rotation + ', 100, 100)');
     }
 
