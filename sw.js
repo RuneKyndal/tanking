@@ -1,14 +1,14 @@
-// sw.js — Tanking App v3.7
-const CACHE_NAME = 'tanking-v37';
+// sw.js — Tanking App v3.8
+const CACHE_NAME = 'tanking-v38';
 
 const ASSETS = [
     './index.html',
     './manifest.json',
     './sw.js',
-    './tank.png'
+    './tank.png',
+    './tank_maskable.png'
 ];
 
-// Install: pre-cache all assets
 self.addEventListener('install', function(event) {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -22,7 +22,6 @@ self.addEventListener('install', function(event) {
     );
 });
 
-// Activate: delete old caches
 self.addEventListener('activate', function(event) {
     event.waitUntil(
         caches.keys().then(function(keys) {
@@ -40,12 +39,11 @@ self.addEventListener('activate', function(event) {
     );
 });
 
-// Fetch: network-first, cache fallback
-// Online  → fresh from GitHub, cache updated automatically
-// Offline → falls back to cache, works 100% offline
+// Network-first, cache fallback
+// Online  → always fresh from GitHub
+// Offline → serves from cache
 self.addEventListener('fetch', function(event) {
     if (event.request.method !== 'GET') return;
-
     event.respondWith(
         fetch(event.request)
             .then(function(response) {
