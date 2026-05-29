@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app v4.1</title>
+    <title>Tanking app v4.2</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -76,7 +76,7 @@
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app v4.1</h2>
+    <h2>Tanking app v4.2</h2>
 
     <div class="preset-row">
         <button class="btn-preset" onclick="applyPreset(16000, 8000, 2500, 1000)">Bell 214B</button>
@@ -463,6 +463,10 @@
         showPage('flight-page');
         document.getElementById('fly-fuel-slider').value = curFuel;
         burnRef = Date.now();
+        // Auto-start GPS on entering flight page.
+        // iOS will show permission popup on first use — user must tap Allow.
+        // On subsequent launches permission is already granted and GPS starts silently.
+        startGPS();
 
         function loop() {
             var now  = Date.now();
