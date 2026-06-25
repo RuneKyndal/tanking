@@ -58,6 +58,10 @@
 </head>
 <body>
 
+    <p class="note" style="margin-top:0;">
+        <button id="exit-btn" style="font-weight:bold; font-size:0.95rem; padding:8px 16px; border:2px solid #000; border-radius:6px; background:#000; color:#fff; cursor:pointer;">&#8592; Exit Manual</button>
+    </p>
+
     <h1>Tanking App Manual</h1>
     
     <p class="note">
@@ -109,6 +113,22 @@
         <li>Save to log.</li>
         <li>Export logs.</li>
     </ul>
+    <script>
+        document.getElementById('exit-btn').addEventListener('click', function () {
+            // If this page is loaded inside the app's iframe, tell the parent to
+            // close the manual and show the main calc page again.
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'EXIT_MANUAL' }, '*');
+            } else {
+                // Opened directly/standalone (e.g. in its own tab) — just go back.
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }
+        });
+    </script>
 
 </body>
 </html>

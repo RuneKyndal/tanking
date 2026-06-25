@@ -1,7 +1,7 @@
 {
     "name": "Tanking App",
     "short_name": "Tanking",
-    "description": "Bell 214 tanking payload calculator",
+    "description": "Bell 214 tanking payload calculator v5.2",
     "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",

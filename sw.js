@@ -1,5 +1,5 @@
-// sw.js — Tanking App v3.8
-const CACHE_NAME = 'tanking-v38';
+// sw.js — Tanking App v3.10
+const CACHE_NAME = 'tanking-v310';
 
 const ASSETS = [
     './index.html',
@@ -20,6 +20,25 @@ self.addEventListener('install', function(event) {
                 return self.skipWaiting();
             })
     );
+});
+
+// Allow the page to force a full reset: delete every cache this SW owns,
+// then take over immediately so the next fetches go to the network fresh.
+self.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'FORCE_UPDATE') {
+        event.waitUntil(
+            caches.keys().then(function(keys) {
+                return Promise.all(keys.map(function(key) { return caches.delete(key); }));
+            }).then(function() {
+                return self.skipWaiting();
+            }).then(function() {
+                // Tell the page(s) it's safe to reload now
+                return self.clients.matchAll().then(function(clients) {
+                    clients.forEach(function(c) { c.postMessage({ type: 'FORCE_UPDATE_DONE' }); });
+                });
+            })
+        );
+    }
 });
 
 self.addEventListener('activate', function(event) {
