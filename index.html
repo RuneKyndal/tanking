@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app v5.7</title>
+    <title>Tanking app v5.8</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -79,9 +79,9 @@
         .bingo-box.warn { background: #ffeb00; }
         .bingo-box.warn-red { background: #ff3300; color: #fff; }
         .bingo-box.warn-red .bingo-reserve { color: #ffdddd; }
-        .bingo-header-row { display: flex; align-items: baseline; gap: 8px; justify-content: center; margin-bottom: 4px; }
-        .bingo-title { font-size: 1.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-        .bingo-reserve { font-size: 0.85rem; color: #555; font-weight: bold; }
+        .bingo-header-row { display: block; text-align: center; margin-bottom: 4px; white-space: nowrap; overflow: hidden; }
+        .bingo-title { font-size: 1.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
+        .bingo-reserve { font-size: 0.85rem; color: #555; font-weight: bold; display: inline-block; margin-left: 8px; vertical-align: middle; }
         .bingo-line { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 16px; justify-content: center; }
         .bingo-time { font-size: 2.1rem; font-weight: bold; flex: 0 0 auto; }
         .bingo-dist { font-size: 1.6rem; font-weight: bold; flex: 0 0 auto; }
@@ -102,13 +102,45 @@
             .ls-fuel-payload > .bubble-v198 { flex: 1; }
             .ls-gauge-wrap { width: 100% !important; }
         }
+
+        /* ── DARK MODE ── */
+        body.dark { background: #1a1a1a; color: #f0f0f0; }
+        body.dark .page { background: #1a1a1a; }
+        body.dark h2 { color: #f0f0f0; }
+        body.dark button { border-color: #555; }
+        body.dark .btn-nav { background: #333; border-color: #555; }
+        body.dark .btn-preset { background: #2a2a2a; color: #f0f0f0; border-color: #555; }
+        body.dark .btn-manual { background: #2a2a2a; color: #f0f0f0; border-color: #555; }
+        body.dark .input-block { background: #252525; border-color: #555; }
+        body.dark .input-row { border-bottom-color: #444; }
+        body.dark input[type="number"] { background: #333; border-color: #555; color: #f0f0f0; }
+        body.dark .fuel-section { background: #252525; border-color: #555; }
+        body.dark .bubble-v198 { background: #252525; border-color: #555; }
+        body.dark .bingo-box { background: #252525; border-color: #555; }
+        body.dark .bingo-box.warn { background: #7a6e00; color: #fff; }
+        body.dark .bingo-box.warn-red { background: #8b1a00; color: #fff; }
+        body.dark .bingo-reserve { color: #aaa; }
+        body.dark .dec-small { color: #aaa; }
+        body.dark .timer-row { border-color: #555; }
+        body.dark .timer-row[style*="background:#eef"] { background: #1e2535 !important; }
+        body.dark .bubble-v198[style*="background:#f0f0f0"] { background: #2a2a2a !important; }
+        body.dark .bubble-v198[style*="background:#eef"] { background: #1e2535 !important; }
+        body.dark input[type="range"] { background: #444; }
+        body.dark input[type="range"]::-webkit-slider-thumb { background: #f0f0f0; border-color: #1a1a1a; box-shadow: 0 0 0 2px #888; }
+        body.dark .log-table th, body.dark .log-table td { border-color: #555; }
+        body.dark #confirm-box { background: #252525; border-color: #555; color: #f0f0f0; }
+        body.dark select { background: #2a2a2a; color: #f0f0f0; border-color: #555; }
+        body.dark #gs-gauge-svg path[stroke="#ddd"] { stroke: #444; }
+        body.dark .gs-tick-line { stroke: #ccc; }
+        body.dark #toast { background: #444; }
+        /* Dark mode SVG text/needle colors handled via JS */
     </style>
 </head>
 <body>
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app v5.7</h2>
+    <h2>Tanking app v5.8</h2>
 
     <div class="preset-row">
         <div style="display:flex; gap:6px;">
@@ -205,6 +237,7 @@
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; gap:4px;">
         <div style="display:flex; align-items:center; gap:4px;">
             <button style="background:#d9534f; color:#fff; height:50px; padding:0 12px; flex:0 0 auto;" onclick="leaveFlight()">BACK</button>
+            <button id="dark-toggle-btn" style="height:50px; padding:0 10px; font-size:0.75rem; background:#333; color:#fff; border-color:#555;" onclick="toggleDark()">🌙 DARK</button>
             <div style="text-align:center; flex:0 0 auto;">
                 <label style="font-size:0.65rem; font-weight:bold;">FUELBURN lbs/hr</label>
                 <select id="burn-rate-select" onchange="updateBingo(); saveSettings();" style="font-size:1rem; display:block; width:auto; border:2px solid #000; border-radius:4px; font-family:inherit;">
@@ -405,9 +438,11 @@
         Promise.all([clearCaches, unregister]).then(function() {
             var status = document.getElementById('update-status');
             if (status) status.textContent = 'Reloading…';
-            // location.reload(true) is ignored by modern browsers; cache-busting
-            // query string forces a genuine network fetch of index.html itself.
-            window.location.href = window.location.pathname.split('?')[0] + '?v=' + Date.now();
+            // Use location.replace with a cache-busting param so the browser
+            // fetches a fresh copy from the server without triggering a file
+            // download. replace() keeps the history stack clean (no extra entry).
+            var base = window.location.origin + window.location.pathname.split('?')[0];
+            window.location.replace(base + '?v=' + Date.now());
         });
     }
 
@@ -947,7 +982,7 @@
         if (ng) ng.style.transform = 'rotate(' + deg + 'deg)';
         // colour the digital readout
         var gsText = document.getElementById('fly-gs-svg');
-        if (gsText) gsText.setAttribute('fill', Math.abs(diff) <= 3 ? '#00aa33' : '#000');
+        if (gsText) gsText.setAttribute('fill', Math.abs(diff) <= 3 ? '#00cc44' : (document.body.classList.contains('dark') ? '#e0e0e0' : '#000'));
     }
 
     // ── Init ──────────────────────────────────────────────────────────────────
@@ -960,6 +995,34 @@
         gsS.appendChild(o);
     }
 
+    // ── Dark Mode ─────────────────────────────────────────────────────────────
+    function applyDark(isDark) {
+        document.body.classList.toggle('dark', isDark);
+        var btn = document.getElementById('dark-toggle-btn');
+        if (btn) {
+            btn.textContent = isDark ? '☀ LIGHT' : '🌙 DARK';
+            btn.style.background = isDark ? '#c8a800' : '#333';
+            btn.style.color = isDark ? '#000' : '#fff';
+        }
+        var svgColor = isDark ? '#e0e0e0' : '#000';
+        var ticks = document.getElementById('gs-tick-group');
+        if (ticks) Array.from(ticks.querySelectorAll('line')).forEach(function(l) { l.setAttribute('stroke', svgColor); });
+        ['gs-min-val','gs-tgt-val','gs-max-val'].forEach(function(id) { var el = document.getElementById(id); if (el) el.setAttribute('fill', svgColor); });
+        var needle = document.querySelector('#needle-group line');
+        var needleDot = document.querySelector('#needle-group circle');
+        var nc = isDark ? '#ccc' : '#333';
+        if (needle) needle.setAttribute('stroke', nc);
+        if (needleDot) needleDot.setAttribute('fill', nc);
+        var gaugeSvg = document.getElementById('gs-gauge-svg');
+        if (gaugeSvg) { var paths = gaugeSvg.querySelectorAll('path'); if (paths[0]) paths[0].setAttribute('stroke', isDark ? '#444' : '#ddd'); }
+    }
+
+    function toggleDark() {
+        var isDark = !document.body.classList.contains('dark');
+        localStorage.setItem('darkMode', isDark ? '1' : '0');
+        applyDark(isDark);
+    }
+
     // Load last used aircraft settings on startup
     // Default to 214B if nothing saved
     applyPreset('214B');
@@ -967,6 +1030,8 @@
     updateGSUI();
     updateBingo();
     applyLayoutMode();
+    // Restore dark mode preference
+    applyDark(localStorage.getItem('darkMode') === '1');
 </script>
 </body>
 </html>
