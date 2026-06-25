@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app v5.5</title>
+    <title>Tanking app v5.6</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -108,7 +108,7 @@
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app v5.5</h2>
+    <h2>Tanking app v5.6</h2>
 
     <div class="preset-row">
         <div style="display:flex; gap:6px;">
@@ -534,7 +534,7 @@
         cancelAnimationFrame(flyTick);
         document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
         document.getElementById(id).style.display = (id === 'flight-page') ? 'flex' : 'block';
-        setTimeout(function() { if (typeof fitActivePage === 'function') fitActivePage(); }, 50);
+        setTimeout(function() { if (typeof fitActivePage === 'function') fitActivePage(); }, 80);
     }
 
     // ── Timers ────────────────────────────────────────────────────────────────
@@ -725,8 +725,9 @@
     // ── (5) iPad / tablet no-scroll auto-fit ────────────────────────────────
     // Detects tablet-class screens (iPad and similar) and scales the active
     // page's inner content down just enough that it fits the viewport with
-    // zero vertical scroll. Runs on load, resize, orientation change, and
-    // whenever the visible page changes.
+    // zero scroll, centered horizontally and vertically. Works for both
+    // display:block and display:flex pages. Runs on load, resize,
+    // orientation change, and whenever the visible page changes.
     function isTabletScreen() {
         var w = window.innerWidth, h = window.innerHeight;
         var longSide = Math.max(w, h);
@@ -737,39 +738,51 @@
         return isIOSTouch && longSide >= 950 && longSide <= 1400;
     }
 
+    function resetFit(el) {
+        el.style.transform       = '';
+        el.style.transformOrigin = '';
+        el.style.position        = '';
+        el.style.left            = '';
+        el.style.top             = '';
+        el.style.width           = '';
+        el.style.height          = '';
+        el.style.margin          = '';
+    }
+
     function fitActivePage() {
-        var active = document.querySelector('.page[style*="display: block"]') ||
-                     document.querySelector('.page[style*="display:block"]');
-        if (!active) {
-            // Fallback: find whichever .page is actually visible
-            var pages = document.querySelectorAll('.page');
-            for (var i = 0; i < pages.length; i++) {
-                if (getComputedStyle(pages[i]).display !== 'none') { active = pages[i]; break; }
-            }
+        var pages = document.querySelectorAll('.page');
+        var active = null;
+        for (var i = 0; i < pages.length; i++) {
+            if (getComputedStyle(pages[i]).display !== 'none') { active = pages[i]; break; }
         }
+        // Always reset every page first so hidden pages don't keep stale styles
+        for (var j = 0; j < pages.length; j++) { resetFit(pages[j]); }
         if (!active) return;
-
-        // Reset any previous scale before measuring
-        active.style.transform = '';
-        active.style.transformOrigin = '';
-        active.style.width = '100%';
-
         if (!isTabletScreen()) return;
 
-        // Measure natural content height vs available viewport height
-        var available = window.innerHeight;
-        var natural = active.scrollHeight;
+        // Measure natural (unscaled) content size
+        var naturalW = active.scrollWidth  || active.offsetWidth;
+        var naturalH = active.scrollHeight || active.offsetHeight;
+        var availW   = window.innerWidth;
+        var availH   = window.innerHeight;
 
-        if (natural > available && natural > 0) {
-            var scale = available / natural;
-            // Don't over-shrink on edge cases; clamp to a sane minimum
-            scale = Math.max(scale, 0.5);
-            active.style.transformOrigin = 'top center';
-            active.style.transform = 'scale(' + scale + ')';
-            // Compensate width so scaled-down content still spans full screen
-            active.style.width = (100 / scale) + '%';
-            active.style.marginLeft = 'calc((1 - ' + (100/scale) + '%) / 2)';
-        }
+        if (naturalH <= availH && naturalW <= availW) return; // already fits
+
+        var scale = Math.min(availW / naturalW, availH / naturalH);
+        scale = Math.max(Math.min(scale, 1), 0.5); // clamp 0.5–1.0
+
+        // Fix the page at a known size/position, then scale it from its own
+        // center. Using position:fixed + left/top 50% + translate(-50%,-50%)
+        // centers correctly regardless of the page's own display mode
+        // (block or flex), so it can't drift to one side.
+        active.style.position        = 'fixed';
+        active.style.left            = '50%';
+        active.style.top             = '50%';
+        active.style.width           = naturalW + 'px';
+        active.style.height          = naturalH + 'px';
+        active.style.margin          = '0';
+        active.style.transformOrigin = 'center center';
+        active.style.transform       = 'translate(-50%, -50%) scale(' + scale + ')';
     }
 
     window.addEventListener('load', function() { setTimeout(fitActivePage, 50); });
