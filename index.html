@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app v5.4</title>
+    <title>Tanking app v5.5</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -108,7 +108,7 @@
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app v5.4</h2>
+    <h2>Tanking app v5.5</h2>
 
     <div class="preset-row">
         <div style="display:flex; gap:6px;">
@@ -534,6 +534,7 @@
         cancelAnimationFrame(flyTick);
         document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
         document.getElementById(id).style.display = (id === 'flight-page') ? 'flex' : 'block';
+        setTimeout(function() { if (typeof fitActivePage === 'function') fitActivePage(); }, 50);
     }
 
     // ── Timers ────────────────────────────────────────────────────────────────
@@ -720,6 +721,60 @@
     window.addEventListener('orientationchange', function() {
         setTimeout(applyLayoutMode, 150);
     });
+
+    // ── (5) iPad / tablet no-scroll auto-fit ────────────────────────────────
+    // Detects tablet-class screens (iPad and similar) and scales the active
+    // page's inner content down just enough that it fits the viewport with
+    // zero vertical scroll. Runs on load, resize, orientation change, and
+    // whenever the visible page changes.
+    function isTabletScreen() {
+        var w = window.innerWidth, h = window.innerHeight;
+        var longSide = Math.max(w, h);
+        var isIOSTouch = navigator.maxTouchPoints > 1 &&
+            /Mac|iPad|iPhone|iPod/.test(navigator.platform || navigator.userAgent);
+        // iPads (and tablet-sized touch screens generally) have a long side
+        // roughly 1024–1400pt. Phones are smaller; desktops aren't touch.
+        return isIOSTouch && longSide >= 950 && longSide <= 1400;
+    }
+
+    function fitActivePage() {
+        var active = document.querySelector('.page[style*="display: block"]') ||
+                     document.querySelector('.page[style*="display:block"]');
+        if (!active) {
+            // Fallback: find whichever .page is actually visible
+            var pages = document.querySelectorAll('.page');
+            for (var i = 0; i < pages.length; i++) {
+                if (getComputedStyle(pages[i]).display !== 'none') { active = pages[i]; break; }
+            }
+        }
+        if (!active) return;
+
+        // Reset any previous scale before measuring
+        active.style.transform = '';
+        active.style.transformOrigin = '';
+        active.style.width = '100%';
+
+        if (!isTabletScreen()) return;
+
+        // Measure natural content height vs available viewport height
+        var available = window.innerHeight;
+        var natural = active.scrollHeight;
+
+        if (natural > available && natural > 0) {
+            var scale = available / natural;
+            // Don't over-shrink on edge cases; clamp to a sane minimum
+            scale = Math.max(scale, 0.5);
+            active.style.transformOrigin = 'top center';
+            active.style.transform = 'scale(' + scale + ')';
+            // Compensate width so scaled-down content still spans full screen
+            active.style.width = (100 / scale) + '%';
+            active.style.marginLeft = 'calc((1 - ' + (100/scale) + '%) / 2)';
+        }
+    }
+
+    window.addEventListener('load', function() { setTimeout(fitActivePage, 50); });
+    window.addEventListener('resize', function() { setTimeout(fitActivePage, 50); });
+    window.addEventListener('orientationchange', function() { setTimeout(fitActivePage, 200); });
 
     // ── Flight page ───────────────────────────────────────────────────────────
     function initFlightPage() {

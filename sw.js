@@ -1,12 +1,13 @@
-// sw.js — Tanking App v3.10
-const CACHE_NAME = 'tanking-v310';
+// sw.js — Tanking App v5.5
+const CACHE_NAME = 'tanking-v55';
 
 const ASSETS = [
+    './',
     './index.html',
+    './manual.html',
     './manifest.json',
     './sw.js',
-    './tank.png',
-    './tank_maskable.png'
+    './tank.png'
 ];
 
 self.addEventListener('install', function(event) {
@@ -14,7 +15,13 @@ self.addEventListener('install', function(event) {
         caches.open(CACHE_NAME)
             .then(function(cache) {
                 console.log('[SW] Pre-caching assets');
-                return cache.addAll(ASSETS);
+                return Promise.all(
+                    ASSETS.map(function(url) {
+                        return cache.add(url).catch(function(err) {
+                            console.warn('[SW] Failed to cache', url, err);
+                        });
+                    })
+                );
             })
             .then(function() {
                 return self.skipWaiting();
