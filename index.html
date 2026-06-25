@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app v5.9</title>
+    <title>Tanking app v6.0</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -140,7 +140,7 @@
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app v5.9</h2>
+    <h2>Tanking app v6.0</h2>
 
     <div class="preset-row">
         <div style="display:flex; gap:6px;">
@@ -404,35 +404,62 @@
         var status = document.getElementById('update-status');
         if (status) status.textContent = 'Clearing cache…';
 
-        // 1. Unregister ALL service workers first so nothing intercepts fetches
+        // Step 1: Unregister ALL service workers so nothing can intercept the reload
         var unregister = ('serviceWorker' in navigator)
             ? navigator.serviceWorker.getRegistrations().then(function(regs) {
                 return Promise.all(regs.map(function(r) { return r.unregister(); }));
               })
             : Promise.resolve();
 
-        // 2. Wipe every Cache Storage entry
+        // Step 2: Wipe every Cache Storage bucket (SW offline cache)
         var clearCaches = ('caches' in window)
             ? caches.keys().then(function(keys) {
                 return Promise.all(keys.map(function(k) { return caches.delete(k); }));
               })
             : Promise.resolve();
 
-        Promise.all([unregister, clearCaches]).then(function() {
-            if (status) status.textContent = 'Fetching fresh files…';
+        // Step 3: Wipe all IndexedDB databases
+        var clearIDB = new Promise(function(resolve) {
+            if (!window.indexedDB || !indexedDB.databases) { resolve(); return; }
+            indexedDB.databases().then(function(dbs) {
+                var dels = dbs.map(function(db) {
+                    return new Promise(function(res) {
+                        var req = indexedDB.deleteDatabase(db.name);
+                        req.onsuccess = req.onerror = req.onblocked = res;
+                    });
+                });
+                Promise.all(dels).then(resolve).catch(resolve);
+            }).catch(resolve);
+        });
 
-            // 3. Force-fetch every asset bypassing HTTP cache so the browser
-            //    cannot serve stale bytes. The SW will re-cache them on next launch.
-            var bust = '?bust=' + Date.now();
-            var assets = ['./index.html', './manual.html', './sw.js', './manifest.json', './tank.png'];
+        Promise.all([unregister, clearCaches, clearIDB]).then(function() {
+            if (status) status.textContent = 'Downloading fresh files…';
+
+            // Step 4: Force-fetch every asset with no-store so the browser
+            // pulls directly from the server and cannot serve anything cached.
+            var bust = '?nocache=' + Date.now();
+            var assets = [
+                './index.html', './sw.js', './manifest.json',
+                './manual.html', './tank.png'
+            ];
             return Promise.all(assets.map(function(url) {
-                return fetch(url + bust, { cache: 'no-store' }).catch(function() {});
+                return fetch(url + bust, {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+                }).catch(function() {});
             }));
         }).then(function() {
-            if (status) status.textContent = 'Reloading…';
-            var base = window.location.origin + window.location.pathname.split('?')[0];
-            window.location.replace(base + '?v=' + Date.now());
-        }).catch(function() {
+            if (status) status.textContent = 'Saving & reloading…';
+
+            // Step 5: Hard navigate — replace() with a unique URL so:
+            // (a) no SW can intercept (all unregistered), (b) browser skips HTTP cache.
+            // After the fresh load the new SW will register and pre-cache cleanly.
+            var cleanPath = window.location.origin + window.location.pathname.replace(/\/+$/, '') + '/';
+            // Strip any old query params then append a fresh bust token
+            window.location.replace(cleanPath.replace(/index\.html$/, '') + 'index.html?v=6.0&t=' + Date.now());
+        }).catch(function(err) {
+            console.warn('[Update] fallback reload, error:', err);
+            // Last-resort: at minimum hard-reload
             window.location.reload(true);
         });
     }
