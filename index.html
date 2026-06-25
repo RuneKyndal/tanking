@@ -451,12 +451,10 @@
         }).then(function() {
             if (status) status.textContent = 'Saving & reloading…';
 
-            // Step 5: Hard navigate — replace() with a unique URL so:
-            // (a) no SW can intercept (all unregistered), (b) browser skips HTTP cache.
-            // After the fresh load the new SW will register and pre-cache cleanly.
-            var cleanPath = window.location.origin + window.location.pathname.replace(/\/+$/, '') + '/';
-            // Strip any old query params then append a fresh bust token
-            window.location.replace(cleanPath.replace(/index\.html$/, '') + 'index.html?v=6.0&t=' + Date.now());
+            // Step 5: Hard navigate back to this same page — just strip any existing
+            // query string and add a fresh bust token. No path manipulation needed.
+            var cleanUrl = window.location.origin + window.location.pathname;
+            window.location.replace(cleanUrl + '?v=6.0&t=' + Date.now());
         }).catch(function(err) {
             console.warn('[Update] fallback reload, error:', err);
             // Last-resort: at minimum hard-reload
