@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app v5.8</title>
+    <title>Tanking app v5.7</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -140,7 +140,7 @@
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app v5.8</h2>
+    <h2>Tanking app v5.7</h2>
 
     <div class="preset-row">
         <div style="display:flex; gap:6px;">
@@ -402,49 +402,43 @@
 
     function runForceUpdate() {
         var status = document.getElementById('update-status');
-        if (status) status.textContent = 'Updating…';
+        if (status) status.textContent = 'Clearing cache…';
 
-        var done = false;
-        function finish() { if (!done) { done = true; finishForceUpdate(); } }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistration('./').then(function(reg) {
-                if (reg && reg.active) {
-                    reg.active.postMessage({ type: 'FORCE_UPDATE' });
-                    // Safety net in case the SW doesn't respond
-                    setTimeout(finish, 3000);
-                } else {
-                    finish();
-                }
-            }).catch(finish);
-        } else {
-            finish();
-        }
-    }
-
-    function finishForceUpdate() {
-        // Also clear caches directly from the page as a belt-and-braces measure,
-        // then unregister the SW so a brand-new one installs on reload.
-        var clearCaches = ('caches' in window)
-            ? caches.keys().then(function(keys) { return Promise.all(keys.map(function(k) { return caches.delete(k); })); })
-            : Promise.resolve();
-
+        // 1. Unregister ALL service workers first so nothing intercepts fetches
         var unregister = ('serviceWorker' in navigator)
             ? navigator.serviceWorker.getRegistrations().then(function(regs) {
                 return Promise.all(regs.map(function(r) { return r.unregister(); }));
               })
             : Promise.resolve();
 
-        Promise.all([clearCaches, unregister]).then(function() {
-            var status = document.getElementById('update-status');
+        // 2. Wipe every Cache Storage entry
+        var clearCaches = ('caches' in window)
+            ? caches.keys().then(function(keys) {
+                return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+              })
+            : Promise.resolve();
+
+        Promise.all([unregister, clearCaches]).then(function() {
+            if (status) status.textContent = 'Fetching fresh files…';
+
+            // 3. Force-fetch every asset bypassing HTTP cache so the browser
+            //    cannot serve stale bytes. The SW will re-cache them on next launch.
+            var bust = '?bust=' + Date.now();
+            var assets = ['./index.html', './manual.html', './sw.js', './manifest.json', './tank.png'];
+            return Promise.all(assets.map(function(url) {
+                return fetch(url + bust, { cache: 'no-store' }).catch(function() {});
+            }));
+        }).then(function() {
             if (status) status.textContent = 'Reloading…';
-            // Use location.replace with a cache-busting param so the browser
-            // fetches a fresh copy from the server without triggering a file
-            // download. replace() keeps the history stack clean (no extra entry).
             var base = window.location.origin + window.location.pathname.split('?')[0];
             window.location.replace(base + '?v=' + Date.now());
+        }).catch(function() {
+            window.location.reload(true);
         });
     }
+
+    // no-op — kept so any stray SW FORCE_UPDATE_DONE messages don't throw
+    function finishForceUpdate() {}
 
 
     // ── Toast ─────────────────────────────────────────────────────────────────
