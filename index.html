@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app V7.9</title>
+    <title>Tanking app V8.0</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -159,7 +159,7 @@
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app V7.9</h2>
+    <h2>Tanking app V8.0</h2>
 
     <div class="preset-row">
         <div style="display:flex; gap:6px;">
@@ -169,7 +169,7 @@
         <div style="display:flex; gap:6px;">
             <button class="btn-preset" onclick="applyPreset('214B')">Bell 214B</button>
             <button class="btn-preset" onclick="applyPreset('214ST')">Bell 214ST</button>
-            <button class="btn-preset" style="background:#1a6b1a; color:#fff;" onclick="openUH60()">UH-60</button>
+            <button class="btn-preset" onclick="openUH60()">UH-60</button>
         </div>
     </div>
 
@@ -427,7 +427,7 @@
 
 <!-- ── RICKROLL OVERLAY ── -->
 <div id="rickroll-overlay" style="display:none; position:fixed; inset:0; background:#000; z-index:99999; flex-direction:column; align-items:center; justify-content:center;">
-    <video id="rickroll-video" src="rickroll.mp4" playsinline preload="none" style="width:100%; height:100%; object-fit:contain;"></video>
+    <video id="rickroll-video" src="rickroll.mp4" playsinline autoplay style="width:100%; height:100%; object-fit:contain;"></video>
     <button onclick="closeRickroll()" style="position:absolute; top:14px; right:14px; background:rgba(0,0,0,0.6); color:#fff; border:2px solid #fff; border-radius:8px; font-size:1.1rem; font-weight:bold; padding:8px 18px; z-index:100000;">✕ CLOSE</button>
 </div>
 
