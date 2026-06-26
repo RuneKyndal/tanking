@@ -204,13 +204,12 @@
     <p>All fuel calculations assume a <strong>500 lb reserve</strong> that must remain on landing.</p>
 
     <h3>Endurance &amp; Range</h3>
-    <p>Using the selected <strong>fuel burn rate</strong> and <strong>planned ground speed</strong>, the app calculates how long and how far the aircraft can fly from its current fuel state while still landing with 500 lb of fuel remaining.</p>
+    <p>Using the selected <strong>fuel burn rate</strong> and <strong>planned ground speed</strong>, the app calculates endurance and range from its current fuel load to still land with 500 lbs.</p>
 
     <h3>Bingo Fuel</h3>
-    <p>Bingo fuel is the fuel quantity at which you must begin the return leg (or divert to an alternate fuel stop) in order to cover the <strong>Distance to Fuel</strong> at the selected ground speed and burn rate, and still land with 500 lb reserve.</p>
+    <p>Bingo fuel is the fuel quantity at which you need to head back for fuel, in order to cover the <strong>Distance to Fuel</strong> at the selected ground speed and burn rate, and still land with 500 lbs.</p>
     <ul>
-        <li>Set <strong>Distance to Fuel</strong> to the distance to your next fuel stop.</li>
-        <li>The app continuously calculates the time remaining before you hit Bingo.</li>
+        <li>Set <strong>Distance to Fuel</strong> to the distance to your fuel.</li>
     </ul>
 
     <!-- ── WARNING COLOURS ── -->
@@ -224,11 +223,11 @@
         </tr>
         <tr>
             <td><span class="warn-box warn-yellow">YELLOW</span></td>
-            <td>Bingo fuel + 15 minutes remaining &mdash; <strong>advisory</strong>. Start planning your divert.</td>
+            <td>Bingo fuel + 15 minutes remaining &mdash; <strong>advisory</strong>. probably last drop before fuel.</td>
         </tr>
         <tr>
             <td><span class="warn-box warn-red">RED</span></td>
-            <td>Bingo fuel reached &mdash; <strong>divert now</strong> to reach fuel with 500 lb reserve.</td>
+            <td>Bingo fuel reached &mdash; <strong>time to head for fuel</strong> to land with 500 lbs.</td>
         </tr>
     </table>
 
@@ -240,11 +239,11 @@
         </tr>
         <tr>
             <td><span class="warn-box warn-yellow">YELLOW</span></td>
-            <td>Fuel remaining at or below <strong>800 lb</strong> &mdash; advisory.</td>
+            <td>Fuel remaining at or below <strong>800 lb</strong> &mdash; advisory.  time to plan for fuel</td>
         </tr>
         <tr>
             <td><span class="warn-box warn-red">RED</span></td>
-            <td>Fuel remaining at or below <strong>500 lb</strong> &mdash; minimum reserve reached.</td>
+            <td>Fuel remaining at or below <strong>500 lb</strong> &mdash; minimum reserve reached.  time to LAND</td>
         </tr>
     </table>
 
