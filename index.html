@@ -169,6 +169,7 @@
         <div style="display:flex; gap:6px;">
             <button class="btn-preset" onclick="applyPreset('214B')">Bell 214B</button>
             <button class="btn-preset" onclick="applyPreset('214ST')">Bell 214ST</button>
+            <button class="btn-preset" style="background:#1a6b1a; color:#fff;" onclick="openUH60()">UH-60</button>
         </div>
     </div>
 
@@ -306,12 +307,14 @@
                         <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:4px;">
                             <span style="font-size:0.85rem; font-weight:bold;">Fuel Plan GS</span>
                             <select id="fuel-plan-gs" onchange="saveFuelPlanGS(); updateBingo();" style="font-size:1.2rem; font-weight:bold; border:2px solid #000; border-radius:4px; font-family:inherit; padding:2px 6px;">
+                                <option value="60">60kts</option>
                                 <option value="70">70kts</option>
                                 <option value="80">80kts</option>
                                 <option value="90">90kts</option>
                                 <option value="100" selected>100kts</option>
                                 <option value="110">110kts</option>
                                 <option value="120">120kts</option>
+                                <option value="130">130kts</option>
                                 <option value="actual">ACTUAL</option>
                             </select>
                             <span style="font-size:0.85rem; font-weight:bold; white-space:nowrap;">Range <span id="bingo-range-dist" style="font-size:1.6rem; font-weight:bold;">--</span>Nm</span>
@@ -322,7 +325,13 @@
                                 <option value="10">10</option><option value="20">20</option><option value="30">30</option>
                                 <option value="40">40</option><option value="50">50</option><option value="60">60</option>
                                 <option value="70">70</option><option value="80">80</option><option value="90">90</option>
-                                <option value="100" selected>100</option>
+                                <option value="100" selected>100</option><option value="110">110</option><option value="120">120</option>
+                                <option value="130">130</option><option value="140">140</option><option value="150">150</option>
+                                <option value="160">160</option><option value="170">170</option><option value="180">180</option>
+                                <option value="190">190</option><option value="200">200</option><option value="210">210</option>
+                                <option value="220">220</option><option value="230">230</option><option value="240">240</option>
+                                <option value="250">250</option><option value="260">260</option><option value="270">270</option>
+                                <option value="280">280</option><option value="290">290</option><option value="300">300</option>
                             </select>
                             <span style="font-size:0.85rem; font-weight:bold;">Nm &nbsp; Bingo in</span>
                             <span id="time-to-bingo" style="font-size:1.6rem; font-weight:bold;">--:--</span>
@@ -415,6 +424,12 @@
 
 <!-- ── TOAST ── -->
 <div id="toast"></div>
+
+<!-- ── RICKROLL OVERLAY ── -->
+<div id="rickroll-overlay" style="display:none; position:fixed; inset:0; background:#000; z-index:99999; flex-direction:column; align-items:center; justify-content:center;">
+    <video id="rickroll-video" src="rickroll.mp4" playsinline autoplay style="width:100%; height:100%; object-fit:contain;"></video>
+    <button onclick="closeRickroll()" style="position:absolute; top:14px; right:14px; background:rgba(0,0,0,0.6); color:#fff; border:2px solid #fff; border-radius:8px; font-size:1.1rem; font-weight:bold; padding:8px 18px; z-index:100000;">✕ CLOSE</button>
+</div>
 
 <script>
     // ── Service Worker ────────────────────────────────────────────────────────
@@ -514,6 +529,25 @@
             // Last-resort: at minimum hard-reload
             window.location.reload(true);
         });
+    }
+
+    function openUH60() {
+        var overlay = document.getElementById('rickroll-overlay');
+        var video   = document.getElementById('rickroll-video');
+        overlay.style.display = 'flex';
+        video.currentTime = 0;
+        video.play();
+        if (overlay.requestFullscreen) overlay.requestFullscreen();
+        else if (overlay.webkitRequestFullscreen) overlay.webkitRequestFullscreen();
+    }
+
+    function closeRickroll() {
+        var overlay = document.getElementById('rickroll-overlay');
+        var video   = document.getElementById('rickroll-video');
+        video.pause();
+        overlay.style.display = 'none';
+        if (document.exitFullscreen) document.exitFullscreen().catch(function(){});
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
 
     // no-op — kept so any stray SW FORCE_UPDATE_DONE messages don't throw

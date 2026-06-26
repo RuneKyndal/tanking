@@ -4,7 +4,7 @@
 const CACHE_NAME = 'tanking-runtime-cache';
 
 const ASSETS = [
-    './', './index.html', './manual.html', './manifest.json', './sw.js', './tank.png'
+    './', './index.html', './manual.html', './manifest.json', './sw.js', './tank.png', './rickroll.mp4'
 ];
 
 self.addEventListener('install', function(event) {
