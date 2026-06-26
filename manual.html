@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="US-ASCII">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tanking App Manual</title>
     <style>
@@ -24,6 +24,10 @@
             border-bottom: 1px solid #dddddd;
             padding-bottom: 5px;
         }
+        h3 {
+            color: #333333;
+            margin-top: 20px;
+        }
         p {
             margin: 10px 0;
         }
@@ -39,7 +43,7 @@
             padding-left: 20px;
         }
         li {
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
         .note {
             background-color: #f9f9f9;
@@ -47,12 +51,62 @@
             padding: 10px 15px;
             margin: 15px 0;
         }
-        .button-text {
+        .btn-label {
             font-weight: bold;
             background-color: #f0f0f0;
-            padding: 2px 6px;
-            border-radius: 3px;
-            border: 1px solid #cccccc;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #aaaaaa;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .btn-label.dark {
+            background-color: #333;
+            color: #fff;
+            border-color: #555;
+        }
+        .btn-label.green {
+            background-color: #00cc00;
+            color: #000;
+            border-color: #009900;
+        }
+        .btn-label.orange {
+            background-color: #ff9900;
+            color: #000;
+            border-color: #cc7700;
+        }
+        .btn-label.red {
+            background-color: #cc0000;
+            color: #fff;
+            border-color: #990000;
+        }
+        .warn-box {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.88rem;
+            border: 1px solid #aaa;
+        }
+        .warn-yellow { background: #ffeb00; color: #000; border-color: #bba000; }
+        .warn-red    { background: #ff3300; color: #fff; border-color: #aa1100; }
+
+        table.status-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.92rem;
+        }
+        table.status-table th {
+            background: #eeeeee;
+            text-align: left;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+        }
+        table.status-table td {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            vertical-align: top;
         }
     </style>
 </head>
@@ -63,64 +117,151 @@
     </p>
 
     <h1>Tanking App Manual</h1>
-    
+
     <p class="note">
         This is a very early release. All suggestions are welcome.<br>
-        The source code is published here for review, or if you want to fork it and build your own from here:<br>
+        The source code is published here for review, or if you want to fork it and build your own:<br>
         <a href="https://github.com/RuneKyndal/tanking/" target="_blank">https://github.com/RuneKyndal/tanking/</a>
     </p>
 
+    <!-- ── INSTALLATION ── -->
+    <h2>Installation</h2>
+    <p>The app is designed as a <strong>Web App</strong>. For offline use it must be <em>installed</em>, not just bookmarked.</p>
+
+    <h3>iOS</h3>
+    <ul>
+        <li>Open the link in <strong>Safari</strong> (not Chrome).</li>
+        <li>Tap <strong>Share → Add to Home Screen</strong>. Make sure the <em>Web App</em> tickbox is <strong>ON</strong>.</li>
+        <li>Close everything, then launch the app from your home screen to complete the initial download.</li>
+        <li>Grant all requested permissions when prompted.</li>
+    </ul>
+
+    <h3>Android</h3>
+    <ul>
+        <li>Open the link in <strong>Chrome</strong>.</li>
+        <li>Tap the menu and choose <strong>Add to Home Screen → Install</strong> (not the shortcut option).</li>
+        <li>Close the browser, then launch from your home screen to complete the initial download.</li>
+        <li>Grant all requested permissions when prompted.</li>
+    </ul>
+
+    <!-- ── QUICK START ── -->
     <h2>Quick Start</h2>
-    <p>The app is designed as a "WebApp". For it to work properly when offline, it must be installed (not just a saved shortcut).</p>
-
-    <h3>iOS Installation</h3>
     <ul>
-        <li>Use Safari browser (not Chrome).</li>
-        <li>Go to the link. Once loaded, tap "Share" + more, then select "Add to Home Screen".</li>
-        <li>Ensure the "Web App" tickbox is ON.</li>
-        <li>Close everything, and launch the app from your homescreen to perform the initial download.</li>
-        <li>Ensure you give all requested permissions to the app.</li>
+        <li>Select your aircraft type, then set weights and fuel load.</li>
+        <li>Tap <span class="btn-label">GO START</span> to move to the timer page.</li>
+        <li>Use engine timers as needed.</li>
+        <li>Tap <span class="btn-label">GO FLY</span> — this starts the flight timer and takes you to the flight page.</li>
     </ul>
 
-    <h3>Android Installation</h3>
-    <ul>
-        <li>Suggested browser: Chrome.</li>
-        <li>Go to the link. Once loaded, click the menu options and choose "Add to Home Screen".</li>
-        <li>Click the "Install" option (NOT the shortcut option).</li>
-        <li>Close the browser, and launch the app from your homescreen to perform the initial download.</li>
-        <li>Ensure you give all requested permissions to the app.</li>
-    </ul>
+    <!-- ── BUTTONS & CONTROLS ── -->
+    <h2>Buttons &amp; Controls</h2>
 
-    <h2>Start</h2>
-    <ul>
-        <li>Choose aircraft type, then update weights and fuel load.</li>
-        <li>Click <span class="button-text">go start</span>.</li>
-        <li>If desired, use engine timers.</li>
-        <li>Click <span class="button-text">go fly</span> (this starts the flight timer).</li>
-    </ul>
+    <h3>Display &amp; Screen</h3>
 
+    <p><span class="btn-label dark">🌙 DARK</span> &nbsp;/&nbsp; <span class="btn-label">☀ LIGHT</span> &mdash;
+    Toggles between <strong>dark and light colour schemes</strong>. Tap to switch; the app remembers your choice.</p>
+
+    <p><span class="btn-label">SLEEP OK</span> &nbsp;/&nbsp; <span class="btn-label">AWAKE</span> &mdash;
+    Controls the iPad/tablet screen sleep behaviour on the flight page.
+    In <strong>AWAKE</strong> mode the screen is prevented from auto-locking, keeping the display on during flight.
+    Tap to toggle if you want to allow normal sleep.</p>
+
+    <h3>GPS</h3>
+
+    <table class="status-table">
+        <tr>
+            <th>Button state</th>
+            <th>Meaning</th>
+        </tr>
+        <tr>
+            <td><span class="btn-label red">GPS OFF</span></td>
+            <td>GPS is not running. Tap to start it.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label orange">GPS&hellip;</span></td>
+            <td>Searching for a fix. Wait for it to turn green.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label green">GPS LIVE</span></td>
+            <td>GPS is active and receiving a valid ground speed.</td>
+        </tr>
+    </table>
+
+    <p><span class="btn-label">GPS PERMIT</span> &mdash;
+    <em>(Experimental)</em> Attempts to resolve GPS permission issues on some iPhones where the system dialog was previously dismissed. If tapping this does not help, go to <strong>iOS Settings → Privacy &amp; Security → Location Services</strong> and enable access for Safari or this app manually.</p>
+
+    <!-- ── IN FLIGHT ── -->
     <h2>In Flight</h2>
     <ul>
-        <li>Ensure GPS activates.</li>
-        <li>Verify fuel burn rate and desired target ground speed.</li>
-        <li>Occasionally update the fuel load to match the aircraft as fuel is burned.</li>
+        <li>Confirm <span class="btn-label green">GPS LIVE</span> is showing before departure.</li>
+        <li>Verify the selected <strong>fuel burn rate</strong> and <strong>target ground speed</strong> match the aircraft.</li>
+        <li>Update the fuel slider periodically to reflect actual fuel remaining as fuel is burned.</li>
     </ul>
 
+    <!-- ── FUEL PLANNING ── -->
+    <h2>Fuel Planning</h2>
+
+    <p>All fuel calculations assume a <strong>500 lb reserve</strong> that must remain on landing.</p>
+
+    <h3>Endurance &amp; Range</h3>
+    <p>Using the selected <strong>fuel burn rate</strong> and <strong>planned ground speed</strong>, the app calculates how long and how far the aircraft can fly from its current fuel state while still landing with 500 lb of fuel remaining.</p>
+
+    <h3>Bingo Fuel</h3>
+    <p>Bingo fuel is the fuel quantity at which you must begin the return leg (or divert to an alternate fuel stop) in order to cover the <strong>Distance to Fuel</strong> at the selected ground speed and burn rate, and still land with 500 lb reserve.</p>
+    <ul>
+        <li>Set <strong>Distance to Fuel</strong> to the distance to your next fuel stop.</li>
+        <li>The app continuously calculates the time remaining before you hit Bingo.</li>
+    </ul>
+
+    <!-- ── WARNING COLOURS ── -->
+    <h2>Warning Colours</h2>
+
+    <h3>Bingo Countdown</h3>
+    <table class="status-table">
+        <tr>
+            <th>Colour</th>
+            <th>Condition</th>
+        </tr>
+        <tr>
+            <td><span class="warn-box warn-yellow">YELLOW</span></td>
+            <td>Bingo fuel + 15 minutes remaining &mdash; <strong>advisory</strong>. Start planning your divert.</td>
+        </tr>
+        <tr>
+            <td><span class="warn-box warn-red">RED</span></td>
+            <td>Bingo fuel reached &mdash; <strong>divert now</strong> to reach fuel with 500 lb reserve.</td>
+        </tr>
+    </table>
+
+    <h3>Fuel Quantity Box</h3>
+    <table class="status-table">
+        <tr>
+            <th>Colour</th>
+            <th>Condition</th>
+        </tr>
+        <tr>
+            <td><span class="warn-box warn-yellow">YELLOW</span></td>
+            <td>Fuel remaining at or below <strong>800 lb</strong> &mdash; advisory.</td>
+        </tr>
+        <tr>
+            <td><span class="warn-box warn-red">RED</span></td>
+            <td>Fuel remaining at or below <strong>500 lb</strong> &mdash; minimum reserve reached.</td>
+        </tr>
+    </table>
+
+    <!-- ── FLIGHT LOG ── -->
     <h2>Flight Log</h2>
     <ul>
-        <li>Click the <span class="button-text">back</span> button to return to the timer page.</li>
-        <li>Stop/start timers.</li>
-        <li>Save to log.</li>
-        <li>Export logs.</li>
+        <li>Tap <span class="btn-label">BACK</span> from the flight page to return to the timer page.</li>
+        <li>Stop or restart engine and flight timers as needed.</li>
+        <li>Tap <strong>Save to Log</strong> to record the current entry.</li>
+        <li>Use <strong>Export Logs</strong> to share or archive your records.</li>
     </ul>
+
     <script>
         document.getElementById('exit-btn').addEventListener('click', function () {
-            // If this page is loaded inside the app's iframe, tell the parent to
-            // close the manual and show the main calc page again.
             if (window.parent && window.parent !== window) {
                 window.parent.postMessage({ type: 'EXIT_MANUAL' }, '*');
             } else {
-                // Opened directly/standalone (e.g. in its own tab) — just go back.
                 if (window.history.length > 1) {
                     window.history.back();
                 } else {
