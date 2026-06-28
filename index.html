@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app V8.2</title>
+    <title>Tanking app V8.4</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -43,7 +43,7 @@
         .timer-row { display: flex; align-items: center; border: 2px solid #000; border-radius: 8px; margin-bottom: 6px; padding: 6px; gap: 4px; }
         .time-display { flex: 0 0 78px; font-family: 'Courier New', Courier, monospace; font-size: 1.05rem; font-weight: bold; text-align: right; }
         .timer-label { font-size: 0.6rem; font-weight: bold; width: 45px; text-transform: uppercase; line-height: 1; }
-        .btn-timer { height: 40px; font-size: 0.75rem; }
+        .btn-timer { height: 60px; font-size: 0.8rem; }
 
         .val-xl-v198 { font-size: 3.5rem; font-weight: bold; display: inline-block; line-height: 1; }
         .unit-xl { font-size: 1.8rem; font-weight: bold; margin-left: 5px; }
@@ -102,6 +102,11 @@
         #ttb-row.warn-red .bingo-plan-value,
         #ttb-row-dup.warn-red .bingo-plan-label,
         #ttb-row-dup.warn-red .bingo-plan-value { color: #fff; }
+
+        /* ── Fuel Calc toggle ── */
+        body.fuelcalc-off #fuelplan-row,
+        body.fuelcalc-off #ttb-row,
+        body.fuelcalc-off #ls-range-bingo-dup { display: none !important; }
 
         /* ── GS GAUGE ── */
         .gs-gauge-outer { width: 100%; display: flex; justify-content: center; align-items: center; }
@@ -162,7 +167,7 @@
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app V8.2</h2>
+    <h2>Tanking app V8.4</h2>
 
     <div class="preset-row">
         <div style="display:flex; gap:6px;">
@@ -207,18 +212,11 @@
     <h2>FLIGHT TIMER</h2>
 
     <div class="timer-row">
-        <span class="timer-label">ENG 1</span>
-        <button class="btn-timer" style="background:#0f0; flex:2;" id="e1-start" onclick="startT('e1')">START</button>
-        <button class="btn-timer" style="background:#f00; color:#fff; flex:2;" id="e1-stop" onclick="stopT('e1')" disabled>STOP</button>
-        <button class="btn-timer" style="background:#ccc; flex:1;" onclick="resetRow('e1')">RST</button>
-        <div class="time-display" id="e1-disp">00:00:00</div>
-    </div>
-    <div class="timer-row">
-        <span class="timer-label">ENG 2</span>
-        <button class="btn-timer" style="background:#0f0; flex:2;" id="e2-start" onclick="startT('e2')">START</button>
-        <button class="btn-timer" style="background:#f00; color:#fff; flex:2;" id="e2-stop" onclick="stopT('e2')" disabled>STOP</button>
-        <button class="btn-timer" style="background:#ccc; flex:1;" onclick="resetRow('e2')">RST</button>
-        <div class="time-display" id="e2-disp">00:00:00</div>
+        <span class="timer-label">ENG</span>
+        <button class="btn-timer" style="background:#0f0; flex:2;" id="eng-start" onclick="startT('eng')">START</button>
+        <button class="btn-timer" style="background:#f00; color:#fff; flex:2;" id="eng-stop" onclick="stopT('eng')" disabled>STOP</button>
+        <button class="btn-timer" style="background:#ccc; flex:1;" onclick="resetRow('eng')">RST</button>
+        <div class="time-display" id="eng-disp">00:00:00</div>
     </div>
     <div class="timer-row" style="background:#eef;">
         <span class="timer-label">FLT</span>
@@ -262,6 +260,7 @@
             <button style="background:#d9534f; color:#fff; height:50px; padding:0 12px; flex:0 0 auto;" onclick="leaveFlight()">BACK</button>
             <button id="dark-toggle-btn" style="height:50px; padding:0 10px; font-size:0.75rem; background:#333; color:#fff; border-color:#555;" onclick="toggleDark()">🌙 DARK</button>
             <button id="wake-btn" onclick="toggleWakeLock()" style="height:50px; padding:0 10px; font-size:0.75rem; background:#333; color:#fff; border-color:#555;">☀ AWAKE</button>
+            <button id="fuelcalc-btn" onclick="toggleFuelCalc()" style="height:50px; padding:0 10px; font-size:0.75rem; background:#333; color:#fff; border-color:#555;">FUEL CALC ON</button>
         </div>
         <div id="flight-ac-label" style="font-size:1.7rem; font-weight:bold; text-align:center; text-transform:uppercase; letter-spacing:1px; flex:1;">Bell 214B</div>
         <div style="display:flex; align-items:center; gap:4px;">
@@ -307,7 +306,7 @@
                             <span id="bingo-time" style="font-size:2.3rem; font-weight:bold;">--h:--m</span>
                             <span style="font-size:0.75rem; font-weight:bold;">(+500lbs rsv)</span>
                         </div>
-                        <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:4px;">
+                        <div id="fuelplan-row" style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:4px;">
                             <span style="font-size:0.85rem; font-weight:bold;">Fuel Plan GS</span>
                             <select id="fuel-plan-gs" onchange="saveFuelPlanGS(); updateBingo();" style="font-size:1.2rem; font-weight:bold; border:2px solid #000; border-radius:4px; font-family:inherit; padding:2px 6px;">
                                 <option value="60">60kts</option>
@@ -611,10 +610,8 @@
 
     // ── State ─────────────────────────────────────────────────────────────────
     var timers = {
-        e1:   { elapsed:0, start:null, interval:null, running:false },
-        e2:   { elapsed:0, start:null, interval:null, running:false },
-        fl:   { elapsed:0, start:null, interval:null, running:false, tsS:null, tsE:null },
-        engG: { start:null, end:null }
+        eng:  { elapsed:0, start:null, blockStart:null, blockEnd:null, interval:null, running:false },
+        fl:   { elapsed:0, start:null, interval:null, running:false, tsS:null, tsE:null }
     };
     var curFuel = 2750, burnRef = null, flyTick = null, curGS = 0, watchID = null;
 
@@ -710,7 +707,7 @@
         timers[id].running = true;
         timers[id].start   = Date.now() - timers[id].elapsed;
         if (id === 'fl' && !timers.fl.tsS) timers.fl.tsS = getTimeStr();
-        if ((id === 'e1' || id === 'e2') && !timers.engG.start) timers.engG.start = Date.now();
+        if (id === 'eng' && !timers.eng.blockStart) timers.eng.blockStart = Date.now();
         timers[id].interval = setInterval(function() {
             timers[id].elapsed = Date.now() - timers[id].start;
             document.getElementById(id+'-disp').innerText = format(timers[id].elapsed);
@@ -724,7 +721,7 @@
         timers[id].running = false;
         clearInterval(timers[id].interval);
         if (id === 'fl') timers.fl.tsE = getTimeStr();
-        if (!timers.e1.running && !timers.e2.running) timers.engG.end = Date.now();
+        if (id === 'eng') timers.eng.blockEnd = Date.now();
         document.getElementById(id+'-start').disabled = false;
         document.getElementById(id+'-stop').disabled  = true;
         updateStats();
@@ -734,21 +731,21 @@
         stopT(id); timers[id].elapsed = 0;
         document.getElementById(id+'-disp').innerText = "00:00:00";
         if (id === 'fl') { timers.fl.tsS = null; timers.fl.tsE = null; }
-        if (id !== 'fl' && !timers.e1.running && !timers.e2.running) { timers.engG.start = null; timers.engG.end = null; }
+        if (id === 'eng') { timers.eng.blockStart = null; timers.eng.blockEnd = null; }
         updateStats();
     }
 
     function resetAllTimers() {
         showDialog("Reset ALL current timers?", function() {
-            ['e1','e2','fl'].forEach(resetRow);
+            ['eng','fl'].forEach(resetRow);
         }, null);
     }
 
     function updateStats() {
-        var eMs = (timers.engG.end || (timers.engG.start ? Date.now() : 0)) - (timers.engG.start || 0);
+        var eMs = (timers.eng.blockEnd || (timers.eng.blockStart ? Date.now() : 0)) - (timers.eng.blockStart || 0);
         document.getElementById('e-hms').innerText = format(Math.max(0, eMs));
         document.getElementById('e-dec').innerText = (eMs/3600000).toFixed(2) + " hr";
-        document.getElementById('e-ts').innerText  = (timers.engG.start ? getTimeStr(timers.engG.start) : "--:--") + " to " + (timers.engG.end ? getTimeStr(timers.engG.end) : "--:--");
+        document.getElementById('e-ts').innerText  = (timers.eng.blockStart ? getTimeStr(timers.eng.blockStart) : "--:--") + " to " + (timers.eng.blockEnd ? getTimeStr(timers.eng.blockEnd) : "--:--");
         document.getElementById('f-hms').innerText = format(timers.fl.elapsed);
         document.getElementById('f-dec').innerText = (timers.fl.elapsed/3600000).toFixed(2) + " hr";
         document.getElementById('f-ts').innerText  = (timers.fl.tsS || "--:--") + " to " + (timers.fl.tsE || "--:--");
@@ -762,7 +759,7 @@
         reg = reg.trim().toUpperCase();
         localStorage.setItem('lastAcReg', reg);
 
-        var engMs = (timers.engG.end || (timers.engG.start ? Date.now() : 0)) - (timers.engG.start || 0);
+        var engMs = (timers.eng.blockEnd || (timers.eng.blockStart ? Date.now() : 0)) - (timers.eng.blockStart || 0);
         var entry = {
             date: new Date().toLocaleDateString(),
             reg:  reg,
@@ -1116,6 +1113,28 @@
         }
     });
 
+    // ── Fuel Calc toggle ─────────────────────────────────────────────────────
+    // When OFF: Fuel Plan GS + Range, and Dist-to-fuel + Bingo-in (portrait
+    // row and its landscape duplicate) are hidden via the body.fuelcalc-off
+    // CSS rule. Endurance/payload/burn rate are unaffected and stay visible.
+    function setFuelCalcBtn(enabled) {
+        var btn = document.getElementById('fuelcalc-btn');
+        if (!btn) return;
+        btn.textContent = enabled ? 'FUEL CALC ON' : 'FUEL CALC OFF';
+        btn.style.background = enabled ? '#28a745' : '#333';
+    }
+
+    function applyFuelCalc(enabled) {
+        document.body.classList.toggle('fuelcalc-off', !enabled);
+        setFuelCalcBtn(enabled);
+    }
+
+    function toggleFuelCalc() {
+        var enabled = document.body.classList.contains('fuelcalc-off'); // currently off -> turning on
+        localStorage.setItem('fuelCalcEnabled', enabled ? '1' : '0');
+        applyFuelCalc(enabled);
+    }
+
 
     // ── GPS ───────────────────────────────────────────────────────────────────
     function setGPSBtn(state, label) {
@@ -1292,6 +1311,8 @@
     applyLayoutMode();
     // Restore dark mode preference
     applyDark(localStorage.getItem('darkMode') === '1');
+    // Restore fuel calc preference (default ON)
+    applyFuelCalc(localStorage.getItem('fuelCalcEnabled') !== '0');
 </script>
 </body>
 </html>
