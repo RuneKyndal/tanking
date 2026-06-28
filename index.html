@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app V8.8</title>
+    <title>Tanking app V8.9</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -191,7 +191,7 @@
             <span class="fuel-label-text">FUEL</span>
             <div class="fuel-big-p1" id="fuel-display">2,750 lbs</div>
         </div>
-        <input type="range" id="fuel-slider" min="500" max="3000" step="50" value="2750" oninput="updateWB(); saveSettings();">
+        <input type="range" id="fuel-slider" min="0" max="3000" step="50" value="2750" oninput="updateWB(); saveSettings();">
     </div>
 
     <div class="bubble-v198">
@@ -254,17 +254,17 @@
 <div id="flight-page" class="page" style="flex-direction:column;">
 
     <!-- Top bar: [BACK | FUELBURN | GS TARGET] ... [GPS | PERMIT] -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; gap:4px;">
-        <div style="display:flex; align-items:center; gap:4px;">
-            <button style="background:#d9534f; color:#fff; height:50px; padding:0 12px; flex:0 0 auto;" onclick="leaveFlight()">BACK</button>
-            <button id="dark-toggle-btn" style="height:50px; padding:0 10px; font-size:0.75rem; background:#333; color:#fff; border-color:#555;" onclick="toggleDark()">🌙 DARK</button>
-            <button id="wake-btn" onclick="toggleWakeLock()" style="height:50px; padding:0 10px; font-size:0.75rem; background:#333; color:#fff; border-color:#555;">☀ AWAKE</button>
-            <button id="fuelcalc-btn" onclick="toggleFuelCalc()" style="height:50px; padding:0 10px; font-size:0.75rem; background:#333; color:#fff; border-color:#555;">FUEL CALC ON</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; gap:3px; width:100%;">
+        <div style="display:flex; align-items:center; gap:3px; flex-shrink:1; min-width:0;">
+            <button style="background:#d9534f; color:#fff; height:44px; padding:0 7px; font-size:0.65rem; flex-shrink:0;" onclick="leaveFlight()">BACK</button>
+            <button id="dark-toggle-btn" style="height:44px; padding:0 6px; font-size:0.65rem; background:#333; color:#fff; border-color:#555; flex-shrink:1;" onclick="toggleDark()">🌙 DARK</button>
+            <button id="wake-btn" onclick="toggleWakeLock()" style="height:44px; padding:0 6px; font-size:0.65rem; background:#333; color:#fff; border-color:#555; flex-shrink:1;">☀ AWAKE</button>
+            <button id="fuelcalc-btn" onclick="toggleFuelCalc()" style="height:44px; padding:0 6px; font-size:0.65rem; background:#333; color:#fff; border-color:#555; flex-shrink:1;">FUEL CALC</button>
         </div>
-        <div id="flight-ac-label" style="font-size:1.7rem; font-weight:bold; text-align:center; text-transform:uppercase; letter-spacing:1px; flex:1;">Bell 214B</div>
-        <div style="display:flex; align-items:center; gap:4px;">
-            <button id="gps-btn" class="gps-off" style="height:50px; padding:0 10px; font-size:0.75rem;" onclick="toggleGPS()">GPS OFF</button>
-            <button id="gps-perm-btn" style="height:50px; padding:2px 6px; background:#444; color:#fff; font-size:0.6rem;" onclick="forceGPSPermission()">GPS PERMIT</button>
+        <div id="flight-ac-label" style="font-size:1rem; font-weight:bold; text-align:center; text-transform:uppercase; letter-spacing:1px; flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 4px;">Bell 214B</div>
+        <div style="display:flex; align-items:center; gap:3px; flex-shrink:1; min-width:0;">
+            <button id="gps-btn" class="gps-off" style="height:44px; padding:0 6px; font-size:0.65rem; flex-shrink:1;" onclick="toggleGPS()">GPS OFF</button>
+            <button id="gps-perm-btn" style="height:44px; padding:2px 5px; background:#444; color:#fff; font-size:0.6rem; flex-shrink:1;" onclick="forceGPSPermission()">PERMIT</button>
         </div>
     </div>
 
@@ -297,14 +297,14 @@
                         <span class="unit-xl">Lbs</span>
                     </div>
                     <div style="height:6px;"></div>
-                    <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value); updateBingo();">
+                    <input type="range" id="fly-fuel-slider" min="0" max="3000" step="50" oninput="curFuel=parseFloat(this.value); updateBingo();">
                     <!-- ENDURANCE always visible, below slider — single constrained line -->
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:4px; margin-top:10px; margin-bottom:2px; width:100%; overflow:hidden;">
                         <!-- ENDURANCE block -->
                         <div style="display:flex; flex-direction:column; align-items:center; flex:1; min-width:0;">
-                            <span style="font-size:0.6rem; font-weight:bold; text-transform:uppercase; white-space:nowrap; color:#555;">ENDURANCE</span>
+                            <span style="font-size:0.6rem; font-weight:bold; text-transform:uppercase; white-space:nowrap; color:#555;">TOTAL ENDURANCE</span>
                             <span id="bingo-time" style="font-size:clamp(1.2rem,5.5vw,2rem); font-weight:bold; white-space:nowrap; line-height:1.1;">--h:--m</span>
-                            <span style="font-size:0.6rem; font-weight:bold; white-space:nowrap; color:#555;">(+500lb rsv)</span>
+                            <span style="font-size:0.6rem; font-weight:bold; white-space:nowrap; color:#555;">To Empty</span>
                         </div>
                         <!-- divider -->
                         <div style="width:1px; background:#ccc; align-self:stretch; flex-shrink:0;"></div>
@@ -317,6 +317,12 @@
                     </div>
                     <!-- Fuel Calc items below slider, inside fuel box -->
                     <div id="fuelcalc-items" style="margin-top:6px; border-top:1px solid #ccc; padding-top:8px;">
+                        <!-- Operational Endurance (+500lb spare) -->
+                        <div style="display:flex; align-items:baseline; justify-content:center; gap:6px; margin-bottom:6px;">
+                            <span style="font-size:0.7rem; font-weight:bold; text-transform:uppercase; color:#555;">OPERATIONAL ENDURANCE</span>
+                            <span id="op-endurance" style="font-size:1.8rem; font-weight:bold;">--h:--m</span>
+                            <span style="font-size:0.65rem; font-weight:bold; color:#555;">(+500lb spare)</span>
+                        </div>
                         <div id="fuelplan-row" style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:4px;">
                             <span style="font-size:0.85rem; font-weight:bold;">Fuel Plan GS</span>
                             <select id="fuel-plan-gs" onchange="saveFuelPlanGS(); updateBingo();" style="font-size:1.2rem; font-weight:bold; border:2px solid #000; border-radius:4px; font-family:inherit; padding:2px 6px;">
@@ -457,7 +463,7 @@
 
 <script>
     // ── App version — change this ONE line to update everywhere ───────────────
-    var APP_VERSION = 'V8.8';
+    var APP_VERSION = 'V8.9';
     document.getElementById('app-title').textContent = 'Tanking app ' + APP_VERSION;
     document.title = 'Tanking app ' + APP_VERSION;
     // ── Service Worker ────────────────────────────────────────────────────────
@@ -871,21 +877,23 @@
         var planVal = planSel ? planSel.value : '100';
         var planGS  = (planVal === 'actual') ? curGS : parseFloat(planVal);
 
-        if (usable <= 0) {
-            document.getElementById('bingo-time').innerText      = '00h:00m';
-            document.getElementById('bingo-range-dist').innerText = '0';
-            var rangeDup0 = document.getElementById('bingo-range-dist-dup');
-            if (rangeDup0) rangeDup0.innerText = '0';
-        } else {
-            var hrs  = usable / burn;        // hours of flight remaining
-            var mins = Math.round(hrs * 60); // total minutes
-            var h    = Math.floor(mins / 60);
-            var m    = mins % 60;
-            document.getElementById('bingo-time').innerText = String(h).padStart(2,'0') + 'h:' + String(m).padStart(2,'0') + 'm';
-            document.getElementById('bingo-range-dist').innerText = Math.round(hrs * planGS);
-            var rangeDup1 = document.getElementById('bingo-range-dist-dup');
-            if (rangeDup1) rangeDup1.innerText = Math.round(hrs * planGS);
-        }
+        // ── TOTAL ENDURANCE: all fuel on board at burn rate (always calculated) ──
+        var hrsTotal  = fuel / burn;
+        var minsTotal = Math.round(hrsTotal * 60);
+        var hT = Math.floor(minsTotal / 60), mT = minsTotal % 60;
+        document.getElementById('bingo-time').innerText = String(hT).padStart(2,'0') + 'h:' + String(mT).padStart(2,'0') + 'm';
+
+        // ── OPERATIONAL ENDURANCE: fuel minus 500lb reserve, floors at 0 ─────
+        var opMins = Math.round(Math.max(0, usable) / burn * 60);
+        var hO = Math.floor(opMins / 60), mO = opMins % 60;
+        var opEl = document.getElementById('op-endurance');
+        if (opEl) opEl.innerText = String(hO).padStart(2,'0') + 'h:' + String(mO).padStart(2,'0') + 'm';
+
+        // ── Range (based on operational endurance) ────────────────────────────
+        var hrsOp = Math.max(0, usable) / burn;
+        document.getElementById('bingo-range-dist').innerText = Math.round(hrsOp * planGS);
+        var rangeDup1 = document.getElementById('bingo-range-dist-dup');
+        if (rangeDup1) rangeDup1.innerText = Math.round(hrsOp * planGS);
 
         // ── Time to Bingo ──────────────────────────────────────────────────────
         // How long you can still wait (burning fuel at the chosen burn rate)
@@ -1158,8 +1166,8 @@
     function setFuelCalcBtn(enabled) {
         var btn = document.getElementById('fuelcalc-btn');
         if (!btn) return;
-        btn.textContent = enabled ? 'FUEL CALC ON' : 'FUEL CALC OFF';
         btn.style.background = enabled ? '#28a745' : '#333';
+        btn.style.color = enabled ? '#fff' : '#aaa';
     }
 
     function applyFuelCalc(enabled) {
