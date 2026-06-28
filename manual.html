@@ -22,11 +22,14 @@
         ul { margin: 10px 0; padding-left: 20px; }
         li { margin-bottom: 6px; }
         .note { background-color: #f9f9f9; border-left: 4px solid #cccccc; padding: 10px 15px; margin: 15px 0; }
+        .note.tip  { border-color: #00aa44; background: #f0fff5; }
+        .note.warn { border-color: #cc7700; background: #fffbf0; }
         .btn-label { font-weight: bold; background-color: #f0f0f0; padding: 2px 8px; border-radius: 4px; border: 1px solid #aaaaaa; font-size: 0.9rem; white-space: nowrap; }
-        .btn-label.dark  { background-color: #333; color: #fff; border-color: #555; }
-        .btn-label.green { background-color: #00cc00; color: #000; border-color: #009900; }
-        .btn-label.orange{ background-color: #ff9900; color: #000; border-color: #cc7700; }
-        .btn-label.red   { background-color: #cc0000; color: #fff; border-color: #990000; }
+        .btn-label.dark   { background-color: #333; color: #fff; border-color: #555; }
+        .btn-label.green  { background-color: #00cc00; color: #000; border-color: #009900; }
+        .btn-label.orange { background-color: #ff9900; color: #000; border-color: #cc7700; }
+        .btn-label.red    { background-color: #cc0000; color: #fff; border-color: #990000; }
+        .btn-label.blue   { background-color: #007bff; color: #fff; border-color: #0055cc; }
         .warn-box { display: inline-block; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 0.88rem; border: 1px solid #aaa; }
         .warn-yellow { background: #ffeb00; color: #000; border-color: #bba000; }
         .warn-red    { background: #ff3300; color: #fff; border-color: #aa1100; }
@@ -34,82 +37,22 @@
         table.status-table th { background: #eeeeee; text-align: left; padding: 6px 10px; border: 1px solid #ccc; }
         table.status-table td { padding: 6px 10px; border: 1px solid #ddd; vertical-align: top; }
 
-        /* ── Gauge demo wrapper ── */
-        .gauge-demo {
-            border: 2px solid #000;
-            border-radius: 10px;
-            padding: 14px 14px 10px;
-            margin: 18px 0;
-            background: #fff;
-            position: relative;
-        }
-        .gauge-demo-inner {
-            position: relative;
-            max-width: 340px;
-            margin: 0 auto;
-        }
-        /* Target GS label/select — mirrors the real app overlay */
-        .gauge-target-label {
-            position: absolute;
-            top: 4px;
-            left: 6px;
-            text-align: left;
-            z-index: 5;
-            font-family: Arial, sans-serif;
-        }
-        .gauge-target-label span {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: bold;
-            line-height: 1.2;
-        }
-        .gauge-target-label select {
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: 2px solid #000;
-            border-radius: 4px;
-            font-family: inherit;
-            padding: 2px 6px;
-        }
-        /* Simulated speed slider below the gauge */
-        .gauge-sim-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 8px;
-            font-family: Arial, sans-serif;
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-        .gauge-sim-row input[type=range] {
-            flex: 1;
-            -webkit-appearance: none;
-            height: 20px;
-            background: #ddd;
-            border-radius: 10px;
-            outline: none;
-        }
-        .gauge-sim-row input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 36px;
-            height: 36px;
-            background: #000;
-            border-radius: 50%;
-            border: 3px solid #fff;
-            box-shadow: 0 0 0 2px #000;
-        }
-        .gauge-sim-val {
-            min-width: 52px;
-            text-align: right;
-            font-size: 1rem;
-        }
-        .gauge-sim-caption {
-            font-size: 0.75rem;
-            color: #666;
-            text-align: center;
-            margin-top: 4px;
-            font-style: italic;
-        }
+        /* ── Section anchor links ── */
+        .toc { background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; padding: 14px 18px; margin: 16px 0 24px; }
+        .toc ul { margin: 6px 0 0; padding-left: 18px; }
+        .toc li { margin-bottom: 3px; }
+
+        /* ── Gauge demo ── */
+        .gauge-demo { border: 2px solid #000; border-radius: 10px; padding: 14px 14px 10px; margin: 18px 0; background: #fff; position: relative; }
+        .gauge-demo-inner { position: relative; max-width: 340px; margin: 0 auto; }
+        .gauge-target-label { position: absolute; top: 4px; left: 6px; text-align: left; z-index: 5; font-family: Arial, sans-serif; }
+        .gauge-target-label span { display: block; font-size: 0.75rem; font-weight: bold; line-height: 1.2; }
+        .gauge-target-label select { font-size: 1.2rem; font-weight: bold; border: 2px solid #000; border-radius: 4px; font-family: inherit; padding: 2px 6px; }
+        .gauge-sim-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-family: Arial, sans-serif; font-size: 0.85rem; font-weight: bold; }
+        .gauge-sim-row input[type=range] { flex: 1; -webkit-appearance: none; height: 20px; background: #ddd; border-radius: 10px; outline: none; }
+        .gauge-sim-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 36px; height: 36px; background: #000; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #000; }
+        .gauge-sim-val { min-width: 52px; text-align: right; font-size: 1rem; }
+        .gauge-sim-caption { font-size: 0.75rem; color: #666; text-align: center; margin-top: 4px; font-style: italic; }
     </style>
 </head>
 <body>
@@ -121,127 +64,168 @@
     <h1>Tanking App Manual</h1>
 
     <p class="note">
-        This is a very early release. All suggestions are welcome.<br>
-        The source code is published here for review, or if you want to fork it and build your own:<br>
+        Source code is published for review or forking:<br>
         <a href="https://github.com/RuneKyndal/tanking/" target="_blank">https://github.com/RuneKyndal/tanking/</a>
     </p>
 
+    <div class="toc">
+        <strong>Contents</strong>
+        <ul>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#quickstart">Quick Start</a></li>
+            <li><a href="#aircraft">Aircraft &amp; Registration</a></li>
+            <li><a href="#setup">Setup Page</a></li>
+            <li><a href="#fuel-endurance">Fuel Endurance — Two Numbers Explained</a></li>
+            <li><a href="#fuelcalc">Fuel Calc Toggle</a></li>
+            <li><a href="#bingo">Bingo Fuel</a></li>
+            <li><a href="#warnings">Warning Colours</a></li>
+            <li><a href="#gps">GPS</a></li>
+            <li><a href="#gsgauge">Ground Speed Gauge</a></li>
+            <li><a href="#flightlog">Flight Log</a></li>
+        </ul>
+    </div>
+
+
     <!-- ── INSTALLATION ── -->
-    <h2>Installation</h2>
-    <p>The app is designed as a <strong>Progressive Web App</strong>. For offline use it must be <em>installed</em>, not just bookmarked.</p>
+    <h2 id="installation">Installation</h2>
+    <p>The app is a <strong>Progressive Web App (PWA)</strong>. It must be <em>installed</em> to work offline — a browser bookmark alone will not cache the files.</p>
 
     <h3>iOS</h3>
     <ul>
-        <li>Open the link in <strong>Safari</strong> (not Chrome).</li>
-        <li>Tap <strong>Share &rarr; Add to Home Screen</strong>. Make sure the <em>Web App</em> toggle is <strong>on</strong>.</li>
-        <li>Close everything, then launch from your home screen to complete the initial download.</li>
-        <li>Grant all requested permissions when prompted.</li>
+        <li>Open the link in <strong>Safari</strong> (not Chrome or Firefox).</li>
+        <li>Tap <strong>Share &rarr; Add to Home Screen</strong>. Ensure the <em>Web App</em> toggle is <strong>on</strong>.</li>
+        <li>Close Safari and launch from your home screen to complete the download.</li>
+        <li>Grant location permission when prompted.</li>
     </ul>
 
     <h3>Android</h3>
     <ul>
         <li>Open the link in <strong>Chrome</strong>.</li>
-        <li>Tap the menu and choose <strong>Add to Home Screen &rarr; Install</strong> (not the shortcut option).</li>
-        <li>Close the browser, then launch from your home screen to complete the initial download.</li>
-        <li>Grant all requested permissions when prompted.</li>
+        <li>Tap the menu and choose <strong>Add to Home Screen &rarr; Install</strong> (not "shortcut").</li>
+        <li>Close Chrome and launch from your home screen to complete the download.</li>
+        <li>Grant location permission when prompted.</li>
     </ul>
 
-    <p class="note">
-        The app automatically checks for and fetches the latest version on startup. If you want to update
-        immediately without waiting for the next launch, use the <strong>manual update</strong> button to force
-        a check and pull the most recent version right away.
+    <p class="note warn">
+        <strong>Poor connection at startup?</strong> If the app stalls on launch while on a weak signal, enable <strong>Airplane Mode</strong> to force it to load from the offline cache. Once loaded, disable Airplane Mode if you need GPS.
     </p>
 
     <p class="note">
-        <strong>Known issue (believed fixed):</strong> if startup appears to hang while you have
-        unreliable connection &mdash; online, but with poor &mdash; rather than fully offline, the app may
-        stall while trying to reach the server. Switching off Wi-Fi and cellular data (or enabling
-        <strong>Airplane Mode</strong>) should force it to fall back to the offline version and load normally.
+        The app checks for updates automatically at startup. To force an immediate update, use <strong>Update App</strong> in the Setup page.
     </p>
+
 
     <!-- ── QUICK START ── -->
-    <h2>Quick Start</h2>
+    <h2 id="quickstart">Quick Start</h2>
     <ul>
-        <li>Select your aircraft type, then set weights and fuel load.</li>
-        <li>Tap <span class="btn-label">GO START</span> to move to the timer page.</li>
-        <li>Use engine timers as needed.</li>
-        <li>Tap <span class="btn-label">GO FLY</span> &mdash; this starts the flight timer and takes you to the flight page.</li>
+        <li>Select your aircraft type (Bell 214B, Bell 214 ST) — weights load automatically.</li>
+        <li>Adjust weights and fuel load as needed.</li>
+        <li>Tap <span class="btn-label green">GO START</span> to move to the timer page.</li>
+        <li>Start the engine timer when you start engines.</li>
+        <li>Tap <span class="btn-label green">GO FLY</span> — this starts the flight timer and opens the flight page.</li>
     </ul>
 
-    <p class="note">
-        Most input selections and manual entries &mdash; gross weights, aircraft type, and similar fields &mdash;
-        are automatically saved and reloaded as your defaults the next time you open the app.
+    <p class="note tip">
+        Most inputs — aircraft type, gross weights, burn rate, ground speed target, and distance to fuel — are saved automatically and restored next time you open the app.
     </p>
 
-    <!-- ── BUTTONS & CONTROLS ── -->
-    <h2>Buttons &amp; Controls</h2>
 
-    <h3>Display &amp; Screen</h3>
+    <!-- ── AIRCRAFT & REGISTRATION ── -->
+    <h2 id="aircraft">Aircraft &amp; Registration</h2>
 
-    <p><span class="btn-label dark">🌙 DARK</span> &nbsp;/&nbsp; <span class="btn-label">&#9728; LIGHT</span> &mdash;
-    Toggles between dark and light colour schemes..</p>
+    <p>Tap one of the aircraft preset buttons (<span class="btn-label">Bell 214B</span> &nbsp; <span class="btn-label">Bell 214 ST</span>) to load the standard weights for that type. You can then adjust any value manually — the changes are saved per aircraft type.</p>
 
-    <p><span class="btn-label">SLEEP OK</span> &nbsp;/&nbsp; <span class="btn-label">AWAKE</span> &mdash;
-    Controls screen sleep behaviour on the flight page.
-    In <strong>AWAKE</strong> mode the screen is prevented from auto-locking, keeping the display on during flight.
-    Tap to toggle if you want to allow normal sleep.</p>
+    <p>The <strong>aircraft registration</strong> field on the timer page lets you record the tail number for the current flight. This is saved into the flight log entry when you tap <span class="btn-label blue">SAVE</span>, so each log row is tied to a specific aircraft. It is not saved between sessions — enter it fresh for each flight.</p>
 
-    <h3>GPS</h3>
 
+    <!-- ── SETUP PAGE ── -->
+    <h2 id="setup">Setup Page</h2>
+
+    <p>Tap <span class="btn-label">&#9881; SETUP</span> from either the calculator page or the flight page to open the Setup page. Use the <span class="btn-label">&#8592; BACK</span> button to return to wherever you came from.</p>
+
+    <p>The Setup page is organised into sections:</p>
+
+    <h3>App</h3>
     <table class="status-table">
-        <tr><th>Button state</th><th>Meaning</th></tr>
+        <tr><th>Button</th><th>What it does</th></tr>
         <tr>
-            <td><span class="btn-label red">GPS OFF</span></td>
-            <td>GPS is not running. Tap to start it.</td>
+            <td><span class="btn-label">&#9432; Manual</span></td>
+            <td>Opens this manual.</td>
         </tr>
         <tr>
-            <td><span class="btn-label orange">GPS&hellip;</span></td>
-            <td>Acquiring a fix. Wait for it to turn green.</td>
-        </tr>
-        <tr>
-            <td><span class="btn-label green">GPS LIVE</span></td>
-            <td>GPS is active and receiving a valid ground speed.</td>
+            <td><span class="btn-label">&#8635; Update App</span></td>
+            <td>Clears the offline cache and downloads the latest version from the server. Your weights, settings, and flight log are not affected — only app files are updated.</td>
         </tr>
     </table>
 
-    <p><span class="btn-label">GPS PERMIT</span> &mdash;
-    <em>(Experimental)</em> Attempts to resolve GPS permission issues on some iPhones where the system dialog was previously dismissed. If this does not help, go to <strong>iOS Settings &rarr; Privacy &amp; Security &rarr; Location Services</strong> and enable access for Safari or this app manually.</p>
+    <h3>Display</h3>
+    <table class="status-table">
+        <tr><th>Button</th><th>What it does</th></tr>
+        <tr>
+            <td><span class="btn-label dark">🌙 Dark Mode</span></td>
+            <td>Toggles dark/light scheme. Preference is saved. Button label reflects current state.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label">&#9728; Keep Awake</span></td>
+            <td>Prevents screen auto-lock. Label shows <strong>Awake (ON)</strong> when active. Not supported on all browsers.</td>
+        </tr>
+    </table>
 
-    <!-- ── IN FLIGHT ── -->
-    <h2>In Flight</h2>
+    <h3>GPS</h3>
+    <table class="status-table">
+        <tr><th>Button</th><th>What it does</th></tr>
+        <tr>
+            <td><span class="btn-label">&#128205; GPS Permission</span></td>
+            <td>Attempts to trigger or repair the location permission dialog. If the permission was previously denied, this will show instructions to fix it in your device settings. See the <a href="#gps">GPS section</a> for full details.</td>
+        </tr>
+    </table>
+
+
+    <!-- ── FUEL ENDURANCE ── -->
+    <h2 id="fuel-endurance">Fuel Endurance — Two Numbers</h2>
+
+    <p>The flight page displays two endurance figures simultaneously. They serve different purposes and are both required on screen.</p>
+
+    <h3>Total Endurance</h3>
+    <p>Fuel on board divided by burn rate — no reserve deducted. This is the number required for SAR tasking and flight following: the actual time the aircraft can remain airborne from the current fuel state. Report this figure to flight services.</p>
+
+    <h3>Operational Endurance (+500 lb)</h3>
+    <p>Usable endurance to the 500 lb reserve. This is the planning number — transit, tasking, and bingo calculations are all based on this figure.</p>
+
+
+    <!-- ── FUEL CALC TOGGLE ── -->
+    <h2 id="fuelcalc">Fuel Calc Toggle</h2>
+
+    <p>The <span class="btn-label">FUEL CALC</span> button in the flight page top bar shows or hides the detailed planning section — Operational Endurance, Fuel Plan GS, Range, and Bingo-in countdown.</p>
+
+    <p><span class="btn-label green">FUEL CALC</span> green = planning section visible. Dark = collapsed, leaving fuel load slider, Total Endurance, and the always-visible Bingo-in summary. Useful when screen real estate is at a premium. Setting is saved.</p>
+
+
+    <!-- ── BINGO FUEL ── -->
+    <h2 id="bingo">Bingo Fuel</h2>
+
+    <p>Bingo fuel is the quantity at which you must turn for fuel immediately — calculated so you can cover the <strong>Distance to Fuel</strong> at the selected ground speed and burn rate, and still land with 500 lb remaining.</p>
+
     <ul>
-        <li>Confirm <span class="btn-label green">GPS LIVE</span> is showing before departure.</li>
-        <li>Verify the selected <strong>fuel burn rate</strong> and <strong>target ground speed</strong> match the aircraft and conditions.</li>
-        <li>Update the fuel slider periodically to reflect actual fuel remaining.</li>
+        <li>Set <strong>Distance to Fuel</strong> to your routing distance to the fuel source before departure.</li>
+        <li><strong>Bingo In</strong> counts down the time remaining until you hit bingo fuel. It is visible both inside the Fuel Calc section and in the compact summary bar inside the fuel box — so it is always on screen even with Fuel Calc collapsed.</li>
+        <li>The <strong>Range</strong> figure shows how far you can travel from this point before reaching bingo — useful for judging whether a diversion to a closer fuel source is viable.</li>
     </ul>
 
-    <!-- ── FUEL PLANNING ── -->
-    <h2>Fuel Planning</h2>
-
-    <p>All fuel calculations assume a <strong>500 lb reserve</strong> that must remain on landing.</p>
-
-    <h3>Endurance &amp; Range</h3>
-    <p>Using the selected fuel burn rate and planned ground speed, the app calculates how long and how far you can fly from the current fuel load and still land with 500 lbs remaining.</p>
-
-    <h3>Bingo Fuel</h3>
-    <p>Bingo fuel is the quantity at which you must turn back for fuel immediately &mdash; calculated so that you can cover the <strong>Distance to Fuel</strong> at the selected ground speed and burn rate, and still land with 500 lbs.</p>
-    <ul>
-        <li>Set <strong>Distance to Fuel</strong> to the distance to your fuel source before departure.</li>
-    </ul>
 
     <!-- ── WARNING COLOURS ── -->
-    <h2>Warning Colours</h2>
+    <h2 id="warnings">Warning Colours</h2>
 
     <h3>Bingo Countdown</h3>
     <table class="status-table">
         <tr><th>Colour</th><th>Condition</th></tr>
         <tr>
             <td><span class="warn-box warn-yellow">YELLOW</span></td>
-            <td>Within 15 minutes of bingo fuel &mdash; advisory. Likely your last drop before heading for fuel.</td>
+            <td>Within 15 minutes of bingo fuel — advisory. Likely your last drop before heading for fuel.</td>
         </tr>
         <tr>
             <td><span class="warn-box warn-red">RED</span></td>
-            <td>Bingo fuel reached &mdash; turn back now to land with 500 lbs.</td>
+            <td>Bingo fuel reached — turn back now to land with 500 lb.</td>
         </tr>
     </table>
 
@@ -250,29 +234,57 @@
         <tr><th>Colour</th><th>Condition</th></tr>
         <tr>
             <td><span class="warn-box warn-yellow">YELLOW</span></td>
-            <td>Fuel remaining at or below <strong>800 lb</strong> &mdash; advisory. Time to plan for fuel.</td>
+            <td>Fuel remaining at or below <strong>800 lb</strong> — advisory. Time to plan for fuel.</td>
         </tr>
         <tr>
             <td><span class="warn-box warn-red">RED</span></td>
-            <td>Fuel remaining at or below <strong>500 lb</strong> &mdash; minimum reserve reached. Land now.</td>
+            <td>Fuel remaining at or below <strong>500 lb</strong> — reserve reached. Land now.</td>
         </tr>
     </table>
 
+
+    <!-- ── GPS ── -->
+    <h2 id="gps">GPS</h2>
+
+    <p>Tap <span class="btn-label red">GPS OFF</span> on the flight page to start the GPS. The button changes colour to show status:</p>
+
+    <table class="status-table">
+        <tr><th>Button state</th><th>Meaning</th></tr>
+        <tr>
+            <td><span class="btn-label red">GPS OFF</span></td>
+            <td>GPS is not running. Tap to start.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label orange">GPS&hellip;</span></td>
+            <td>Acquiring a fix. Wait for it to turn green.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label green">GPS LIVE</span></td>
+            <td>GPS is active and feeding ground speed to the gauge.</td>
+        </tr>
+    </table>
+
+    <p>If GPS permission was previously denied, use <span class="btn-label">&#128205; GPS Permission</span> in the Setup page to attempt to repair it, or follow the instructions shown to fix it in your device settings manually.</p>
+
+    <p class="note warn">
+        <strong>iOS:</strong> Settings &rarr; Privacy &amp; Security &rarr; Location Services &rarr; find Safari or this app &rarr; set to <em>While Using</em>.<br>
+        <strong>Android:</strong> Settings &rarr; Apps &rarr; this app/browser &rarr; Permissions &rarr; Location &rarr; Allow.
+    </p>
+
+
     <!-- ── GROUND SPEED GAUGE ── -->
-    <h2>Ground Speed Gauge</h2>
+    <h2 id="gsgauge">Ground Speed Gauge</h2>
 
-    <p>The ground speed gauge is a <strong>deviation instrument</strong>, designed to be read at a glance without focusing on numbers &mdash; the same intuitive finction as the airspeed indicator. Clockwise needle movement means faster; counter-clockwise means slower.</p>
+    <p>The ground speed gauge is a <strong>deviation instrument</strong> — read it at a glance without focusing on numbers, the same way you read an airspeed indicator. Clockwise = faster; counter-clockwise = slower.</p>
 
-    <p>Set your <strong>Target GS</strong> from the drop down. This value becomes the 12&nbsp;o&rsquo;clock position. The arc spans &plusmn;10&nbsp;kts either side of target &mdash; the operational range, beyond that window, the needle simply pegs left (too slow) or right (too fast).</p>
-
-    <p>The green band at 12&nbsp;o&rsquo;clock marks the on-speed range (&plusmn;3&nbsp;kts). The large digital readout in the centre shows actual ground speed in Kts.</p>
+    <p>Set your <strong>Target GS</strong> from the dropdown. That value becomes the 12&nbsp;o&rsquo;clock position. The arc spans &plusmn;10&nbsp;kts either side of target. Outside that window the needle pegs left (too slow) or right (too fast). The green band at 12&nbsp;o&rsquo;clock marks the on-speed range (&plusmn;3&nbsp;kts). The large central number is actual ground speed in knots.</p>
 
     <ul>
-        <li><strong>Needle hard left</strong> &mdash; well below target.</li>
-        <li><strong>Needle climbing toward 12&nbsp;o&rsquo;clock</strong> &mdash; below target speed.</li>
-        <li><strong>Needle in the green at 12&nbsp;o&rsquo;clock</strong> &mdash; on speed.</li>
-        <li><strong>Needle right of centre</strong> &mdash; above target.</li>
-        <li><strong>Needle hard right</strong> &mdash; pegged above +10&nbsp;kts.</li>
+        <li><strong>Needle hard left</strong> — well below target speed.</li>
+        <li><strong>Needle climbing toward 12 o'clock</strong> — below target, accelerating.</li>
+        <li><strong>Needle in the green at 12 o'clock</strong> — on speed.</li>
+        <li><strong>Needle right of centre</strong> — above target.</li>
+        <li><strong>Needle hard right</strong> — pegged more than +10 kts above target.</li>
     </ul>
 
     <p>Choose target speed based on conditions, pilot preference, and sea-scoop configuration. A consistent speed through the run gives the most predictable tank load.</p>
@@ -280,38 +292,25 @@
     <!-- ── INTERACTIVE GAUGE DEMO ── -->
     <div class="gauge-demo">
         <div class="gauge-demo-inner">
-
-            <!-- Target GS overlay — matches the real app position exactly -->
             <div class="gauge-target-label">
                 <span>TARGET GS</span>
                 <select id="demo-gs-target" onchange="updateDemoGauge()"></select>
             </div>
-
-            <!-- The gauge SVG — identical viewBox, arcs, ticks, needle, readout to the real app -->
             <svg id="demo-gs-svg" viewBox="0 0 200 135" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;">
-                <!-- Background arc -->
                 <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#ddd" stroke-width="14" stroke-linecap="round"/>
-                <!-- Yellow arc (full sweep) -->
                 <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#ffcc00" stroke-width="14" stroke-linecap="round"/>
-                <!-- Green zone: centre ±3 kts = ±27° -->
                 <path d="M 100 20 A 80 80 0 0 1 143.2 31.8" fill="none" stroke="#00cc44" stroke-width="14" transform="rotate(-27 100 100)"/>
                 <path d="M 100 20 A 80 80 0 0 0 56.8 31.8"  fill="none" stroke="#00cc44" stroke-width="14" transform="rotate(27 100 100)"/>
-                <!-- Tick marks (built by JS, same loop as real app) -->
                 <g id="demo-tick-group"></g>
-                <!-- Scale labels -->
                 <text id="demo-min-val" x="8"   y="103" text-anchor="middle" font-size="9" font-weight="bold" fill="#000" font-family="Arial,sans-serif">--</text>
                 <text id="demo-tgt-val" x="100" y="10"  text-anchor="middle" font-size="9" font-weight="bold" fill="#000" font-family="Arial,sans-serif">--</text>
                 <text id="demo-max-val" x="192" y="103" text-anchor="middle" font-size="9" font-weight="bold" fill="#000" font-family="Arial,sans-serif">--</text>
-                <!-- Large digital readout -->
                 <text id="demo-gs-readout" x="100" y="88" text-anchor="middle" font-size="48" font-weight="bold" fill="#000" font-family="Arial,sans-serif">0</text>
-                <!-- Needle — same geometry as real app, transition matches -->
                 <g id="demo-needle-group" style="transform:rotate(0deg); transform-origin:100px 100px; transition:transform 0.2s linear;">
                     <line x1="100" y1="100" x2="100" y2="20" stroke="#333" stroke-width="3" stroke-linecap="round"/>
                     <circle cx="100" cy="100" r="5" fill="#333"/>
                 </g>
             </svg>
-
-            <!-- Simulated speed slider -->
             <div class="gauge-sim-row">
                 <span style="white-space:nowrap;">Simulated GS</span>
                 <input type="range" id="demo-speed-slider" min="0" max="50" value="18" step="1" oninput="updateDemoGauge()">
@@ -321,14 +320,20 @@
         </div>
     </div>
 
+
     <!-- ── FLIGHT LOG ── -->
-    <h2>Flight Log</h2>
+    <h2 id="flightlog">Flight Log</h2>
     <ul>
-        <li>Tap <span class="btn-label">BACK</span> from the flight page to return to the timer page.</li>
-        <li>Stop or restart engine and flight timers as needed.</li>
-        <li>Tap <strong>Save to Log</strong> to record the current entry.</li>
-        <li>Use <strong>Export Logs</strong> to share or archive your records.</li>
+        <li>After a flight, tap <span class="btn-label">BACK</span> on the flight page to return to the timer page.</li>
+        <li>Stop engine and flight timers as needed.</li>
+        <li>Enter the aircraft registration if you haven't already.</li>
+        <li>Tap <span class="btn-label blue">SAVE</span> to record the entry — this stores date, registration, engine block time, and flight time.</li>
+        <li>Tap <span class="btn-label">LOGS</span> to view saved entries, or export them as <strong>.CSV</strong> or <strong>.TXT</strong>.</li>
     </ul>
+
+    <p class="note">
+        Log entries are stored locally on the device. Exporting to CSV or TXT is the only way to back them up — no cloud sync is performed.
+    </p>
 
     <script>
         /* ── Exit button ── */
@@ -341,7 +346,7 @@
             }
         });
 
-        /* ── Build Target GS selector: 0–30 kts, default 18 (same as real app) ── */
+        /* ── Build Target GS selector ── */
         var gsSelect = document.getElementById('demo-gs-target');
         for (var i = 0; i <= 30; i++) {
             var o = document.createElement('option');
@@ -350,7 +355,7 @@
             gsSelect.appendChild(o);
         }
 
-        /* ── Build tick marks — exact copy of real app drawGSTicks() ── */
+        /* ── Build tick marks ── */
         (function drawTicks() {
             var g = document.getElementById('demo-tick-group');
             for (var i = -90; i <= 90; i += 9) {
@@ -364,20 +369,15 @@
             }
         })();
 
-        /* ── Update gauge — exact copy of real app updateGSUI() logic ── */
+        /* ── Update demo gauge ── */
         function updateDemoGauge() {
             var tgt   = parseFloat(document.getElementById('demo-gs-target').value);
             var speed = parseFloat(document.getElementById('demo-speed-slider').value);
-
-            /* Clamp slider to a sensible range around target */
             document.getElementById('demo-min-val').textContent = Math.max(0, tgt - 10);
             document.getElementById('demo-tgt-val').textContent = tgt;
             document.getElementById('demo-max-val').textContent = tgt + 10;
-
             document.getElementById('demo-gs-readout').textContent = Math.round(speed);
             document.getElementById('demo-speed-val').textContent  = Math.round(speed) + ' kts';
-
-            /* Needle rotation: diff * 9 deg/kt, clamped ±90° — same formula as real app */
             var diff = speed - tgt;
             var deg  = Math.min(90, Math.max(-90, diff * 9));
             document.getElementById('demo-needle-group').style.transform = 'rotate(' + deg + 'deg)';
