@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app V8.4</title>
+    <title>Tanking app V8.5</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -104,8 +104,7 @@
         #ttb-row-dup.warn-red .bingo-plan-value { color: #fff; }
 
         /* ── Fuel Calc toggle ── */
-        body.fuelcalc-off #fuelplan-row,
-        body.fuelcalc-off #ttb-row,
+        body.fuelcalc-off #fuelcalc-items,
         body.fuelcalc-off #ls-range-bingo-dup { display: none !important; }
 
         /* ── GS GAUGE ── */
@@ -167,7 +166,7 @@
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app V8.4</h2>
+    <h2>Tanking app V8.5</h2>
 
     <div class="preset-row">
         <div style="display:flex; gap:6px;">
@@ -300,7 +299,7 @@
                     <div style="height:6px;"></div>
                     <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value); updateBingo();">
                     <!-- Fuel Calc items below slider, inside fuel box -->
-                    <div style="margin-top:10px; border-top:1px solid #ccc; padding-top:8px;">
+                    <div id="fuelcalc-items" style="margin-top:10px; border-top:1px solid #ccc; padding-top:8px;">
                         <div style="display:flex; align-items:baseline; justify-content:center; gap:8px; margin-bottom:6px;">
                             <span style="font-size:0.75rem; font-weight:bold; text-transform:uppercase;">ENDURANCE</span>
                             <span id="bingo-time" style="font-size:2.3rem; font-weight:bold;">--h:--m</span>
@@ -1114,9 +1113,10 @@
     });
 
     // ── Fuel Calc toggle ─────────────────────────────────────────────────────
-    // When OFF: Fuel Plan GS + Range, and Dist-to-fuel + Bingo-in (portrait
-    // row and its landscape duplicate) are hidden via the body.fuelcalc-off
-    // CSS rule. Endurance/payload/burn rate are unaffected and stay visible.
+    // When OFF: the whole Fuel Calc block — Endurance, Fuel Plan GS + Range,
+    // and Dist-to-fuel + Bingo-in (portrait row and its landscape duplicate)
+    // — is hidden via the body.fuelcalc-off CSS rule. Fuel load, burn rate,
+    // and payload stay visible either way.
     function setFuelCalcBtn(enabled) {
         var btn = document.getElementById('fuelcalc-btn');
         if (!btn) return;
