@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app V8.5</title>
+    <title>Tanking app V8.8</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -166,7 +166,7 @@
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app V8.5</h2>
+    <h2 id="app-title"></h2>
 
     <div class="preset-row">
         <div style="display:flex; gap:6px;">
@@ -298,13 +298,25 @@
                     </div>
                     <div style="height:6px;"></div>
                     <input type="range" id="fly-fuel-slider" min="500" max="3000" step="50" oninput="curFuel=parseFloat(this.value); updateBingo();">
-                    <!-- Fuel Calc items below slider, inside fuel box -->
-                    <div id="fuelcalc-items" style="margin-top:10px; border-top:1px solid #ccc; padding-top:8px;">
-                        <div style="display:flex; align-items:baseline; justify-content:center; gap:8px; margin-bottom:6px;">
-                            <span style="font-size:0.75rem; font-weight:bold; text-transform:uppercase;">ENDURANCE</span>
-                            <span id="bingo-time" style="font-size:2.3rem; font-weight:bold;">--h:--m</span>
-                            <span style="font-size:0.75rem; font-weight:bold;">(+500lbs rsv)</span>
+                    <!-- ENDURANCE always visible, below slider — single constrained line -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:4px; margin-top:10px; margin-bottom:2px; width:100%; overflow:hidden;">
+                        <!-- ENDURANCE block -->
+                        <div style="display:flex; flex-direction:column; align-items:center; flex:1; min-width:0;">
+                            <span style="font-size:0.6rem; font-weight:bold; text-transform:uppercase; white-space:nowrap; color:#555;">ENDURANCE</span>
+                            <span id="bingo-time" style="font-size:clamp(1.2rem,5.5vw,2rem); font-weight:bold; white-space:nowrap; line-height:1.1;">--h:--m</span>
+                            <span style="font-size:0.6rem; font-weight:bold; white-space:nowrap; color:#555;">(+500lb rsv)</span>
                         </div>
+                        <!-- divider -->
+                        <div style="width:1px; background:#ccc; align-self:stretch; flex-shrink:0;"></div>
+                        <!-- BINGO IN block -->
+                        <div id="bingo-in-always-row" style="display:flex; flex-direction:column; align-items:center; flex:1; min-width:0;">
+                            <span style="font-size:0.6rem; font-weight:bold; text-transform:uppercase; white-space:nowrap; color:#555;">BINGO IN</span>
+                            <span id="bingo-in-always" style="font-size:clamp(1.2rem,5.5vw,2rem); font-weight:bold; white-space:nowrap; line-height:1.1;">--:--</span>
+                            <span id="bingo-in-basis" style="font-size:0.6rem; color:#000; font-weight:normal; white-space:nowrap; line-height:1.3;">--Nm@--kts</span>
+                        </div>
+                    </div>
+                    <!-- Fuel Calc items below slider, inside fuel box -->
+                    <div id="fuelcalc-items" style="margin-top:6px; border-top:1px solid #ccc; padding-top:8px;">
                         <div id="fuelplan-row" style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:4px;">
                             <span style="font-size:0.85rem; font-weight:bold;">Fuel Plan GS</span>
                             <select id="fuel-plan-gs" onchange="saveFuelPlanGS(); updateBingo();" style="font-size:1.2rem; font-weight:bold; border:2px solid #000; border-radius:4px; font-family:inherit; padding:2px 6px;">
@@ -444,6 +456,10 @@
 </div>
 
 <script>
+    // ── App version — change this ONE line to update everywhere ───────────────
+    var APP_VERSION = 'V8.8';
+    document.getElementById('app-title').textContent = 'Tanking app ' + APP_VERSION;
+    document.title = 'Tanking app ' + APP_VERSION;
     // ── Service Worker ────────────────────────────────────────────────────────
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
@@ -881,12 +897,18 @@
         var ttbRow = document.getElementById('ttb-row');
         var ttbElDup  = document.getElementById('time-to-bingo-dup');
         var ttbRowDup = document.getElementById('ttb-row-dup');
+        var ttbAlways    = document.getElementById('bingo-in-always');
+        var ttbAlwaysRow = document.getElementById('bingo-in-always-row');
         if (ttbEl) {
             if (!planGS || planGS <= 0) {
                 ttbEl.innerText = '--:--';
                 if (ttbRow) { ttbRow.classList.remove('warn','warn-red'); }
                 if (ttbElDup) ttbElDup.innerText = '--:--';
                 if (ttbRowDup) { ttbRowDup.classList.remove('warn','warn-red'); }
+                if (ttbAlways) ttbAlways.innerText = '--:--';
+                if (ttbAlwaysRow) { ttbAlwaysRow.style.background = ''; ttbAlwaysRow.style.color = ''; }
+                var basisEl0 = document.getElementById('bingo-in-basis');
+                if (basisEl0) basisEl0.innerText = '--Nm@--kts';
             } else {
                 var transitHrs  = dist / planGS;
                 var fuelNeeded  = transitHrs * burn + BINGO_RESERVE;
@@ -895,8 +917,24 @@
                 if (ttbHrs < 0) ttbHrs = 0;
                 var ttbMins = Math.round(ttbHrs * 60);
                 var th = Math.floor(ttbMins / 60), tm = ttbMins % 60;
-                ttbEl.innerText = String(th).padStart(2,'0') + ':' + String(tm).padStart(2,'0');
-                if (ttbElDup) ttbElDup.innerText = String(th).padStart(2,'0') + ':' + String(tm).padStart(2,'0');
+                var ttbStr = String(th).padStart(2,'0') + ':' + String(tm).padStart(2,'0');
+                ttbEl.innerText = ttbStr;
+                if (ttbElDup) ttbElDup.innerText = ttbStr;
+                if (ttbAlways) ttbAlways.innerText = ttbStr;
+                var basisEl = document.getElementById('bingo-in-basis');
+                if (basisEl) basisEl.innerText = dist + 'Nm@' + Math.round(planGS) + 'kts';
+                if (ttbAlwaysRow) {
+                    if (rawTtbHrs <= 0) {
+                        ttbAlwaysRow.style.background = '#ff3300'; ttbAlwaysRow.style.color = '#fff';
+                        ttbAlwaysRow.style.borderRadius = '6px'; ttbAlwaysRow.style.padding = '2px 8px 2px 10px';
+                    } else if (rawTtbHrs <= 0.25) {
+                        ttbAlwaysRow.style.background = '#ffeb00'; ttbAlwaysRow.style.color = '#000';
+                        ttbAlwaysRow.style.borderRadius = '6px'; ttbAlwaysRow.style.padding = '2px 8px 2px 10px';
+                    } else {
+                        ttbAlwaysRow.style.background = ''; ttbAlwaysRow.style.color = '';
+                        ttbAlwaysRow.style.borderRadius = ''; ttbAlwaysRow.style.padding = ''; ttbAlwaysRow.style.paddingLeft = '12px';
+                    }
+                }
 
                 if (ttbRow) {
                     if (rawTtbHrs <= 0) {
@@ -1008,7 +1046,7 @@
         if (naturalH <= availH && naturalW <= availW) return; // already fits
 
         var scale = Math.min(availW / naturalW, availH / naturalH);
-        scale = Math.max(Math.min(scale, 1), 0.5); // clamp 0.5–1.0
+        scale = Math.max(Math.min(scale, 1), 0.4); // clamp 0.4–1.0
 
         // Fix the page at a known size/position, then scale it from its own
         // center. Using position:fixed + left/top 50% + translate(-50%,-50%)
@@ -1127,6 +1165,9 @@
     function applyFuelCalc(enabled) {
         document.body.classList.toggle('fuelcalc-off', !enabled);
         setFuelCalcBtn(enabled);
+        // Content height changed — rescale the active page so it still fits
+        // the screen with no scroll (matters most in landscape on iPad).
+        setTimeout(function() { if (typeof fitActivePage === 'function') fitActivePage(); }, 50);
     }
 
     function toggleFuelCalc() {
