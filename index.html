@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app V8.1</title>
+    <title>Tanking app V8.2</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -96,10 +96,12 @@
         .bingo-plan-row select { font-size: clamp(1rem, 4.6vw, 1.3rem); font-weight: bold; border: 2px solid #000; border-radius: 4px; font-family: inherit; padding: 2px 4px; }
         .bingo-plan-range { font-size: clamp(1rem, 4.6vw, 1.3rem); font-weight: bold; white-space: nowrap; }
         .bingo-plan-value { font-size: clamp(1rem, 4.6vw, 1.3rem); font-weight: bold; white-space: nowrap; }
-        #ttb-row.warn { background: #ffeb00; }
-        #ttb-row.warn-red { background: #ff3300; }
+        #ttb-row.warn, #ttb-row-dup.warn { background: #ffeb00; }
+        #ttb-row.warn-red, #ttb-row-dup.warn-red { background: #ff3300; }
         #ttb-row.warn-red .bingo-plan-label,
-        #ttb-row.warn-red .bingo-plan-value { color: #fff; }
+        #ttb-row.warn-red .bingo-plan-value,
+        #ttb-row-dup.warn-red .bingo-plan-label,
+        #ttb-row-dup.warn-red .bingo-plan-value { color: #fff; }
 
         /* ── GS GAUGE ── */
         .gs-gauge-outer { width: 100%; display: flex; justify-content: center; align-items: center; }
@@ -116,6 +118,7 @@
             .ls-fuel-payload { display: flex !important; gap: 6px; }
             .ls-fuel-payload > .bubble-v198 { flex: 1; }
             .ls-gauge-wrap { width: 100% !important; }
+            .ls-landscape-only { display: block !important; }
         }
 
         /* ── DARK MODE ── */
@@ -137,8 +140,8 @@
         body.dark .bingo-reserve { color: #aaa; }
         body.dark .bingo-endur-label { color: #aaa; }
         body.dark .bingo-plan-row select { background: #2a2a2a; color: #f0f0f0; border-color: #555; }
-        body.dark #ttb-row.warn { background: #7a6e00; }
-        body.dark #ttb-row.warn-red { background: #8b1a00; }
+        body.dark #ttb-row.warn, body.dark #ttb-row-dup.warn { background: #7a6e00; }
+        body.dark #ttb-row.warn-red, body.dark #ttb-row-dup.warn-red { background: #8b1a00; }
         body.dark .dec-small { color: #aaa; }
         body.dark .timer-row { border-color: #555; }
         body.dark .timer-row[style*="background:#eef"] { background: #1e2535 !important; }
@@ -159,7 +162,7 @@
 
 <!-- ── CALC PAGE ── -->
 <div id="calc-page" class="page">
-    <h2>Tanking app V8.1</h2>
+    <h2>Tanking app V8.2</h2>
 
     <div class="preset-row">
         <div style="display:flex; gap:6px;">
@@ -301,7 +304,7 @@
                     <div style="margin-top:10px; border-top:1px solid #ccc; padding-top:8px;">
                         <div style="display:flex; align-items:baseline; justify-content:center; gap:8px; margin-bottom:6px;">
                             <span style="font-size:0.75rem; font-weight:bold; text-transform:uppercase;">ENDURANCE</span>
-                            <span id="bingo-time" style="font-size:1.6rem; font-weight:bold;">--h:--m</span>
+                            <span id="bingo-time" style="font-size:2.3rem; font-weight:bold;">--h:--m</span>
                             <span style="font-size:0.75rem; font-weight:bold;">(+500lbs rsv)</span>
                         </div>
                         <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:4px;">
@@ -317,7 +320,7 @@
                                 <option value="130">130kts</option>
                                 <option value="actual">ACTUAL</option>
                             </select>
-                            <span style="font-size:0.85rem; font-weight:bold; white-space:nowrap;">Range <span id="bingo-range-dist" style="font-size:1.6rem; font-weight:bold;">--</span>Nm</span>
+                            <span style="font-size:0.85rem; font-weight:bold; white-space:nowrap;">Range <span id="bingo-range-dist" style="font-size:2.3rem; font-weight:bold;">--</span>Nm</span>
                         </div>
                         <div id="ttb-row" style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:6px; padding:4px; border-radius:6px;">
                             <span style="font-size:0.85rem; font-weight:bold;">Dist to fuel</span>
@@ -334,7 +337,7 @@
                                 <option value="280">280</option><option value="290">290</option><option value="300">300</option>
                             </select>
                             <span style="font-size:0.85rem; font-weight:bold;">Nm &nbsp; Bingo in</span>
-                            <span id="time-to-bingo" style="font-size:1.6rem; font-weight:bold;">--:--</span>
+                            <span id="time-to-bingo" style="font-size:2.3rem; font-weight:bold;">--:--</span>
                         </div>
                     </div>
                 </div>
@@ -344,6 +347,17 @@
                     <div style="display:flex; align-items:baseline; justify-content:center; gap:4px;">
                         <span class="val-xl-v198" id="fly-ltr">--</span>
                         <span class="unit-xl">Ltrs</span>
+                    </div>
+
+                    <!-- Landscape-only duplicate of Range + Bingo-in, shown below Payload -->
+                    <div id="ls-range-bingo-dup" class="ls-landscape-only" style="margin-top:10px; border-top:1px solid #ccc; padding-top:8px; display:none;">
+                        <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
+                            <span style="font-size:1.2rem; font-weight:bold; white-space:nowrap;">Range <span id="bingo-range-dist-dup" style="font-size:3.5rem; font-weight:bold;">--</span>Nm</span>
+                        </div>
+                        <div id="ttb-row-dup" style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:6px; padding:4px; border-radius:6px;">
+                            <span style="font-size:1.2rem; font-weight:bold;">Bingo in</span>
+                            <span id="time-to-bingo-dup" style="font-size:3.5rem; font-weight:bold;">--:--</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -400,7 +414,7 @@
     <button onclick="showPage('timer-page')" style="background:#28a745; color:#fff; width:100%; padding:16px; margin-bottom:12px; border:2px solid #000; border-radius:8px; font-weight:bold;">BACK</button>
     <table class="log-table">
         <thead>
-            <tr><th>Date</th><th>Eng Block</th><th>HH:MM</th><th>Eng</th><th>Flt Block</th><th>HH:MM</th><th>Flt</th></tr>
+            <tr><th>Date</th><th>Reg</th><th>Eng Block</th><th>HH:MM</th><th>Eng</th><th>Flt Block</th><th>HH:MM</th><th>Flt</th></tr>
         </thead>
         <tbody id="log-body"></tbody>
     </table>
@@ -742,9 +756,16 @@
 
     // ── Save / Log ────────────────────────────────────────────────────────────
     function saveLog() {
+        var lastReg = localStorage.getItem('lastAcReg') || '';
+        var reg = prompt("Aircraft registration (e.g. N1234):", lastReg);
+        if (reg === null) reg = lastReg; // cancelled — keep previous default, don't block the save
+        reg = reg.trim().toUpperCase();
+        localStorage.setItem('lastAcReg', reg);
+
         var engMs = (timers.engG.end || (timers.engG.start ? Date.now() : 0)) - (timers.engG.start || 0);
         var entry = {
             date: new Date().toLocaleDateString(),
+            reg:  reg,
             eb:   document.getElementById('e-ts').innerText,
             ehms: formatShort(engMs),
             eh:   (engMs/3600000).toFixed(2),
@@ -763,18 +784,18 @@
         var log   = JSON.parse(localStorage.getItem('hLogV36') || '[]').reverse();
         var tbody = document.getElementById('log-body');
         tbody.innerHTML = '';
-        if (!log.length) { tbody.innerHTML = '<tr><td colspan="7">No logs.</td></tr>'; return; }
+        if (!log.length) { tbody.innerHTML = '<tr><td colspan="8">No logs.</td></tr>'; return; }
         var html = '', dailyE = 0, dailyF = 0, lastDate = log[0].date, dayHtml = '';
         log.forEach(function(e, i) {
             if (e.date !== lastDate) {
-                html += dayHtml + '<tr style="background:#f0f0f0;font-weight:bold;"><td colspan="3">TOTAL ' + lastDate + '</td><td>' + dailyE.toFixed(2) + '</td><td colspan="2"></td><td>' + dailyF.toFixed(2) + '</td></tr>';
+                html += dayHtml + '<tr style="background:#f0f0f0;font-weight:bold;"><td colspan="4">TOTAL ' + lastDate + '</td><td>' + dailyE.toFixed(2) + '</td><td colspan="2"></td><td>' + dailyF.toFixed(2) + '</td></tr>';
                 dayHtml = ''; dailyE = 0; dailyF = 0; lastDate = e.date;
             }
-            dayHtml += '<tr><td>' + e.date + '</td><td>' + e.eb + '</td><td>' + e.ehms + '</td><td>' + e.eh + '</td><td>' + e.fb + '</td><td>' + e.fhms + '</td><td>' + e.fh + '</td></tr>';
+            dayHtml += '<tr><td>' + e.date + '</td><td>' + (e.reg || '') + '</td><td>' + e.eb + '</td><td>' + e.ehms + '</td><td>' + e.eh + '</td><td>' + e.fb + '</td><td>' + e.fhms + '</td><td>' + e.fh + '</td></tr>';
             dailyE += parseFloat(e.eh);
             dailyF += parseFloat(e.fh);
             if (i === log.length - 1) {
-                html += dayHtml + '<tr style="background:#f0f0f0;font-weight:bold;"><td colspan="3">TOTAL ' + lastDate + '</td><td>' + dailyE.toFixed(2) + '</td><td colspan="2"></td><td>' + dailyF.toFixed(2) + '</td></tr>';
+                html += dayHtml + '<tr style="background:#f0f0f0;font-weight:bold;"><td colspan="4">TOTAL ' + lastDate + '</td><td>' + dailyE.toFixed(2) + '</td><td colspan="2"></td><td>' + dailyF.toFixed(2) + '</td></tr>';
             }
         });
         tbody.innerHTML = html;
@@ -793,12 +814,12 @@
         if (!log.length) { showToast("No logs found."); return; }
         var content, ext, mime;
         if (type === 'csv') {
-            content = "Date,Eng Block,Eng HHMM,Eng Dec,Flt Block,Flt HHMM,Flt Dec\n" +
-                log.map(function(e){return [e.date,e.eb,e.ehms,e.eh,e.fb,e.fhms,e.fh].join(',');}).join('\n');
+            content = "Date,Reg,Eng Block,Eng HHMM,Eng Dec,Flt Block,Flt HHMM,Flt Dec\n" +
+                log.map(function(e){return [e.date,(e.reg||''),e.eb,e.ehms,e.eh,e.fb,e.fhms,e.fh].join(',');}).join('\n');
             ext = ".csv"; mime = "text/csv";
         } else {
             content = "HELI LOG\n" +
-                log.map(function(e){return e.date+" | ENG: "+e.eb+" ["+e.ehms+"] ("+e.eh+"h) | FLT: "+e.fb+" ["+e.fhms+"] ("+e.fh+"h)";}).join('\n');
+                log.map(function(e){return e.date+(e.reg ? " ["+e.reg+"]" : "")+" | ENG: "+e.eb+" ["+e.ehms+"] ("+e.eh+"h) | FLT: "+e.fb+" ["+e.fhms+"] ("+e.fh+"h)";}).join('\n');
             ext = ".txt"; mime = "text/plain";
         }
         var a = document.createElement('a');
@@ -841,6 +862,8 @@
         if (usable <= 0) {
             document.getElementById('bingo-time').innerText      = '00h:00m';
             document.getElementById('bingo-range-dist').innerText = '0';
+            var rangeDup0 = document.getElementById('bingo-range-dist-dup');
+            if (rangeDup0) rangeDup0.innerText = '0';
         } else {
             var hrs  = usable / burn;        // hours of flight remaining
             var mins = Math.round(hrs * 60); // total minutes
@@ -848,6 +871,8 @@
             var m    = mins % 60;
             document.getElementById('bingo-time').innerText = String(h).padStart(2,'0') + 'h:' + String(m).padStart(2,'0') + 'm';
             document.getElementById('bingo-range-dist').innerText = Math.round(hrs * planGS);
+            var rangeDup1 = document.getElementById('bingo-range-dist-dup');
+            if (rangeDup1) rangeDup1.innerText = Math.round(hrs * planGS);
         }
 
         // ── Time to Bingo ──────────────────────────────────────────────────────
@@ -858,10 +883,14 @@
         var dist   = distEl ? parseFloat(distEl.value) || 0 : 0;
         var ttbEl  = document.getElementById('time-to-bingo');
         var ttbRow = document.getElementById('ttb-row');
+        var ttbElDup  = document.getElementById('time-to-bingo-dup');
+        var ttbRowDup = document.getElementById('ttb-row-dup');
         if (ttbEl) {
             if (!planGS || planGS <= 0) {
                 ttbEl.innerText = '--:--';
                 if (ttbRow) { ttbRow.classList.remove('warn','warn-red'); }
+                if (ttbElDup) ttbElDup.innerText = '--:--';
+                if (ttbRowDup) { ttbRowDup.classList.remove('warn','warn-red'); }
             } else {
                 var transitHrs  = dist / planGS;
                 var fuelNeeded  = transitHrs * burn + BINGO_RESERVE;
@@ -871,6 +900,7 @@
                 var ttbMins = Math.round(ttbHrs * 60);
                 var th = Math.floor(ttbMins / 60), tm = ttbMins % 60;
                 ttbEl.innerText = String(th).padStart(2,'0') + ':' + String(tm).padStart(2,'0');
+                if (ttbElDup) ttbElDup.innerText = String(th).padStart(2,'0') + ':' + String(tm).padStart(2,'0');
 
                 if (ttbRow) {
                     if (rawTtbHrs <= 0) {
@@ -881,6 +911,17 @@
                         ttbRow.classList.remove('warn-red');
                     } else {
                         ttbRow.classList.remove('warn','warn-red');
+                    }
+                }
+                if (ttbRowDup) {
+                    if (rawTtbHrs <= 0) {
+                        ttbRowDup.classList.add('warn-red');
+                        ttbRowDup.classList.remove('warn');
+                    } else if (rawTtbHrs <= 0.25) { // 15 minutes
+                        ttbRowDup.classList.add('warn');
+                        ttbRowDup.classList.remove('warn-red');
+                    } else {
+                        ttbRowDup.classList.remove('warn','warn-red');
                     }
                 }
             }
