@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app V8.9</title>
+    <title>Tanking app V9.4</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -159,7 +159,13 @@
         body.dark #gs-gauge-svg path[stroke="#ddd"] { stroke: #444; }
         body.dark .gs-tick-line { stroke: #ccc; }
         body.dark #toast { background: #444; }
-        /* Dark mode SVG text/needle colors handled via JS */
+        /* ── SETUP PAGE ── */
+        .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .setup-btn { width: 100%; padding: 18px 10px; font-size: 0.95rem; border-radius: 10px; border: 2px solid #000; font-weight: bold; text-transform: uppercase; background: #f0f0f0; color: #000; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; min-height: 80px; }
+        .setup-btn-icon { font-size: 1.6rem; flex-shrink: 0; }
+        .setup-section-label { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #888; margin: 18px 0 8px 2px; }
+        body.dark .setup-btn { background: #2a2a2a; color: #f0f0f0; border-color: #555; }
+        body.dark .setup-section-label { color: #888; }
     </style>
 </head>
 <body>
@@ -169,13 +175,12 @@
     <h2 id="app-title"></h2>
 
     <div class="preset-row">
-        <div style="display:flex; gap:6px;">
-            <a class="btn-manual" href="#" onclick="showPage('manual-page'); return false;">&#9432; Manual</a>
-            <a class="btn-manual" href="#" onclick="forceUpdate(); return false;">&#8635; Update</a>
+        <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn-preset" style="background:#444; color:#fff; padding:12px 14px;" onclick="showPage('setup-page')">&#9881; SETUP</button>
         </div>
         <div style="display:flex; gap:6px;">
             <button class="btn-preset" onclick="applyPreset('214B')">Bell 214B</button>
-            <button class="btn-preset" onclick="applyPreset('214ST')">Bell 214ST</button>
+            <button class="btn-preset" onclick="applyPreset('214ST')">Bell 214 ST</button>
             <button class="btn-preset" onclick="openUH60()">UH-60</button>
         </div>
     </div>
@@ -253,18 +258,16 @@
 <!-- ── FLIGHT PAGE ── -->
 <div id="flight-page" class="page" style="flex-direction:column;">
 
-    <!-- Top bar: [BACK | FUELBURN | GS TARGET] ... [GPS | PERMIT] -->
+    <!-- Top bar: [BACK | SETUP | FUELBURN] ... [AC LABEL] ... [GPS] -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; gap:3px; width:100%;">
         <div style="display:flex; align-items:center; gap:3px; flex-shrink:1; min-width:0;">
             <button style="background:#d9534f; color:#fff; height:44px; padding:0 7px; font-size:0.65rem; flex-shrink:0;" onclick="leaveFlight()">BACK</button>
-            <button id="dark-toggle-btn" style="height:44px; padding:0 6px; font-size:0.65rem; background:#333; color:#fff; border-color:#555; flex-shrink:1;" onclick="toggleDark()">🌙 DARK</button>
-            <button id="wake-btn" onclick="toggleWakeLock()" style="height:44px; padding:0 6px; font-size:0.65rem; background:#333; color:#fff; border-color:#555; flex-shrink:1;">☀ AWAKE</button>
+            <button style="background:#444; color:#fff; height:44px; padding:0 7px; font-size:0.65rem; flex-shrink:0;" onclick="showPage('setup-page')">&#9881; SETUP</button>
             <button id="fuelcalc-btn" onclick="toggleFuelCalc()" style="height:44px; padding:0 6px; font-size:0.65rem; background:#333; color:#fff; border-color:#555; flex-shrink:1;">FUEL CALC</button>
         </div>
         <div id="flight-ac-label" style="font-size:1rem; font-weight:bold; text-align:center; text-transform:uppercase; letter-spacing:1px; flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 4px;">Bell 214B</div>
         <div style="display:flex; align-items:center; gap:3px; flex-shrink:1; min-width:0;">
             <button id="gps-btn" class="gps-off" style="height:44px; padding:0 6px; font-size:0.65rem; flex-shrink:1;" onclick="toggleGPS()">GPS OFF</button>
-            <button id="gps-perm-btn" style="height:44px; padding:2px 5px; background:#444; color:#fff; font-size:0.6rem; flex-shrink:1;" onclick="forceGPSPermission()">PERMIT</button>
         </div>
     </div>
 
@@ -419,6 +422,46 @@
 
 </div>
 
+<!-- ── SETUP PAGE ── -->
+<div id="setup-page" class="page">
+    <h2>&#9881; SETUP</h2>
+
+    <p class="setup-section-label">App</p>
+    <div class="setup-grid">
+        <button class="setup-btn" onclick="showPage('manual-page')">
+            <span class="setup-btn-icon">&#9432;</span>
+            <span>Manual</span>
+        </button>
+        <button class="setup-btn" onclick="forceUpdate()">
+            <span class="setup-btn-icon">&#8635;</span>
+            <span>Update App</span>
+        </button>
+    </div>
+
+    <p class="setup-section-label">Display</p>
+    <div class="setup-grid">
+        <button class="setup-btn" id="setup-dark-btn" onclick="toggleDark()">
+            <span class="setup-btn-icon">🌙</span>
+            <span id="setup-dark-label">Dark Mode</span>
+        </button>
+        <button class="setup-btn" id="setup-wake-btn" onclick="toggleWakeLock()">
+            <span class="setup-btn-icon">☀</span>
+            <span id="setup-wake-label">Keep Awake</span>
+        </button>
+    </div>
+
+    <p class="setup-section-label">GPS</p>
+    <div class="setup-grid">
+        <button class="setup-btn" onclick="forceGPSPermission()">
+            <span class="setup-btn-icon">&#128205;</span>
+            <span>GPS Permission</span>
+        </button>
+    </div>
+
+    <div style="height:20px;"></div>
+    <button class="btn-nav" style="background:#444;" onclick="goBackFromSetup()">&#8592; BACK</button>
+</div>
+
 <!-- ── MANUAL PAGE (loaded inside app) ── -->
 <div id="manual-page" class="page" style="padding:0;">
     <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem;" onclick="showPage('calc-page')">&#8592; EXIT MANUAL</button>
@@ -463,7 +506,7 @@
 
 <script>
     // ── App version — change this ONE line to update everywhere ───────────────
-    var APP_VERSION = 'V8.9';
+    var APP_VERSION = 'V9.4';
     document.getElementById('app-title').textContent = 'Tanking app ' + APP_VERSION;
     document.title = 'Tanking app ' + APP_VERSION;
     // ── Service Worker ────────────────────────────────────────────────────────
@@ -589,6 +632,31 @@
 
     // no-op — kept so any stray SW FORCE_UPDATE_DONE messages don't throw
     function finishForceUpdate() {}
+
+    // ── Setup Page ────────────────────────────────────────────────────────────
+    var _setupReturnPage = 'calc-page';
+    var originalShowPage;
+
+    function goBackFromSetup() {
+        showPage(_setupReturnPage);
+    }
+
+    function updateSetupButtons() {
+        var isDark = document.body.classList.contains('dark');
+        var darkBtn = document.getElementById('setup-dark-btn');
+        var darkLbl = document.getElementById('setup-dark-label');
+        if (darkBtn && darkLbl) {
+            darkLbl.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+            darkBtn.querySelector('.setup-btn-icon').textContent = isDark ? '☀' : '🌙';
+        }
+        var wakeBtn = document.getElementById('setup-wake-btn');
+        var wakeLbl = document.getElementById('setup-wake-label');
+        if (wakeBtn && wakeLbl) {
+            var awake = !!wakeLock;
+            wakeLbl.textContent = awake ? 'Awake (ON)' : 'Keep Awake';
+            wakeBtn.querySelector('.setup-btn-icon').textContent = awake ? '🔆' : '☀';
+        }
+    }
 
 
     // ── Toast ─────────────────────────────────────────────────────────────────
@@ -717,8 +785,14 @@
     // ── Page navigation ───────────────────────────────────────────────────────
     function showPage(id) {
         cancelAnimationFrame(flyTick);
+        // Track which page opened setup so we can go back correctly
+        if (id === 'setup-page') {
+            var cur = document.querySelector('.page[style*="display: block"], .page[style*="display:block"], .page[style*="display: flex"], .page[style*="display:flex"]');
+            if (cur && cur.id && cur.id !== 'setup-page') _setupReturnPage = cur.id;
+        }
         document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
         document.getElementById(id).style.display = (id === 'flight-page') ? 'flex' : 'block';
+        if (id === 'setup-page') updateSetupButtons();
         setTimeout(function() { if (typeof fitActivePage === 'function') fitActivePage(); }, 80);
     }
 
@@ -1127,9 +1201,11 @@
         navigator.wakeLock.request('screen').then(function(lock) {
             wakeLock = lock;
             setWakeBtn(true);
+            if (typeof updateSetupButtons === 'function') updateSetupButtons();
             lock.addEventListener('release', function() {
                 wakeLock = null;
                 setWakeBtn(false);
+                if (typeof updateSetupButtons === 'function') updateSetupButtons();
             });
         }).catch(function() { setWakeBtn(false); });
     }
@@ -1138,6 +1214,7 @@
         wakeWanted = false;
         if (wakeLock) { wakeLock.release(); wakeLock = null; }
         setWakeBtn(false);
+        if (typeof updateSetupButtons === 'function') updateSetupButtons();
     }
 
     function toggleWakeLock() {
@@ -1342,6 +1419,7 @@
         if (needleDot) needleDot.setAttribute('fill', nc);
         var gaugeSvg = document.getElementById('gs-gauge-svg');
         if (gaugeSvg) { var paths = gaugeSvg.querySelectorAll('path'); if (paths[0]) paths[0].setAttribute('stroke', isDark ? '#444' : '#ddd'); }
+        if (typeof updateSetupButtons === 'function') updateSetupButtons();
     }
 
     function toggleDark() {
