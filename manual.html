@@ -45,9 +45,6 @@
         /* ── Gauge demo ── */
         .gauge-demo { border: 2px solid #000; border-radius: 10px; padding: 14px 14px 10px; margin: 18px 0; background: #fff; position: relative; }
         .gauge-demo-inner { position: relative; max-width: 340px; margin: 0 auto; }
-        .gauge-target-label { position: absolute; top: 4px; left: 6px; text-align: left; z-index: 5; font-family: Arial, sans-serif; }
-        .gauge-target-label span { display: block; font-size: 0.75rem; font-weight: bold; line-height: 1.2; }
-        .gauge-target-label select { font-size: 1.2rem; font-weight: bold; border: 2px solid #000; border-radius: 4px; font-family: inherit; padding: 2px 6px; }
         .gauge-sim-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-family: Arial, sans-serif; font-size: 0.85rem; font-weight: bold; }
         .gauge-sim-row input[type=range] { flex: 1; -webkit-appearance: none; height: 20px; background: #ddd; border-radius: 10px; outline: none; }
         .gauge-sim-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 36px; height: 36px; background: #000; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #000; }
@@ -64,8 +61,14 @@
     <h1>Tanking App Manual</h1>
 
     <p class="note">
-        Source code is published for review or forking:<br>
+        this App is a work in progress.. please provide feedback, suggestions, issues<br>
+        <br>
+        the Source code is published for here review, you are welcome to "fork" and modidy to build your own.<br>
         <a href="https://github.com/RuneKyndal/tanking/" target="_blank">https://github.com/RuneKyndal/tanking/</a>
+        <br>
+        Installation link:<br>
+        <a href="https://runekyndal.github.io/tanking/index.html" target="_blank">https://runekyndal.github.io/tanking/index.html</a>
+
     </p>
 
     <div class="toc">
@@ -88,7 +91,7 @@
 
     <!-- ── INSTALLATION ── -->
     <h2 id="installation">Installation</h2>
-    <p>The app is a <strong>Progressive Web App (PWA)</strong>. It must be <em>installed</em> to work offline — a browser bookmark alone will not cache the files.</p>
+    <p>The app is a <strong>Progressive Web App (PWA)</strong>. It must be <em>installed</em> to work offline — a browser bookmark alone will not cache the files. It WILL fail to load if offline.</p>
 
     <h3>iOS</h3>
     <ul>
@@ -115,14 +118,16 @@
     </p>
 
 
+
     <!-- ── QUICK START ── -->
     <h2 id="quickstart">Quick Start</h2>
     <ul>
-        <li>Select your aircraft type (Bell 214B, Bell 214 ST) — weights load automatically.</li>
-        <li>Adjust weights and fuel load as needed.</li>
+        <li>Select your aircraft type (Bell 214B, Bell 214 ST) — generic weights load automatically.</li>
+        <li>Adjust weights and fuel load to match your aircraf.</li>
         <li>Tap <span class="btn-label green">GO START</span> to move to the timer page.</li>
-        <li>Start the engine timer when you start engines.</li>
-        <li>Tap <span class="btn-label green">GO FLY</span> — this starts the flight timer and opens the flight page.</li>
+        <li>Start the engine timer when you start engines.  (optional)</li>
+        <li>Start the flt timer when you are ready.  (optional)</li>
+        <li>Tap <span class="btn-label green">GO FLY</span> — this ALSO starts the flight timer and opens the flight page.</li>
     </ul>
 
     <p class="note tip">
@@ -130,15 +135,7 @@
     </p>
 
 
-    <!-- ── AIRCRAFT & REGISTRATION ── -->
-    <h2 id="aircraft">Aircraft &amp; Registration</h2>
-
-    <p>Tap one of the aircraft preset buttons (<span class="btn-label">Bell 214B</span> &nbsp; <span class="btn-label">Bell 214 ST</span>) to load the standard weights for that type. You can then adjust any value manually — the changes are saved per aircraft type.</p>
-
-    <p>The <strong>aircraft registration</strong> field on the timer page lets you record the tail number for the current flight. This is saved into the flight log entry when you tap <span class="btn-label blue">SAVE</span>, so each log row is tied to a specific aircraft. It is not saved between sessions — enter it fresh for each flight.</p>
-
-
-    <!-- ── SETUP PAGE ── -->
+        <!-- ── SETUP PAGE ── -->
     <h2 id="setup">Setup Page</h2>
 
     <p>Tap <span class="btn-label">&#9881; SETUP</span> from either the calculator page or the flight page to open the Setup page. Use the <span class="btn-label">&#8592; BACK</span> button to return to wherever you came from.</p>
@@ -182,12 +179,12 @@
 
 
     <!-- ── FUEL ENDURANCE ── -->
-    <h2 id="fuel-endurance">Fuel Endurance — Two Numbers</h2>
+    <h2 id="fuel-endurance">Fuel Endurance</h2>
 
     <p>The flight page displays two endurance figures simultaneously. They serve different purposes and are both required on screen.</p>
 
     <h3>Total Endurance</h3>
-    <p>Fuel on board divided by burn rate — no reserve deducted. This is the number required for SAR tasking and flight following: the actual time the aircraft can remain airborne from the current fuel state. Report this figure to flight services.</p>
+    <p>Fuel on board divided by burn rate — no reserve deducted. This is the number passed to flight services for SAR purposes.  </p>
 
     <h3>Operational Endurance (+500 lb)</h3>
     <p>Usable endurance to the 500 lb reserve. This is the planning number — transit, tasking, and bingo calculations are all based on this figure.</p>
@@ -277,7 +274,7 @@
 
     <p>The ground speed gauge is a <strong>deviation instrument</strong> — read it at a glance without focusing on numbers, the same way you read an airspeed indicator. Clockwise = faster; counter-clockwise = slower.</p>
 
-    <p>Set your <strong>Target GS</strong> from the dropdown. That value becomes the 12&nbsp;o&rsquo;clock position. The arc spans &plusmn;10&nbsp;kts either side of target. Outside that window the needle pegs left (too slow) or right (too fast). The green band at 12&nbsp;o&rsquo;clock marks the on-speed range (&plusmn;3&nbsp;kts). The large central number is actual ground speed in knots.</p>
+    <p>The target speed selector sits at <strong>12 o'clock</strong> on the gauge — tap it to change the value. That number defines the centre of the arc. Min and max (&plusmn;10&nbsp;kts) are shown at 9 and 3 o'clock. Outside that window the needle pegs. The green band at 12&nbsp;o'clock marks on-speed (&plusmn;3&nbsp;kts). The large central number is actual ground speed in knots.</p>
 
     <ul>
         <li><strong>Needle hard left</strong> — well below target speed.</li>
@@ -287,36 +284,43 @@
         <li><strong>Needle hard right</strong> — pegged more than +10 kts above target.</li>
     </ul>
 
-    <p>Choose target speed based on conditions, pilot preference, and sea-scoop configuration. A consistent speed through the run gives the most predictable tank load.</p>
+    <p>Choose target speed based on conditions, pilot preference, and sea-scoop configuration.</p>
 
     <!-- ── INTERACTIVE GAUGE DEMO ── -->
     <div class="gauge-demo">
         <div class="gauge-demo-inner">
-            <div class="gauge-target-label">
-                <span>TARGET GS</span>
-                <select id="demo-gs-target" onchange="updateDemoGauge()"></select>
-            </div>
-            <svg id="demo-gs-svg" viewBox="0 0 200 135" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;">
-                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#ddd" stroke-width="14" stroke-linecap="round"/>
-                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#ffcc00" stroke-width="14" stroke-linecap="round"/>
-                <path d="M 100 20 A 80 80 0 0 1 143.2 31.8" fill="none" stroke="#00cc44" stroke-width="14" transform="rotate(-27 100 100)"/>
-                <path d="M 100 20 A 80 80 0 0 0 56.8 31.8"  fill="none" stroke="#00cc44" stroke-width="14" transform="rotate(27 100 100)"/>
+            <svg id="demo-gs-svg" viewBox="0 8 200 137" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;">
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#ddd" stroke-width="14" stroke-linecap="round"/>
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#ffcc00" stroke-width="14" stroke-linecap="round"/>
+                <path d="M 100 30 A 80 80 0 0 1 143.2 41.8" fill="none" stroke="#00cc44" stroke-width="14" transform="rotate(-27 100 110)"/>
+                <path d="M 100 30 A 80 80 0 0 0  56.8 41.8" fill="none" stroke="#00cc44" stroke-width="14" transform="rotate(27 100 110)"/>
                 <g id="demo-tick-group"></g>
-                <text id="demo-min-val" x="8"   y="103" text-anchor="middle" font-size="9" font-weight="bold" fill="#000" font-family="Arial,sans-serif">--</text>
-                <text id="demo-tgt-val" x="100" y="10"  text-anchor="middle" font-size="9" font-weight="bold" fill="#000" font-family="Arial,sans-serif">--</text>
-                <text id="demo-max-val" x="192" y="103" text-anchor="middle" font-size="9" font-weight="bold" fill="#000" font-family="Arial,sans-serif">--</text>
-                <text id="demo-gs-readout" x="100" y="88" text-anchor="middle" font-size="48" font-weight="bold" fill="#000" font-family="Arial,sans-serif">0</text>
-                <g id="demo-needle-group" style="transform:rotate(0deg); transform-origin:100px 100px; transition:transform 0.2s linear;">
-                    <line x1="100" y1="100" x2="100" y2="20" stroke="#333" stroke-width="3" stroke-linecap="round"/>
-                    <circle cx="100" cy="100" r="5" fill="#333"/>
+                <text id="demo-min-val" x="8"   y="113" text-anchor="middle" font-size="9" font-weight="bold" fill="#000" font-family="Arial,sans-serif">--</text>
+                <text id="demo-max-val" x="194" y="113" text-anchor="middle" font-size="9" font-weight="bold" fill="#000" font-family="Arial,sans-serif">--</text>
+                <text id="demo-gs-readout" x="100" y="98" text-anchor="middle" font-size="48" font-weight="bold" fill="#000" font-family="Arial,sans-serif">0</text>
+                <g id="demo-needle-group" style="transform:rotate(0deg); transform-origin:100px 110px; transition:transform 0.2s linear;">
+                    <line x1="100" y1="110" x2="100" y2="30" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="100" cy="110" r="5" fill="#333"/>
                 </g>
+                <!-- 12 o'clock dropdown — matches app -->
+                <foreignObject x="80" y="9" width="52" height="14">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+                        <select id="demo-gs-target" onchange="updateDemoGauge()"
+                            style="font-size:9px;font-weight:bold;border:none;background:transparent;
+                                   font-family:Arial,sans-serif;padding:0;margin:0;cursor:pointer;
+                                   color:#000;text-align:center;text-align-last:center;
+                                   width:100%;-webkit-appearance:auto;appearance:auto;">
+                        </select>
+                    </div>
+                </foreignObject>
+                <text x="134" y="17" text-anchor="start" font-size="5" font-weight="bold" fill="#555" font-family="Arial,sans-serif">TARGET GS</text>
             </svg>
             <div class="gauge-sim-row">
                 <span style="white-space:nowrap;">Simulated GS</span>
                 <input type="range" id="demo-speed-slider" min="0" max="50" value="18" step="1" oninput="updateDemoGauge()">
                 <span class="gauge-sim-val" id="demo-speed-val">18 kts</span>
             </div>
-            <p class="gauge-sim-caption">Set Target GS, then drag the slider to see how the needle responds.</p>
+            <p class="gauge-sim-caption">Tap the number at 12 o'clock to change target speed, then drag the slider.</p>
         </div>
     </div>
 
@@ -325,9 +329,9 @@
     <h2 id="flightlog">Flight Log</h2>
     <ul>
         <li>After a flight, tap <span class="btn-label">BACK</span> on the flight page to return to the timer page.</li>
-        <li>Stop engine and flight timers as needed.</li>
-        <li>Enter the aircraft registration if you haven't already.</li>
+        <li>Stop engine and flight timers.</li>
         <li>Tap <span class="btn-label blue">SAVE</span> to record the entry — this stores date, registration, engine block time, and flight time.</li>
+        <li>Enter the aircraft registration if you haven't already.</li>
         <li>Tap <span class="btn-label">LOGS</span> to view saved entries, or export them as <strong>.CSV</strong> or <strong>.TXT</strong>.</li>
     </ul>
 
@@ -355,16 +359,16 @@
             gsSelect.appendChild(o);
         }
 
-        /* ── Build tick marks ── */
+        /* ── Build tick marks (pivot at 110) ── */
         (function drawTicks() {
             var g = document.getElementById('demo-tick-group');
             for (var i = -90; i <= 90; i += 9) {
                 var l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                l.setAttribute('x1', '100'); l.setAttribute('y1', '13');
-                l.setAttribute('x2', '100'); l.setAttribute('y2', '27');
+                l.setAttribute('x1', '100'); l.setAttribute('y1', '23');
+                l.setAttribute('x2', '100'); l.setAttribute('y2', '37');
                 l.setAttribute('stroke', '#000');
                 l.setAttribute('stroke-width', '1.5');
-                l.setAttribute('transform', 'rotate(' + i + ' 100 100)');
+                l.setAttribute('transform', 'rotate(' + i + ' 100 110)');
                 g.appendChild(l);
             }
         })();
@@ -374,7 +378,6 @@
             var tgt   = parseFloat(document.getElementById('demo-gs-target').value);
             var speed = parseFloat(document.getElementById('demo-speed-slider').value);
             document.getElementById('demo-min-val').textContent = Math.max(0, tgt - 10);
-            document.getElementById('demo-tgt-val').textContent = tgt;
             document.getElementById('demo-max-val').textContent = tgt + 10;
             document.getElementById('demo-gs-readout').textContent = Math.round(speed);
             document.getElementById('demo-speed-val').textContent  = Math.round(speed) + ' kts';
