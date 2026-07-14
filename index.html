@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app V9.9</title>
+    <title>Tanking app V10.1</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -498,6 +498,18 @@
         <div style="font-size:0.65rem; color:#888; text-align:center; margin-top:6px;">Jet-A @ 20&deg;C, 0.800 kg/L</div>
     </div>
 
+    <div style="border-top:1px solid #ccc; margin-top:20px; padding-top:16px;">
+        <div class="fuel-section">
+            <div style="text-align:center; font-weight:bold; margin-bottom:10px;">LBS to Liters converter</div>
+            <div class="fuel-header-row">
+                <span class="fuel-label-text">LBS &#8596; LITERS</span>
+                <div class="fuel-big-p1" id="lbsltr-display">0 lbs</div>
+            </div>
+            <input type="range" id="lbsltr-slider" min="0" max="3000" step="50" value="0" oninput="updateLbsLtr()">
+            <div class="fuel-big-p1" style="text-align:center; margin-top:6px;" id="lbsltr-liters-display">0 L</div>
+        </div>
+    </div>
+
     <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem; margin-top:20px;" onclick="showPage('calc-page')">&#8592; BACK</button>
 </div>
 
@@ -833,6 +845,7 @@
 	        document.getElementById('refuel-actual-slider').value = isNaN(lastActual) ? 0 : lastActual;
 	        showPage('refuel-page');
 	        updateRefuelCalc();
+	        updateLbsLtr();
 	    }
 
 	    function updateRefuelCalc() {
@@ -853,6 +866,13 @@
 	            lbsEl.innerText = 'DEFUEL ' + Math.round(-req).toLocaleString();
 	            ltrEl.innerText = Math.round(lbsToLitersJetA20C(-req)).toLocaleString();
 	        }
+	    }
+
+
+	    function updateLbsLtr() {
+	        var lbs = parseFloat(document.getElementById('lbsltr-slider').value) || 0;
+	        document.getElementById('lbsltr-display').innerText = lbs.toLocaleString() + ' lbs';
+	        document.getElementById('lbsltr-liters-display').innerText = Math.round(lbsToLitersJetA20C(lbs)).toLocaleString() + ' L';
 	    }
 
 
