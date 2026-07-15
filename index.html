@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app V10.1</title>
+    <title>Tanking app V10.3</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -52,6 +52,9 @@
 
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 20px; background: #ddd; border-radius: 10px; outline: none; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; background: #000; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #000; }
+        input[type="range"].slider-compact { height: 12px; }
+        input[type="range"].slider-compact::-webkit-slider-thumb { width: 28px; height: 28px; border-width: 2px; }
+        body.dark input[type="range"].slider-compact::-webkit-slider-thumb { box-shadow: 0 0 0 1px #888; }
 
         .log-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; margin-top: 10px; }
         .log-table th, .log-table td { border: 1px solid #000; padding: 4px 2px; text-align: center; }
@@ -444,6 +447,10 @@
             <span class="setup-btn-icon">&#9981;</span>
             <span>Refuel Calc</span>
         </button>
+        <button class="setup-btn" onclick="openArenaCalc()">
+            <span class="setup-btn-icon">&#9981;</span>
+            <span>ARENA</span>
+        </button>
     </div>
 
     <p class="setup-section-label">Display</p>
@@ -513,6 +520,60 @@
     <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem; margin-top:20px;" onclick="showPage('calc-page')">&#8592; BACK</button>
 </div>
 
+<!-- ── ARENA DAILY FUEL INPUT PAGE ── -->
+<div id="arena-page" class="page">
+    <h2>&#9981; Arena daily fuel input</h2>
+
+    <div class="fuel-section">
+        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">START FUEL</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; margin-bottom:4px;">
+            <div style="text-align:center;"><small style="font-weight:bold;">LBS</small><div class="fuel-big-p1" id="arena-start-lbs">0</div></div>
+            <div style="text-align:center; border-left:1px solid #ccc;"><small style="font-weight:bold;">LITERS</small><div class="fuel-big-p1" id="arena-start-liters">0</div></div>
+        </div>
+        <input type="range" class="slider-compact" id="arena-start-slider" min="0" max="3000" step="50" value="0" oninput="updateArenaFuel()">
+    </div>
+
+    <div class="fuel-section" style="margin-top:8px;">
+        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">END FUEL</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; margin-bottom:4px;">
+            <div style="text-align:center;"><small style="font-weight:bold;">LBS</small><div class="fuel-big-p1" id="arena-end-lbs">0</div></div>
+            <div style="text-align:center; border-left:1px solid #ccc;"><small style="font-weight:bold;">LITERS</small><div class="fuel-big-p1" id="arena-end-liters">0</div></div>
+        </div>
+        <input type="range" class="slider-compact" id="arena-end-slider" min="0" max="3000" step="50" value="0" oninput="updateArenaFuel()">
+    </div>
+
+    <div style="border-top:1px solid #ccc; margin-top:10px; padding-top:8px;">
+        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">FUEL UPLOADS (LITERS)</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <label style="font-weight:bold;">Fuel 1</label>
+            <input type="number" inputmode="numeric" id="arena-fuel1" min="0" step="1" value="0" oninput="updateArenaTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <label style="font-weight:bold;">Fuel 2</label>
+            <input type="number" inputmode="numeric" id="arena-fuel2" min="0" step="1" value="0" oninput="updateArenaTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <label style="font-weight:bold;">Fuel 3</label>
+            <input type="number" inputmode="numeric" id="arena-fuel3" min="0" step="1" value="0" oninput="updateArenaTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <label style="font-weight:bold;">Fuel 4</label>
+            <input type="number" inputmode="numeric" id="arena-fuel4" min="0" step="1" value="0" oninput="updateArenaTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <label style="font-weight:bold;">Fuel 5</label>
+            <input type="number" inputmode="numeric" id="arena-fuel5" min="0" step="1" value="0" oninput="updateArenaTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
+        </div>
+    </div>
+
+    <div class="bubble-v198">
+        <div style="background:#000; color:#fff; padding:4px; font-size:0.8rem; margin-bottom:5px; font-weight:bold;">TOTAL FUEL UPLOAD</div>
+        <div class="fuel-big-p1" id="arena-total-liters">0 L</div>
+    </div>
+
+    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem; margin-top:10px;" onclick="showPage('setup-page')">&#8592; BACK</button>
+</div>
+
 <!-- ── MANUAL PAGE (loaded inside app) ── -->
 <div id="manual-page" class="page" style="padding:0;">
     <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem;" onclick="showPage('calc-page')">&#8592; EXIT MANUAL</button>
@@ -557,7 +618,7 @@
 
 <script>
     // ── App version — change this ONE line to update everywhere ───────────────
-    var APP_VERSION = 'V9.9';
+    var APP_VERSION = 'V10.3';
     document.getElementById('app-title').textContent = 'Tanking app ' + APP_VERSION;
     document.title = 'Tanking app ' + APP_VERSION;
     // ── Service Worker ────────────────────────────────────────────────────────
@@ -873,6 +934,36 @@
 	        var lbs = parseFloat(document.getElementById('lbsltr-slider').value) || 0;
 	        document.getElementById('lbsltr-display').innerText = lbs.toLocaleString() + ' lbs';
 	        document.getElementById('lbsltr-liters-display').innerText = Math.round(lbsToLitersJetA20C(lbs)).toLocaleString() + ' L';
+	    }
+
+	    function openArenaCalc() {
+	        var lastStart = parseFloat(localStorage.getItem('arenaStartLbs'));
+	        var lastEnd = parseFloat(localStorage.getItem('arenaEndLbs'));
+	        document.getElementById('arena-start-slider').value = isNaN(lastStart) ? 0 : lastStart;
+	        document.getElementById('arena-end-slider').value = isNaN(lastEnd) ? 0 : lastEnd;
+	        showPage('arena-page');
+	        updateArenaFuel();
+	        updateArenaTotal();
+	    }
+
+	    function updateArenaFuel() {
+	        var startLbs = parseFloat(document.getElementById('arena-start-slider').value) || 0;
+	        var endLbs = parseFloat(document.getElementById('arena-end-slider').value) || 0;
+	        localStorage.setItem('arenaStartLbs', startLbs);
+	        localStorage.setItem('arenaEndLbs', endLbs);
+	        document.getElementById('arena-start-lbs').innerText = startLbs.toLocaleString();
+	        document.getElementById('arena-start-liters').innerText = Math.round(lbsToLitersJetA20C(startLbs)).toLocaleString();
+	        document.getElementById('arena-end-lbs').innerText = endLbs.toLocaleString();
+	        document.getElementById('arena-end-liters').innerText = Math.round(lbsToLitersJetA20C(endLbs)).toLocaleString();
+	    }
+
+	    function updateArenaTotal() {
+	        var ids = ['arena-fuel1','arena-fuel2','arena-fuel3','arena-fuel4','arena-fuel5'];
+	        var total = 0;
+	        for (var i = 0; i < ids.length; i++) {
+	            total += parseFloat(document.getElementById(ids[i]).value) || 0;
+	        }
+	        document.getElementById('arena-total-liters').innerText = Math.round(total).toLocaleString() + ' L';
 	    }
 
 
