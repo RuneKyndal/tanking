@@ -571,7 +571,7 @@
         <div class="fuel-big-p1" id="arena-total-liters">0 L</div>
     </div>
 
-    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem; margin-top:10px;" onclick="showPage('setup-page')">&#8592; BACK</button>
+    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem; margin-top:10px;" onclick="showPage('calc-page')">&#8592; BACK</button>
 </div>
 
 <!-- ── MANUAL PAGE (loaded inside app) ── -->
@@ -982,10 +982,15 @@
     function showPage(id) {
         cancelAnimationFrame(flyTick);
         // Track which page opened setup so we can go back correctly
-        if (id === 'setup-page') {
-            var cur = document.querySelector('.page[style*="display: block"], .page[style*="display:block"], .page[style*="display: flex"], .page[style*="display:flex"]');
-            if (cur && cur.id && cur.id !== 'setup-page') _setupReturnPage = cur.id;
-        }
+if (id === 'setup-page') {
+    var cur = Array.from(document.querySelectorAll('.page')).find(function(p) {
+        return getComputedStyle(p).display !== 'none';
+    });
+
+    if (cur && cur.id !== 'setup-page') {
+        _setupReturnPage = cur.id;
+    }
+}
         document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
         document.getElementById(id).style.display = (id === 'flight-page') ? 'flex' : 'block';
         if (id === 'setup-page') updateSetupButtons();
