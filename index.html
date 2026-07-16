@@ -566,9 +566,12 @@
         </div>
     </div>
 
-    <div class="bubble-v198">
-        <div style="background:#000; color:#fff; padding:4px; font-size:0.8rem; margin-bottom:5px; font-weight:bold;">Total Fuel Added</div>
-        <div class="fuel-big-p1" id="aeronet-total-liters">0 L</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+        <button onclick="clearAeronetReceipts()" style="background:#000; color:#fff; border:2px solid #000; border-radius:10px; font-weight:bold; font-size:1rem;">CLEAR</button>
+        <div class="bubble-v198" style="margin-bottom:0;">
+            <div style="background:#000; color:#fff; padding:4px; font-size:0.8rem; margin-bottom:5px; font-weight:bold;">Total Fuel Added</div>
+            <div class="fuel-big-p1" id="aeronet-total-liters" style="font-size:2rem;">0 L</div>
+        </div>
     </div>
 
     <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem; margin-top:10px;" onclick="goBack()">&#8592; BACK</button>
@@ -929,11 +932,18 @@
 	        document.getElementById('lbsltr-liters-display').innerText = Math.round(lbsToLitersJetA20C(lbs)).toLocaleString() + ' L';
 	    }
 
+	    var AERONET_FUEL_IDS = ['aeronet-fuel1','aeronet-fuel2','aeronet-fuel3','aeronet-fuel4','aeronet-fuel5'];
+	    var AERONET_FUEL_KEYS = ['aeronetFuel1','aeronetFuel2','aeronetFuel3','aeronetFuel4','aeronetFuel5'];
+
 	    function openAeronetCalc() {
 	        var lastStart = parseFloat(localStorage.getItem('aeronetStartLbs'));
 	        var lastEnd = parseFloat(localStorage.getItem('aeronetEndLbs'));
 	        document.getElementById('aeronet-start-slider').value = isNaN(lastStart) ? 0 : lastStart;
 	        document.getElementById('aeronet-end-slider').value = isNaN(lastEnd) ? 0 : lastEnd;
+	        for (var i = 0; i < AERONET_FUEL_IDS.length; i++) {
+	            var v = parseFloat(localStorage.getItem(AERONET_FUEL_KEYS[i]));
+	            document.getElementById(AERONET_FUEL_IDS[i]).value = isNaN(v) ? 0 : v;
+	        }
 	        showPage('aeronet-page');
 	        updateAeronetFuel();
 	        updateAeronetTotal();
@@ -951,12 +961,22 @@
 	    }
 
 	    function updateAeronetTotal() {
-	        var ids = ['aeronet-fuel1','aeronet-fuel2','aeronet-fuel3','aeronet-fuel4','aeronet-fuel5'];
 	        var total = 0;
-	        for (var i = 0; i < ids.length; i++) {
-	            total += parseFloat(document.getElementById(ids[i]).value) || 0;
+	        for (var i = 0; i < AERONET_FUEL_IDS.length; i++) {
+	            var v = parseFloat(document.getElementById(AERONET_FUEL_IDS[i]).value) || 0;
+	            localStorage.setItem(AERONET_FUEL_KEYS[i], v);
+	            total += v;
 	        }
 	        document.getElementById('aeronet-total-liters').innerText = Math.round(total).toLocaleString() + ' L';
+	    }
+
+	    function clearAeronetReceipts() {
+	        // Only zeroes the 5 fuel-added receipts - Start/End Fuel sliders
+	        // are left exactly as they are.
+	        for (var i = 0; i < AERONET_FUEL_IDS.length; i++) {
+	            document.getElementById(AERONET_FUEL_IDS[i]).value = 0;
+	        }
+	        updateAeronetTotal();
 	    }
 
 
