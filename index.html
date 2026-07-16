@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" href="tank.png">
     <link rel="manifest" href="manifest.json">
-    <title>Tanking app V10.3</title>
+    <title>Tanking app</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body {
@@ -249,7 +249,7 @@
     </div>
 
     <div style="display:flex; gap:5px; margin-top:10px;">
-        <button style="background:#444; color:#fff; flex:1.5; height:50px;" onclick="showPage('calc-page')">BACK</button>
+        <button style="background:#444; color:#fff; flex:1.5; height:50px;" onclick="goBack()">BACK</button>
         <button style="background:#007bff; color:#fff; flex:1; height:50px;" onclick="saveLog()">SAVE</button>
         <button style="background:#666; color:#fff; flex:1; height:50px;" onclick="showLog()">LOGS</button>
     </div>
@@ -266,7 +266,7 @@
         <div style="display:flex; align-items:center; gap:3px; flex-shrink:1; min-width:0;">
             <button style="background:#d9534f; color:#fff; height:44px; padding:0 7px; font-size:0.65rem; flex-shrink:0;" onclick="leaveFlight()">BACK</button>
             <button style="background:#444; color:#fff; height:44px; padding:0 7px; font-size:0.65rem; flex-shrink:0;" onclick="showPage('setup-page')">&#9881; SETUP</button>
-            <button id="fuelcalc-btn" onclick="toggleFuelCalc()" style="height:44px; padding:0 6px; font-size:0.65rem; background:#333; color:#fff; border-color:#555; flex-shrink:1;">FUEL CALC</button>
+            <button id="fuelcalc-btn" onclick="toggleFuelCalc()" style="height:44px; padding:0 6px; font-size:0.65rem; background:#333; color:#fff; border-color:#555; flex-shrink:1;">BINGO CALC</button>
         </div>
         <div id="flight-ac-label" style="font-size:1rem; font-weight:bold; text-align:center; text-transform:uppercase; letter-spacing:1px; flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 4px;">Bell 214B</div>
         <div style="display:flex; align-items:center; gap:3px; flex-shrink:1; min-width:0;">
@@ -447,9 +447,9 @@
             <span class="setup-btn-icon">&#9981;</span>
             <span>Refuel Calc</span>
         </button>
-        <button class="setup-btn" onclick="openArenaCalc()">
+        <button class="setup-btn" onclick="openAeronetCalc()">
             <span class="setup-btn-icon">&#9981;</span>
-            <span>ARENA</span>
+            <span>Aeronet</span>
         </button>
     </div>
 
@@ -474,7 +474,7 @@
     </div>
 
     <div style="height:20px;"></div>
-    <button class="btn-nav" style="background:#444;" onclick="goBackFromSetup()">&#8592; BACK</button>
+    <button class="btn-nav" style="background:#444;" onclick="goBack()">&#8592; BACK</button>
 </div>
 <!-- ── REFUEL CALC PAGE ── -->
 <div id="refuel-page" class="page">
@@ -517,72 +517,72 @@
         </div>
     </div>
 
-    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem; margin-top:20px;" onclick="showPage('calc-page')">&#8592; BACK</button>
+    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem; margin-top:20px;" onclick="goBack()">&#8592; BACK</button>
 </div>
 
-<!-- ── ARENA DAILY FUEL INPUT PAGE ── -->
-<div id="arena-page" class="page">
-    <h2>&#9981; Arena daily fuel input</h2>
+<!-- ── AERONET DAILY FUEL INPUT PAGE ── -->
+<div id="aeronet-page" class="page">
+    <h2>&#9981; Aeronet daily fuel input</h2>
 
     <div class="fuel-section">
-        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">START FUEL</div>
+        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">Start of Day fuel</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; margin-bottom:4px;">
-            <div style="text-align:center;"><small style="font-weight:bold;">LBS</small><div class="fuel-big-p1" id="arena-start-lbs">0</div></div>
-            <div style="text-align:center; border-left:1px solid #ccc;"><small style="font-weight:bold;">LITERS</small><div class="fuel-big-p1" id="arena-start-liters">0</div></div>
+            <div style="text-align:center;"><small style="font-weight:bold;">LBS</small><div class="fuel-big-p1" id="aeronet-start-lbs">0</div></div>
+            <div style="text-align:center; border-left:1px solid #ccc;"><small style="font-weight:bold;">LITERS</small><div class="fuel-big-p1" id="aeronet-start-liters">0</div></div>
         </div>
-        <input type="range" class="slider-compact" id="arena-start-slider" min="0" max="3000" step="50" value="0" oninput="updateArenaFuel()">
+        <input type="range" class="slider-compact" id="aeronet-start-slider" min="0" max="3000" step="50" value="0" oninput="updateAeronetFuel()">
     </div>
 
     <div class="fuel-section" style="margin-top:8px;">
-        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">END FUEL</div>
+        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">End of Day Fuel</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; margin-bottom:4px;">
-            <div style="text-align:center;"><small style="font-weight:bold;">LBS</small><div class="fuel-big-p1" id="arena-end-lbs">0</div></div>
-            <div style="text-align:center; border-left:1px solid #ccc;"><small style="font-weight:bold;">LITERS</small><div class="fuel-big-p1" id="arena-end-liters">0</div></div>
+            <div style="text-align:center;"><small style="font-weight:bold;">LBS</small><div class="fuel-big-p1" id="aeronet-end-lbs">0</div></div>
+            <div style="text-align:center; border-left:1px solid #ccc;"><small style="font-weight:bold;">LITERS</small><div class="fuel-big-p1" id="aeronet-end-liters">0</div></div>
         </div>
-        <input type="range" class="slider-compact" id="arena-end-slider" min="0" max="3000" step="50" value="0" oninput="updateArenaFuel()">
+        <input type="range" class="slider-compact" id="aeronet-end-slider" min="0" max="3000" step="50" value="0" oninput="updateAeronetFuel()">
     </div>
 
     <div style="border-top:1px solid #ccc; margin-top:10px; padding-top:8px;">
-        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">FUEL UPLOADS (LITERS)</div>
+        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">fuel Added (LITERS)</div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
             <label style="font-weight:bold;">Fuel 1</label>
-            <input type="number" inputmode="numeric" id="arena-fuel1" min="0" step="1" value="0" oninput="updateArenaTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
+            <input type="number" inputmode="numeric" id="aeronet-fuel1" min="0" step="1" value="0" oninput="updateAeronetTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
             <label style="font-weight:bold;">Fuel 2</label>
-            <input type="number" inputmode="numeric" id="arena-fuel2" min="0" step="1" value="0" oninput="updateArenaTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
+            <input type="number" inputmode="numeric" id="aeronet-fuel2" min="0" step="1" value="0" oninput="updateAeronetTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
             <label style="font-weight:bold;">Fuel 3</label>
-            <input type="number" inputmode="numeric" id="arena-fuel3" min="0" step="1" value="0" oninput="updateArenaTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
+            <input type="number" inputmode="numeric" id="aeronet-fuel3" min="0" step="1" value="0" oninput="updateAeronetTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
             <label style="font-weight:bold;">Fuel 4</label>
-            <input type="number" inputmode="numeric" id="arena-fuel4" min="0" step="1" value="0" oninput="updateArenaTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
+            <input type="number" inputmode="numeric" id="aeronet-fuel4" min="0" step="1" value="0" oninput="updateAeronetTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
             <label style="font-weight:bold;">Fuel 5</label>
-            <input type="number" inputmode="numeric" id="arena-fuel5" min="0" step="1" value="0" oninput="updateArenaTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
+            <input type="number" inputmode="numeric" id="aeronet-fuel5" min="0" step="1" value="0" oninput="updateAeronetTotal()" style="width:110px; padding:6px; font-size:1.1rem; text-align:right; border:1px solid #ccc; border-radius:6px;">
         </div>
     </div>
 
     <div class="bubble-v198">
-        <div style="background:#000; color:#fff; padding:4px; font-size:0.8rem; margin-bottom:5px; font-weight:bold;">TOTAL FUEL UPLOAD</div>
-        <div class="fuel-big-p1" id="arena-total-liters">0 L</div>
+        <div style="background:#000; color:#fff; padding:4px; font-size:0.8rem; margin-bottom:5px; font-weight:bold;">Total Fuel Added</div>
+        <div class="fuel-big-p1" id="aeronet-total-liters">0 L</div>
     </div>
 
-    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem; margin-top:10px;" onclick="showPage('calc-page')">&#8592; BACK</button>
+    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem; margin-top:10px;" onclick="goBack()">&#8592; BACK</button>
 </div>
 
 <!-- ── MANUAL PAGE (loaded inside app) ── -->
 <div id="manual-page" class="page" style="padding:0;">
-    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem;" onclick="showPage('calc-page')">&#8592; EXIT MANUAL</button>
+    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem;" onclick="goBack()">&#8592; EXIT MANUAL</button>
     <iframe id="manual-frame" src="manual.html" style="width:100%; height:calc(100% - 50px); border:none; display:block;"></iframe>
 </div>
 
 <!-- ── LOG PAGE ── -->
 <div id="log-page" class="page">
-    <button onclick="showPage('timer-page')" style="background:#28a745; color:#fff; width:100%; padding:16px; margin-bottom:12px; border:2px solid #000; border-radius:8px; font-weight:bold;">BACK</button>
+    <button onclick="goBack()" style="background:#28a745; color:#fff; width:100%; padding:16px; margin-bottom:12px; border:2px solid #000; border-radius:8px; font-weight:bold;">BACK</button>
     <table class="log-table">
         <thead>
             <tr><th>Date</th><th>Reg</th><th>Eng Block</th><th>HH:MM</th><th>Eng</th><th>Flt Block</th><th>HH:MM</th><th>Flt</th></tr>
@@ -618,7 +618,7 @@
 
 <script>
     // ── App version — change this ONE line to update everywhere ───────────────
-    var APP_VERSION = 'V10.3';
+    var APP_VERSION = 'V10.4';
     document.getElementById('app-title').textContent = 'Tanking app ' + APP_VERSION;
     document.title = 'Tanking app ' + APP_VERSION;
     // ── Service Worker ────────────────────────────────────────────────────────
@@ -635,10 +635,10 @@
         });
     }
 
-    // Let the manual page's own Exit button (clicked inside the iframe) close back to the calc page
+    // Let the manual page's own Exit button (clicked inside the iframe) close back to wherever manual was opened from
     window.addEventListener('message', function(e) {
         if (e.data && e.data.type === 'EXIT_MANUAL') {
-            showPage('calc-page');
+            goBack();
         }
         if (e.data && e.data.type === 'FORCE_UPDATE_DONE') {
             finishForceUpdate();
@@ -746,13 +746,6 @@
     function finishForceUpdate() {}
 
     // ── Setup Page ────────────────────────────────────────────────────────────
-    var _setupReturnPage = 'calc-page';
-    var originalShowPage;
-
-    function goBackFromSetup() {
-        showPage(_setupReturnPage);
-    }
-
     function updateSetupButtons() {
         var isDark = document.body.classList.contains('dark');
         var darkBtn = document.getElementById('setup-dark-btn');
@@ -936,34 +929,34 @@
 	        document.getElementById('lbsltr-liters-display').innerText = Math.round(lbsToLitersJetA20C(lbs)).toLocaleString() + ' L';
 	    }
 
-	    function openArenaCalc() {
-	        var lastStart = parseFloat(localStorage.getItem('arenaStartLbs'));
-	        var lastEnd = parseFloat(localStorage.getItem('arenaEndLbs'));
-	        document.getElementById('arena-start-slider').value = isNaN(lastStart) ? 0 : lastStart;
-	        document.getElementById('arena-end-slider').value = isNaN(lastEnd) ? 0 : lastEnd;
-	        showPage('arena-page');
-	        updateArenaFuel();
-	        updateArenaTotal();
+	    function openAeronetCalc() {
+	        var lastStart = parseFloat(localStorage.getItem('aeronetStartLbs'));
+	        var lastEnd = parseFloat(localStorage.getItem('aeronetEndLbs'));
+	        document.getElementById('aeronet-start-slider').value = isNaN(lastStart) ? 0 : lastStart;
+	        document.getElementById('aeronet-end-slider').value = isNaN(lastEnd) ? 0 : lastEnd;
+	        showPage('aeronet-page');
+	        updateAeronetFuel();
+	        updateAeronetTotal();
 	    }
 
-	    function updateArenaFuel() {
-	        var startLbs = parseFloat(document.getElementById('arena-start-slider').value) || 0;
-	        var endLbs = parseFloat(document.getElementById('arena-end-slider').value) || 0;
-	        localStorage.setItem('arenaStartLbs', startLbs);
-	        localStorage.setItem('arenaEndLbs', endLbs);
-	        document.getElementById('arena-start-lbs').innerText = startLbs.toLocaleString();
-	        document.getElementById('arena-start-liters').innerText = Math.round(lbsToLitersJetA20C(startLbs)).toLocaleString();
-	        document.getElementById('arena-end-lbs').innerText = endLbs.toLocaleString();
-	        document.getElementById('arena-end-liters').innerText = Math.round(lbsToLitersJetA20C(endLbs)).toLocaleString();
+	    function updateAeronetFuel() {
+	        var startLbs = parseFloat(document.getElementById('aeronet-start-slider').value) || 0;
+	        var endLbs = parseFloat(document.getElementById('aeronet-end-slider').value) || 0;
+	        localStorage.setItem('aeronetStartLbs', startLbs);
+	        localStorage.setItem('aeronetEndLbs', endLbs);
+	        document.getElementById('aeronet-start-lbs').innerText = startLbs.toLocaleString();
+	        document.getElementById('aeronet-start-liters').innerText = Math.round(lbsToLitersJetA20C(startLbs)).toLocaleString();
+	        document.getElementById('aeronet-end-lbs').innerText = endLbs.toLocaleString();
+	        document.getElementById('aeronet-end-liters').innerText = Math.round(lbsToLitersJetA20C(endLbs)).toLocaleString();
 	    }
 
-	    function updateArenaTotal() {
-	        var ids = ['arena-fuel1','arena-fuel2','arena-fuel3','arena-fuel4','arena-fuel5'];
+	    function updateAeronetTotal() {
+	        var ids = ['aeronet-fuel1','aeronet-fuel2','aeronet-fuel3','aeronet-fuel4','aeronet-fuel5'];
 	        var total = 0;
 	        for (var i = 0; i < ids.length; i++) {
 	            total += parseFloat(document.getElementById(ids[i]).value) || 0;
 	        }
-	        document.getElementById('arena-total-liters').innerText = Math.round(total).toLocaleString() + ' L';
+	        document.getElementById('aeronet-total-liters').innerText = Math.round(total).toLocaleString() + ' L';
 	    }
 
 
@@ -979,22 +972,36 @@
     }
 
     // ── Page navigation ───────────────────────────────────────────────────────
-    function showPage(id) {
-        cancelAnimationFrame(flyTick);
-        // Track which page opened setup so we can go back correctly
-if (id === 'setup-page') {
-    var cur = Array.from(document.querySelectorAll('.page')).find(function(p) {
-        return getComputedStyle(p).display !== 'none';
-    });
+    // Real back-stack: every forward navigation (showPage) pushes the page you
+    // were just on. goBack() pops the stack and returns you there - works for
+    // any depth (flight -> setup -> aeronet -> back -> setup -> back -> flight),
+    // not just one remembered level.
+    var _navStack = [];
 
-    if (cur && cur.id !== 'setup-page') {
-        _setupReturnPage = cur.id;
+    function _currentPageId() {
+        var cur = Array.from(document.querySelectorAll('.page')).find(function(p) {
+            return getComputedStyle(p).display !== 'none';
+        });
+        return cur ? cur.id : null;
     }
-}
+
+    function _switchToPage(id) {
+        cancelAnimationFrame(flyTick);
         document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
         document.getElementById(id).style.display = (id === 'flight-page') ? 'flex' : 'block';
         if (id === 'setup-page') updateSetupButtons();
         setTimeout(function() { if (typeof fitActivePage === 'function') fitActivePage(); }, 80);
+    }
+
+    function showPage(id) {
+        var cur = _currentPageId();
+        if (cur && cur !== id) _navStack.push(cur);
+        _switchToPage(id);
+    }
+
+    function goBack() {
+        var prev = _navStack.pop() || 'calc-page'; // safety fallback if the stack is ever empty
+        _switchToPage(prev);
     }
 
     // ── Timers ────────────────────────────────────────────────────────────────
@@ -1383,7 +1390,7 @@ if (id === 'setup-page') {
     function leaveFlight() {
         stopGPS();
         releaseWakeLock();
-        showPage('timer-page');
+        goBack();
     }
 
     // ── Screen Wake Lock (iPad must not sleep while flying) ────────────────────
