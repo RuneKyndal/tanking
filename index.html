@@ -169,6 +169,24 @@
         .setup-section-label { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #888; margin: 18px 0 8px 2px; }
         body.dark .setup-btn { background: #2a2a2a; color: #f0f0f0; border-color: #555; }
         body.dark .setup-section-label { color: #888; }
+        .setup-btn.active { background: #28a745 !important; color: #fff !important; border-color: #1e7e34 !important; }
+        body.dark .setup-btn.active { background: #1e7e34 !important; border-color: #28a745 !important; }
+
+        /* ── NAVIGATION: MARK buttons ── */
+        .nav-mark-btn { position: absolute; width: auto; height: auto; border-radius: 5px; color: #fff; font-size: 1.2rem; line-height: 1; padding: 8px 10px; z-index: 6; box-shadow: 0 2px 6px rgba(0,0,0,0.4); transition: box-shadow 0.2s; }
+        .nav-mark-btn#nav-mark-blue { background: #0066ff; border-color: #003d99; }
+        .nav-mark-btn#nav-mark-red  { background: #cc0000; border-color: #800000; }
+        .nav-mark-btn.marked { box-shadow: 0 0 0 3px #fff, 0 2px 6px rgba(0,0,0,0.4); }
+        body.nav-off .nav-mark-btn { display: none !important; }
+
+        /* ── NAVIGATION: relative bearing pointer overlay ── */
+        #nav-pointer-overlay { display: none; position: fixed; inset: 0; pointer-events: none; z-index: 9990; }
+        body.nav-off #nav-pointer-overlay { display: none !important; }
+        .nav-ptr { position: absolute; display: none; flex-direction: column; align-items: center; gap: 2px; transform: translate(-50%, -50%); }
+        .nav-ptr-arrow { width: 56px; height: 56px; transition: transform 0.25s linear; filter: drop-shadow(0 0 2px rgba(255,255,255,0.9)) drop-shadow(0 0 2px rgba(255,255,255,0.9)); }
+        .nav-ptr-dist { font-size: 1.4rem; font-weight: bold; white-space: nowrap; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff; }
+        #nav-ptr-blue .nav-ptr-dist { color: #0066ff; }
+        #nav-ptr-red  .nav-ptr-dist { color: #cc0000; }
     </style>
 </head>
 <body>
@@ -416,6 +434,9 @@
                         <circle cx="100" cy="100" r="5" fill="#333"/>
                     </g>
                 </svg>
+                <!-- NAV: MARK waypoint buttons, flanking the arc's center pivot -->
+                <button id="nav-mark-blue" class="nav-mark-btn" style="left:25%; top:92%; transform:translate(-50%,-50%);" onclick="handleMark('blue')">MARK</button>
+                <button id="nav-mark-red"  class="nav-mark-btn" style="left:75%; top:92%; transform:translate(-50%,-50%);" onclick="handleMark('red')">MARK</button>
             </div>
         </div>
         <!-- end right col -->
@@ -423,6 +444,22 @@
     </div>
     <!-- end ls-main -->
 
+</div>
+
+<!-- NAV: relative-bearing pointer overlay — sits above every other page feature -->
+<div id="nav-pointer-overlay">
+    <div id="nav-ptr-blue" class="nav-ptr">
+        <div class="nav-ptr-arrow">
+            <svg viewBox="0 0 24 24" width="56" height="56"><polygon points="12,0 20,20 12,15 4,20" fill="#0066ff" stroke="#fff" stroke-width="1"/></svg>
+        </div>
+        <span class="nav-ptr-dist">--nm</span>
+    </div>
+    <div id="nav-ptr-red" class="nav-ptr">
+        <div class="nav-ptr-arrow">
+            <svg viewBox="0 0 24 24" width="56" height="56"><polygon points="12,0 20,20 12,15 4,20" fill="#cc0000" stroke="#fff" stroke-width="1"/></svg>
+        </div>
+        <span class="nav-ptr-dist">--nm</span>
+    </div>
 </div>
 
 <!-- ── SETUP PAGE ── -->
@@ -470,6 +507,14 @@
         <button class="setup-btn" onclick="forceGPSPermission()">
             <span class="setup-btn-icon">&#128205;</span>
             <span>GPS Permission</span>
+        </button>
+    </div>
+
+    <p class="setup-section-label">Navigation</p>
+    <div class="setup-grid">
+        <button class="setup-btn" id="setup-nav-btn" onclick="toggleNav()">
+            <span class="setup-btn-icon">&#129517;</span>
+            <span id="setup-nav-label">Navigation</span>
         </button>
     </div>
 
@@ -764,6 +809,13 @@
             wakeLbl.textContent = awake ? 'Awake (ON)' : 'Keep Awake';
             wakeBtn.querySelector('.setup-btn-icon').textContent = awake ? '🔆' : '☀';
         }
+        var navBtn = document.getElementById('setup-nav-btn');
+        var navLbl = document.getElementById('setup-nav-label');
+        if (navBtn && navLbl) {
+            var navOn = !document.body.classList.contains('nav-off');
+            navBtn.classList.toggle('active', navOn);
+            navLbl.textContent = navOn ? 'Navigation (ON)' : 'Navigation';
+        }
     }
 
 
@@ -811,6 +863,13 @@
         fl:   { elapsed:0, start:null, interval:null, running:false, tsS:null, tsE:null }
     };
     var curFuel = 2750, burnRef = null, flyTick = null, curGS = 0, watchID = null;
+    // NAV: live position/track + marked waypoints. Waypoints are memory-only —
+    // they never persist to localStorage, so every cold start / GO FLY begins
+    // with both pointers off, per spec.
+    var curLat = null, curLon = null, curHeading = 0;
+    var navWP = { blue: null, red: null };
+    var navTapTime = { blue: 0, red: 0 };
+    var navTapTimer = { blue: null, red: null };
 
     // ── (3) Settings: per-aircraft persistence ────────────────────────────────
     // Key: 'settings_214B' and 'settings_214ST'
@@ -1010,6 +1069,7 @@
         document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
         document.getElementById(id).style.display = (id === 'flight-page') ? 'flex' : 'block';
         if (id === 'setup-page') updateSetupButtons();
+        if (typeof updateNavPointers === 'function') updateNavPointers();
         setTimeout(function() { if (typeof fitActivePage === 'function') fitActivePage(); }, 80);
     }
 
@@ -1386,6 +1446,9 @@
         startGPS();
         wakeWanted = true;
         requestWakeLock();
+        // NAV: no pointers active on a fresh GO FLY — waypoints never persist.
+        clearWaypoint('blue');
+        clearWaypoint('red');
 
         function loop() {
             var now  = Date.now();
@@ -1402,6 +1465,7 @@
             document.getElementById('flight-timer-main').innerText = format(timers.fl.elapsed);
             updateGSUI();
             updateBingo();
+            updateNavPointers();
             flyTick = requestAnimationFrame(loop);
         }
         flyTick = requestAnimationFrame(loop);
@@ -1410,6 +1474,8 @@
     function leaveFlight() {
         stopGPS();
         releaseWakeLock();
+        clearWaypoint('blue');
+        clearWaypoint('red');
         goBack();
     }
 
@@ -1490,6 +1556,173 @@
     }
 
 
+    // ── NAVIGATION (relative bearing pointers) ──────────────────────────────────
+    // Config on/off switch. Turning navigation off also clears any marked
+    // waypoints — pointers never carry state while the feature is disabled.
+    function applyNav(enabled) {
+        document.body.classList.toggle('nav-off', !enabled);
+        var btn = document.getElementById('setup-nav-btn');
+        var lbl = document.getElementById('setup-nav-label');
+        if (btn && lbl) {
+            btn.classList.toggle('active', enabled);
+            lbl.textContent = enabled ? 'Navigation (ON)' : 'Navigation';
+        }
+        if (!enabled) {
+            clearWaypoint('blue');
+            clearWaypoint('red');
+        }
+        updateNavPointers();
+    }
+
+    function toggleNav() {
+        var enabled = document.body.classList.contains('nav-off'); // currently off -> turning on
+        localStorage.setItem('navEnabled', enabled ? '1' : '0');
+        applyNav(enabled);
+    }
+
+    // MARK button tap logic:
+    //  - 1st tap (no waypoint yet)  -> marks current GPS position, pointer turns on
+    //  - tap again (waypoint set)   -> overwrites with the new current position
+    //  - two taps in quick succession (a real double-tap) -> clears/disables the pointer
+    // A short window is used to tell a double-tap apart from a normal single tap.
+    function handleMark(color) {
+        if (document.body.classList.contains('nav-off')) return;
+        var now = Date.now();
+        if (navTapTimer[color]) { clearTimeout(navTapTimer[color]); navTapTimer[color] = null; }
+        if (now - navTapTime[color] < 400) {
+            navTapTime[color] = 0;
+            clearWaypoint(color);
+            return;
+        }
+        navTapTime[color] = now;
+        navTapTimer[color] = setTimeout(function() {
+            navTapTimer[color] = null;
+            setWaypoint(color);
+        }, 400);
+    }
+
+    function setWaypoint(color) {
+        if (curLat === null || curLon === null) {
+            showToast('No GPS fix yet');
+            return;
+        }
+        navWP[color] = { lat: curLat, lon: curLon };
+        var btn = document.getElementById('nav-mark-' + color);
+        if (btn) btn.classList.add('marked');
+        updateNavPointers();
+    }
+
+    function clearWaypoint(color) {
+        navWP[color] = null;
+        var btn = document.getElementById('nav-mark-' + color);
+        if (btn) btn.classList.remove('marked');
+        var ptr = document.getElementById('nav-ptr-' + color);
+        if (ptr) ptr.style.display = 'none';
+    }
+
+    function toRad(d) { return d * Math.PI / 180; }
+    function toDeg(r) { return r * 180 / Math.PI; }
+
+    // Great-circle bearing, degrees true, 0-360
+    function gcBearing(lat1, lon1, lat2, lon2) {
+        var f1 = toRad(lat1), f2 = toRad(lat2), dl = toRad(lon2 - lon1);
+        var y = Math.sin(dl) * Math.cos(f2);
+        var x = Math.cos(f1) * Math.sin(f2) - Math.sin(f1) * Math.cos(f2) * Math.cos(dl);
+        return (toDeg(Math.atan2(y, x)) + 360) % 360;
+    }
+
+    // Great-circle distance, nautical miles
+    function gcDistanceNm(lat1, lon1, lat2, lon2) {
+        var R = 3440.065;
+        var f1 = toRad(lat1), f2 = toRad(lat2), df = toRad(lat2 - lat1), dl = toRad(lon2 - lon1);
+        var a = Math.sin(df / 2) * Math.sin(df / 2) + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    // Finds the on-screen pixel centre of the GS arc's pivot point (the same
+    // point the needle rotates around), honouring the SVG's own letterboxing
+    // so this stays correct across portrait/landscape and any screen size.
+    function getArcCenterScreenPos() {
+        var svg = document.getElementById('gs-gauge-svg');
+        if (!svg) return null;
+        var rect = svg.getBoundingClientRect();
+        if (!rect.width || !rect.height) return null;
+        var vbW = 200, vbH = 135;
+        var scale = Math.min(rect.width / vbW, rect.height / vbH);
+        var offX = rect.left + (rect.width - vbW * scale) / 2;
+        var offY = rect.top + (rect.height - vbH * scale) / 2;
+        return { x: offX + 100 * scale, y: offY + 100 * scale, scale: scale };
+    }
+
+    // Positions/rotates the two pointer arrows around the arc's centre.
+    // Each arrow sits on a ring just outside the gauge, angled to the
+    // waypoint's bearing relative to live ground track — no needle line,
+    // tip only. If that ring position would fall off-screen, the arrow is
+    // clamped to the viewport edge (independently on x and y) so it tracks
+    // along the edge instead of disappearing, then resumes the ring once
+    // back in view.
+    function updateNavPointers() {
+        var overlay = document.getElementById('nav-pointer-overlay');
+        if (!overlay) return;
+        var navOn = !document.body.classList.contains('nav-off');
+        var flightPage = document.getElementById('flight-page');
+        var onFlight = flightPage && flightPage.style.display !== 'none';
+        var anyWP = navOn && (navWP.blue || navWP.red);
+        if (!onFlight || !anyWP) { overlay.style.display = 'none'; return; }
+
+        var center = getArcCenterScreenPos();
+        if (!center || curLat === null || curLon === null) { overlay.style.display = 'none'; return; }
+        overlay.style.display = 'block';
+
+        // The gauge arc's outer edge sits at r=87 (viewBox units) from centre.
+        // Keep the pointer's centre point comfortably beyond that at all times,
+        // even after the screen-edge clamp below, so the arrow/label never sit
+        // over the arc or needle.
+        var arcOuterR = 87 * center.scale;
+        var minSafeR  = arcOuterR + 40;
+        var ringR     = Math.max(minSafeR, 100 * center.scale);
+        var margin    = 48;
+
+        ['blue', 'red'].forEach(function(color) {
+            var el = document.getElementById('nav-ptr-' + color);
+            var wp = navWP[color];
+            if (!el) return;
+            if (!wp) { el.style.display = 'none'; return; }
+
+            var brg  = gcBearing(curLat, curLon, wp.lat, wp.lon);
+            var dist = gcDistanceNm(curLat, curLon, wp.lat, wp.lon);
+            var rel  = ((brg - (curHeading || 0)) % 360 + 360) % 360;
+            var rad  = toRad(rel);
+
+            var rawX = center.x + ringR * Math.sin(rad);
+            var rawY = center.y - ringR * Math.cos(rad);
+            var px = Math.min(Math.max(rawX, margin), window.innerWidth  - margin);
+            var py = Math.min(Math.max(rawY, margin), window.innerHeight - margin);
+
+            // If clamping to the screen edge pulled the point back inside the
+            // arc's safe radius, push it back out along the same bearing so it
+            // stays outside the arc, then re-clamp to the viewport.
+            var dx = px - center.x, dy = py - center.y;
+            var d  = Math.sqrt(dx * dx + dy * dy);
+            if (d < minSafeR) {
+                var s = d === 0 ? 1 : minSafeR / d;
+                px = center.x + dx * s;
+                py = center.y + dy * s;
+                px = Math.min(Math.max(px, margin), window.innerWidth  - margin);
+                py = Math.min(Math.max(py, margin), window.innerHeight - margin);
+            }
+
+            el.style.left = px + 'px';
+            el.style.top  = py + 'px';
+            el.style.display = 'flex';
+            var arrow = el.querySelector('.nav-ptr-arrow');
+            if (arrow) arrow.style.transform = 'rotate(' + rel + 'deg)';
+            var distLbl = el.querySelector('.nav-ptr-dist');
+            if (distLbl) distLbl.textContent = dist.toFixed(1) + 'nm';
+        });
+    }
+
+
     // ── GPS ───────────────────────────────────────────────────────────────────
     function setGPSBtn(state, label) {
         var btn = document.getElementById('gps-btn');
@@ -1519,8 +1752,16 @@
         watchID = navigator.geolocation.watchPosition(
             function(pos) {
                 curGS = (pos.coords.speed || 0) * 1.94384;
+                curLat = pos.coords.latitude;
+                curLon = pos.coords.longitude;
+                // Ground track: keep the last known value if the device isn't
+                // currently reporting one (e.g. stationary) rather than snapping to 0.
+                if (typeof pos.coords.heading === 'number' && !isNaN(pos.coords.heading)) {
+                    curHeading = pos.coords.heading;
+                }
                 setGPSBtn('live', 'GPS LIVE');
                 updateGSUI();
+                updateNavPointers();
             },
             function(err) {
                 watchID = null;
@@ -1668,6 +1909,9 @@
     applyDark(localStorage.getItem('darkMode') === '1');
     // Restore fuel calc preference (default ON)
     applyFuelCalc(localStorage.getItem('fuelCalcEnabled') !== '0');
+    // Restore navigation on/off preference (default OFF). Marked waypoints
+    // themselves are never restored — only the feature toggle persists.
+    applyNav(localStorage.getItem('navEnabled') === '1');
 </script>
 </body>
 </html>
