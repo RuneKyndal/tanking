@@ -472,6 +472,10 @@
             <span class="setup-btn-icon">&#9432;</span>
             <span>Manual</span>
         </button>
+        <button class="setup-btn" onclick="showPage('caution-page')">
+            <span class="setup-btn-icon">&#9888;</span>
+            <span>Caution Panel</span>
+        </button>
         <button class="setup-btn" onclick="forceUpdate()">
             <span class="setup-btn-icon">&#8635;</span>
             <span>Update App</span>
@@ -521,6 +525,7 @@
     <div style="height:20px;"></div>
     <button class="btn-nav" style="background:#444;" onclick="goBack()">&#8592; BACK</button>
 </div>
+
 <!-- ── REFUEL CALC PAGE ── -->
 <div id="refuel-page" class="page">
     <h2>&#9981; REFUEL CALC</h2>
@@ -628,6 +633,12 @@
     <iframe id="manual-frame" src="manual.html" style="width:100%; height:calc(100% - 50px); border:none; display:block;"></iframe>
 </div>
 
+<!-- ── CAUTION PAGE (loaded inside app) ── -->
+<div id="caution-page" class="page" style="padding:0;">
+    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem;" onclick="goBack()">&#8592; EXIT CAUTION</button>
+    <iframe id="caution-frame" src="caution.html" style="width:100%; height:calc(100% - 50px); border:none; display:block;"></iframe>
+</div>
+
 <!-- ── LOG PAGE ── -->
 <div id="log-page" class="page">
     <button onclick="goBack()" style="background:#28a745; color:#fff; width:100%; padding:16px; margin-bottom:12px; border:2px solid #000; border-radius:8px; font-weight:bold;">BACK</button>
@@ -683,10 +694,17 @@
         });
     }
 
-    // Let the manual page's own Exit button (clicked inside the iframe) close back to wherever manual was opened from
+    // Let pages loaded inside iframes tell the parent to close them
     window.addEventListener('message', function(e) {
         if (e.data && e.data.type === 'EXIT_MANUAL') {
-            goBack();
+            // Close the manual page (which is inside an iframe)
+            var prev = _navStack.pop() || 'setup-page';
+            _switchToPage(prev);
+        }
+        if (e.data && e.data.type === 'EXIT_CAUTION') {
+            // Close the caution page (which is inside an iframe)
+            var prev = _navStack.pop() || 'setup-page';
+            _switchToPage(prev);
         }
         if (e.data && e.data.type === 'FORCE_UPDATE_DONE') {
             finishForceUpdate();
@@ -746,7 +764,7 @@
             var bust = '?nocache=' + Date.now();
             var assets = [
                 './index.html', './sw.js', './manifest.json',
-                './manual.html', './tank.png'
+                './manual.html', './tank.png', './caution.html'
             ];
             return Promise.all(assets.map(function(url) {
                 return fetch(url + bust, {
@@ -939,104 +957,104 @@
     }
 
      // ── Refuel Calculator ─────────────────────────────────────────────────────
-	    // Jet-A reference density is ~0.804 kg/L at 15°C (ASTM D1655). Corrected
-	    // for a typical 20°C fuel temperature that works out to ~0.800 kg/L,
-	    // which also matches the standard industry planning figure of 0.8 kg/L.
-	    // Good for quick ramp math - for certified W&B use the density on the
-	    // actual fuel slip/BOL.
-	    var JETA_KG_PER_LITER_20C = 0.800;
-	    function lbsToLitersJetA20C(lbs) {
-	        return (lbs * 0.453592) / JETA_KG_PER_LITER_20C;
-	    }
+        // Jet-A reference density is ~0.804 kg/L at 15°C (ASTM D1655). Corrected
+        // for a typical 20°C fuel temperature that works out to ~0.800 kg/L,
+        // which also matches the standard industry planning figure of 0.8 kg/L.
+        // Good for quick ramp math - for certified W&B use the density on the
+        // actual fuel slip/BOL.
+        var JETA_KG_PER_LITER_20C = 0.800;
+        function lbsToLitersJetA20C(lbs) {
+            return (lbs * 0.453592) / JETA_KG_PER_LITER_20C;
+        }
 
-	    function openRefuelCalc() {
-	        // Desired fuel starts from whatever is set on the main (page one)
-	        // fuel slider - that's the flight's planned load.
-	        var pageOneFuel = parseFloat(document.getElementById('fuel-slider').value) || 0;
-	        document.getElementById('refuel-desired-slider').value = pageOneFuel;
-	        // Actual fuel (what's currently in the tank) has no app source to
-	        // pull from - it's read off the aircraft gauge each time - so just
-	        // remember whatever was last entered here.
-	        var lastActual = parseFloat(localStorage.getItem('refuelActualLbs'));
-	        document.getElementById('refuel-actual-slider').value = isNaN(lastActual) ? 0 : lastActual;
-	        showPage('refuel-page');
-	        updateRefuelCalc();
-	        updateLbsLtr();
-	    }
+        function openRefuelCalc() {
+            // Desired fuel starts from whatever is set on the main (page one)
+            // fuel slider - that's the flight's planned load.
+            var pageOneFuel = parseFloat(document.getElementById('fuel-slider').value) || 0;
+            document.getElementById('refuel-desired-slider').value = pageOneFuel;
+            // Actual fuel (what's currently in the tank) has no app source to
+            // pull from - it's read off the aircraft gauge each time - so just
+            // remember whatever was last entered here.
+            var lastActual = parseFloat(localStorage.getItem('refuelActualLbs'));
+            document.getElementById('refuel-actual-slider').value = isNaN(lastActual) ? 0 : lastActual;
+            showPage('refuel-page');
+            updateRefuelCalc();
+            updateLbsLtr();
+        }
 
-	    function updateRefuelCalc() {
-	        var desired = parseFloat(document.getElementById('refuel-desired-slider').value) || 0;
-	        var actual  = parseFloat(document.getElementById('refuel-actual-slider').value) || 0;
-	        localStorage.setItem('refuelActualLbs', actual);
+        function updateRefuelCalc() {
+            var desired = parseFloat(document.getElementById('refuel-desired-slider').value) || 0;
+            var actual  = parseFloat(document.getElementById('refuel-actual-slider').value) || 0;
+            localStorage.setItem('refuelActualLbs', actual);
 
-	        document.getElementById('refuel-desired-display').innerText = desired.toLocaleString() + ' lbs';
-	        document.getElementById('refuel-actual-display').innerText  = actual.toLocaleString() + ' lbs';
+            document.getElementById('refuel-desired-display').innerText = desired.toLocaleString() + ' lbs';
+            document.getElementById('refuel-actual-display').innerText  = actual.toLocaleString() + ' lbs';
 
-	        var req = desired - actual;
-	        var lbsEl = document.getElementById('refuel-req-lbs');
-	        var ltrEl = document.getElementById('refuel-req-liters');
-	        if (req >= 0) {
-	            lbsEl.innerText = Math.round(req).toLocaleString();
-	            ltrEl.innerText = Math.round(lbsToLitersJetA20C(req)).toLocaleString();
-	        } else {
-	            lbsEl.innerText = 'DEFUEL ' + Math.round(-req).toLocaleString();
-	            ltrEl.innerText = Math.round(lbsToLitersJetA20C(-req)).toLocaleString();
-	        }
-	    }
+            var req = desired - actual;
+            var lbsEl = document.getElementById('refuel-req-lbs');
+            var ltrEl = document.getElementById('refuel-req-liters');
+            if (req >= 0) {
+                lbsEl.innerText = Math.round(req).toLocaleString();
+                ltrEl.innerText = Math.round(lbsToLitersJetA20C(req)).toLocaleString();
+            } else {
+                lbsEl.innerText = 'DEFUEL ' + Math.round(-req).toLocaleString();
+                ltrEl.innerText = Math.round(lbsToLitersJetA20C(-req)).toLocaleString();
+            }
+        }
 
 
-	    function updateLbsLtr() {
-	        var lbs = parseFloat(document.getElementById('lbsltr-slider').value) || 0;
-	        document.getElementById('lbsltr-display').innerText = lbs.toLocaleString() + ' lbs';
-	        document.getElementById('lbsltr-liters-display').innerText = Math.round(lbsToLitersJetA20C(lbs)).toLocaleString() + ' L';
-	    }
+        function updateLbsLtr() {
+            var lbs = parseFloat(document.getElementById('lbsltr-slider').value) || 0;
+            document.getElementById('lbsltr-display').innerText = lbs.toLocaleString() + ' lbs';
+            document.getElementById('lbsltr-liters-display').innerText = Math.round(lbsToLitersJetA20C(lbs)).toLocaleString() + ' L';
+        }
 
-	    var AERONET_FUEL_IDS = ['aeronet-fuel1','aeronet-fuel2','aeronet-fuel3','aeronet-fuel4','aeronet-fuel5'];
-	    var AERONET_FUEL_KEYS = ['aeronetFuel1','aeronetFuel2','aeronetFuel3','aeronetFuel4','aeronetFuel5'];
+        var AERONET_FUEL_IDS = ['aeronet-fuel1','aeronet-fuel2','aeronet-fuel3','aeronet-fuel4','aeronet-fuel5'];
+        var AERONET_FUEL_KEYS = ['aeronetFuel1','aeronetFuel2','aeronetFuel3','aeronetFuel4','aeronetFuel5'];
 
-	    function openAeronetCalc() {
-	        var lastStart = parseFloat(localStorage.getItem('aeronetStartLbs'));
-	        var lastEnd = parseFloat(localStorage.getItem('aeronetEndLbs'));
-	        document.getElementById('aeronet-start-slider').value = isNaN(lastStart) ? 0 : lastStart;
-	        document.getElementById('aeronet-end-slider').value = isNaN(lastEnd) ? 0 : lastEnd;
-	        for (var i = 0; i < AERONET_FUEL_IDS.length; i++) {
-	            var v = parseFloat(localStorage.getItem(AERONET_FUEL_KEYS[i]));
-	            document.getElementById(AERONET_FUEL_IDS[i]).value = isNaN(v) ? 0 : v;
-	        }
-	        showPage('aeronet-page');
-	        updateAeronetFuel();
-	        updateAeronetTotal();
-	    }
+        function openAeronetCalc() {
+            var lastStart = parseFloat(localStorage.getItem('aeronetStartLbs'));
+            var lastEnd = parseFloat(localStorage.getItem('aeronetEndLbs'));
+            document.getElementById('aeronet-start-slider').value = isNaN(lastStart) ? 0 : lastStart;
+            document.getElementById('aeronet-end-slider').value = isNaN(lastEnd) ? 0 : lastEnd;
+            for (var i = 0; i < AERONET_FUEL_IDS.length; i++) {
+                var v = parseFloat(localStorage.getItem(AERONET_FUEL_KEYS[i]));
+                document.getElementById(AERONET_FUEL_IDS[i]).value = isNaN(v) ? 0 : v;
+            }
+            showPage('aeronet-page');
+            updateAeronetFuel();
+            updateAeronetTotal();
+        }
 
-	    function updateAeronetFuel() {
-	        var startLbs = parseFloat(document.getElementById('aeronet-start-slider').value) || 0;
-	        var endLbs = parseFloat(document.getElementById('aeronet-end-slider').value) || 0;
-	        localStorage.setItem('aeronetStartLbs', startLbs);
-	        localStorage.setItem('aeronetEndLbs', endLbs);
-	        document.getElementById('aeronet-start-lbs').innerText = startLbs.toLocaleString();
-	        document.getElementById('aeronet-start-liters').innerText = Math.round(lbsToLitersJetA20C(startLbs)).toLocaleString();
-	        document.getElementById('aeronet-end-lbs').innerText = endLbs.toLocaleString();
-	        document.getElementById('aeronet-end-liters').innerText = Math.round(lbsToLitersJetA20C(endLbs)).toLocaleString();
-	    }
+        function updateAeronetFuel() {
+            var startLbs = parseFloat(document.getElementById('aeronet-start-slider').value) || 0;
+            var endLbs = parseFloat(document.getElementById('aeronet-end-slider').value) || 0;
+            localStorage.setItem('aeronetStartLbs', startLbs);
+            localStorage.setItem('aeronetEndLbs', endLbs);
+            document.getElementById('aeronet-start-lbs').innerText = startLbs.toLocaleString();
+            document.getElementById('aeronet-start-liters').innerText = Math.round(lbsToLitersJetA20C(startLbs)).toLocaleString();
+            document.getElementById('aeronet-end-lbs').innerText = endLbs.toLocaleString();
+            document.getElementById('aeronet-end-liters').innerText = Math.round(lbsToLitersJetA20C(endLbs)).toLocaleString();
+        }
 
-	    function updateAeronetTotal() {
-	        var total = 0;
-	        for (var i = 0; i < AERONET_FUEL_IDS.length; i++) {
-	            var v = parseFloat(document.getElementById(AERONET_FUEL_IDS[i]).value) || 0;
-	            localStorage.setItem(AERONET_FUEL_KEYS[i], v);
-	            total += v;
-	        }
-	        document.getElementById('aeronet-total-liters').innerText = Math.round(total).toLocaleString() + ' L';
-	    }
+        function updateAeronetTotal() {
+            var total = 0;
+            for (var i = 0; i < AERONET_FUEL_IDS.length; i++) {
+                var v = parseFloat(document.getElementById(AERONET_FUEL_IDS[i]).value) || 0;
+                localStorage.setItem(AERONET_FUEL_KEYS[i], v);
+                total += v;
+            }
+            document.getElementById('aeronet-total-liters').innerText = Math.round(total).toLocaleString() + ' L';
+        }
 
-	    function clearAeronetReceipts() {
-	        // Only zeroes the 5 fuel-added receipts - Start/End Fuel sliders
-	        // are left exactly as they are.
-	        for (var i = 0; i < AERONET_FUEL_IDS.length; i++) {
-	            document.getElementById(AERONET_FUEL_IDS[i]).value = 0;
-	        }
-	        updateAeronetTotal();
-	    }
+        function clearAeronetReceipts() {
+            // Only zeroes the 5 fuel-added receipts - Start/End Fuel sliders
+            // are left exactly as they are.
+            for (var i = 0; i < AERONET_FUEL_IDS.length; i++) {
+                document.getElementById(AERONET_FUEL_IDS[i]).value = 0;
+            }
+            updateAeronetTotal();
+        }
 
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -1077,6 +1095,21 @@
         var cur = _currentPageId();
         if (cur && cur !== id) _navStack.push(cur);
         _switchToPage(id);
+        
+        // If we're showing the caution page, reset the iframe to caution.html
+        if (id === 'caution-page') {
+            var frame = document.getElementById('caution-frame');
+            if (frame) {
+                frame.src = 'caution.html';
+            }
+        }
+        // If we're showing the manual page, reset the iframe to manual.html
+        if (id === 'manual-page') {
+            var frame = document.getElementById('manual-frame');
+            if (frame) {
+                frame.src = 'manual.html';
+            }
+        }
     }
 
     function goBack() {
