@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caution warning light app Manual</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 { color: #111111; border-bottom: 2px solid #eeeeee; padding-bottom: 10px; }
+        h2 { color: #222222; margin-top: 30px; border-bottom: 1px solid #dddddd; padding-bottom: 5px; }
+        h3 { color: #333333; margin-top: 20px; }
+        p  { margin: 10px 0; }
+        a  { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul { margin: 10px 0; padding-left: 20px; }
+        li { margin-bottom: 6px; }
+        .note { background-color: #f9f9f9; border-left: 4px solid #cccccc; padding: 10px 15px; margin: 15px 0; }
+        .note.tip  { border-color: #00aa44; background: #f0fff5; }
+        .note.warn { border-color: #cc7700; background: #fffbf0; }
+        .btn-label { font-weight: bold; background-color: #f0f0f0; padding: 2px 8px; border-radius: 4px; border: 1px solid #aaaaaa; font-size: 0.9rem; white-space: nowrap; }
+        .btn-label.dark   { background-color: #333; color: #fff; border-color: #555; }
+        .btn-label.green  { background-color: #00cc00; color: #000; border-color: #009900; }
+        .btn-label.orange { background-color: #ff9900; color: #000; border-color: #cc7700; }
+        .btn-label.red    { background-color: #cc0000; color: #fff; border-color: #990000; }
+        .btn-label.blue   { background-color: #007bff; color: #fff; border-color: #0055cc; }
+        .warn-box { display: inline-block; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 0.88rem; border: 1px solid #aaa; }
+        .warn-yellow { background: #ffeb00; color: #000; border-color: #bba000; }
+        .warn-red    { background: #ff3300; color: #fff; border-color: #aa1100; }
+        table.status-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.92rem; }
+        table.status-table th { background: #eeeeee; text-align: left; padding: 6px 10px; border: 1px solid #ccc; }
+        table.status-table td { padding: 6px 10px; border: 1px solid #ddd; vertical-align: top; }
+
+        /* ── Section anchor links ── */
+        .toc { background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; padding: 14px 18px; margin: 16px 0 24px; }
+        .toc ul { margin: 6px 0 0; padding-left: 18px; }
+        .toc li { margin-bottom: 3px; }
+
+    </style>
+</head>
+<body>
+
+    <p class="note" style="margin-top:0;">
+        <button id="exit-btn" type="button" onclick="window.location.href='index.html'" style="font-weight:bold; font-size:0.95rem; padding:8px 16px; border:2px solid #000; border-radius:6px; background:#000; color:#fff; cursor:pointer;">&#8592; Exit Manual</button>
+    </p>
+
+    <h1>Caution warning light app Manual</h1>
+
+    <!-- ── PANEL TEST ── -->
+    <h2 id="panel-test">Panel Test</h2>
+    <p>Each caution/warning panel includes a TEST button, </p>
+    <p>Tapping it toggles the displayed lamps <strong>on</strong>; and <strong>off</strong>.</p>
+    <p>The test displays the lights that would normally be illuminated on the aircraft during pre-start..</p>
+
+    <h3>Bell 214ST</h3>
+    <p>On the C/W panel, tap the <span class="btn-label dark">TEST PNL</span> area in the center of the panel.</p>
+
+    <h3>Bell 214B</h3>
+    <p>On the C/W panel, tap the round <span class="btn-label dark">TEST</span> push button at the lower right.</p>
+
+
+
+    <!-- ── INSTALLATION ── -->
+    <h2 id="installation">Installation</h2>
+    <p>The app is a <strong>Progressive Web App (PWA)</strong>. It must be <em>installed</em> to work offline — a browser bookmark alone will not cache the files. It WILL fail to load if offline.</p>
+
+    <h3>iOS</h3>
+    <ul>
+        <li>Open the link in <strong>Safari</strong> (not Chrome or Firefox).</li>
+        <li>Tap <strong>Share &rarr; Add to Home Screen</strong>. Ensure the <em>Web App</em> toggle is <strong>on</strong>.</li>
+        <li>Close Safari and launch from your home screen to complete the download.</li>
+    </ul>
+
+    <h3>Android</h3>
+    <ul>
+        <li>Open the link in <strong>Chrome</strong>.</li>
+        <li>Tap the menu and choose <strong>Add to Home Screen &rarr; Install</strong> (not "shortcut").</li>
+        <li>Close Chrome and launch from your home screen to complete the download.</li>
+    </ul>
+
+
+</body>
+</html>

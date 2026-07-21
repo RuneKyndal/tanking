@@ -472,6 +472,12 @@
             <span class="setup-btn-icon">&#9432;</span>
             <span>Manual</span>
         </button>
+
+         <button class="setup-btn" onclick="showPage('caution-page')">
+		            <span class="setup-btn-icon">&#9888;</span>
+		            <span>Caution Panel</span>
+        </button>
+
         <button class="setup-btn" onclick="forceUpdate()">
             <span class="setup-btn-icon">&#8635;</span>
             <span>Update App</span>
@@ -628,6 +634,13 @@
     <iframe id="manual-frame" src="manual.html" style="width:100%; height:calc(100% - 50px); border:none; display:block;"></iframe>
 </div>
 
+<!-- ── CAUTION PAGE (loaded inside app) ── -->
+<div id="caution-page" class="page" style="padding:0;">
+    <button style="background:#444; color:#fff; width:100%; padding:14px; border:none; border-radius:0; font-weight:bold; font-size:1rem;" onclick="goBack()">&#8592; EXIT CAUTION</button>
+    <iframe id="caution-frame" src="caution.html" style="width:100%; height:calc(100% - 50px); border:none; display:block;"></iframe>
+</div>
+
+
 <!-- ── LOG PAGE ── -->
 <div id="log-page" class="page">
     <button onclick="goBack()" style="background:#28a745; color:#fff; width:100%; padding:16px; margin-bottom:12px; border:2px solid #000; border-radius:8px; font-weight:bold;">BACK</button>
@@ -746,7 +759,7 @@
             var bust = '?nocache=' + Date.now();
             var assets = [
                 './index.html', './sw.js', './manifest.json',
-                './manual.html', './tank.png'
+                './manual.html', './tank.png', './caution.html'
             ];
             return Promise.all(assets.map(function(url) {
                 return fetch(url + bust, {
