@@ -677,7 +677,7 @@
 
 <script>
     // ── App version — change this ONE line to update everywhere ───────────────
-    var APP_VERSION = 'V10.4';
+    var APP_VERSION = 'V10.5';
     document.getElementById('app-title').textContent = 'Tanking app ' + APP_VERSION;
     document.title = 'Tanking app ' + APP_VERSION;
     // ── Service Worker ────────────────────────────────────────────────────────
@@ -1095,7 +1095,7 @@
         var cur = _currentPageId();
         if (cur && cur !== id) _navStack.push(cur);
         _switchToPage(id);
-        
+
         // If we're showing the caution page, reset the iframe to caution.html
         if (id === 'caution-page') {
             var frame = document.getElementById('caution-frame');
