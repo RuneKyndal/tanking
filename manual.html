@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caution warning light app Manual</title>
+    <title>Tanking App Manual</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,6 +35,21 @@
         .btn-label.amber  { background-color: #ff8c00; color: #000; border-color: #b35900; }
         .btn-label.caution-yellow { background-color: #ffcc00; color: #000; border-color: #b39700; }
         .btn-label.warning-red   { background-color: #ff3333; color: #fff; border-color: #b30000; }
+        .btn-mark {
+            display: inline-block;
+            font-weight: bold;
+            padding: 4px 14px;
+            border-radius: 4px;
+            border: 2px solid #000;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .btn-mark.blue   { background: #0066ff; border-color: #003d99; }
+        .btn-mark.amber  { background: #ff8c00; border-color: #b35900; }
+        .btn-mark.red    { background: #cc0000; border-color: #800000; }
         .color-dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid #888; vertical-align: middle; margin-right: 4px; }
         .color-dot.blue { background: #0066ff; }
         .color-dot.amber { background: #ff8c00; }
@@ -74,7 +89,10 @@
         .mark-card.amber { border-color: #ff8c00; background: #fff8f0; }
         .mark-card.red { border-color: #cc0000; background: #fff0f0; }
         .mark-card .mark-icon { font-size: 2.8rem; display: block; margin-bottom: 4px; }
-        .mark-card h4 { margin: 4px 0; }
+        .mark-card .mark-btn-demo { display: inline-block; font-weight: bold; padding: 6px 18px; border-radius: 4px; border: 2px solid #000; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin: 4px 0 8px; }
+        .mark-card .mark-btn-demo.blue { background: #0066ff; border-color: #003d99; }
+        .mark-card .mark-btn-demo.amber { background: #ff8c00; border-color: #b35900; }
+        .mark-card .mark-btn-demo.red { background: #cc0000; border-color: #800000; }
         .mark-card .mark-color { font-weight: bold; }
         .mark-card .mark-color.blue { color: #0066ff; }
         .mark-card .mark-color.amber { color: #ff8c00; }
@@ -146,138 +164,60 @@
         .pointer-swatch.blue { background: #0066ff; }
         .pointer-swatch.amber { background: #ff8c00; }
         .pointer-swatch.red { background: #cc0000; }
+
+        /* ── Gauge demo ── */
+        .gauge-demo {
+            border: 2px solid #000;
+            border-radius: 10px;
+            padding: 14px 14px 10px;
+            margin: 18px 0;
+            background: #fff;
+            position: relative;
+        }
+        .gauge-demo-inner { position: relative; max-width: 340px; margin: 0 auto; }
+        .gauge-sim-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-family: Arial, sans-serif; font-size: 0.85rem; font-weight: bold; }
+        .gauge-sim-row input[type=range] { flex: 1; -webkit-appearance: none; height: 20px; background: #ddd; border-radius: 10px; outline: none; }
+        .gauge-sim-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 36px; height: 36px; background: #000; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #000; }
+        .gauge-sim-val { min-width: 52px; text-align: right; font-size: 1rem; }
+        .gauge-sim-caption { font-size: 0.75rem; color: #666; text-align: center; margin-top: 4px; font-style: italic; }
     </style>
 </head>
 <body>
 
     <p class="note" style="margin-top:0;">
-    <button id="exit-btn" type="button" onclick="parent.postMessage({type:'EXIT_MANUAL'},'*')" style="font-weight:bold; font-size:0.95rem; padding:8px 16px; border:2px solid #000; border-radius:6px; background:#000; color:#fff; cursor:pointer;">&#8592; Exit Manual</button>
+        <button id="exit-btn" style="font-weight:bold; font-size:0.95rem; padding:8px 16px; border:2px solid #000; border-radius:6px; background:#000; color:#fff; cursor:pointer;">&#8592; Exit Manual</button>
     </p>
 
-    <h1>Caution Warning Light App Manual</h1>
+    <h1>Tanking App Manual</h1>
+
+    <p class="note">
+        This App is a work in progress.. please provide feedback, suggestions, issues<br>
+        <br>
+        The Source code is published for here review, you are welcome to "fork" and modify to build your own.<br>
+        <a href="https://github.com/RuneKyndal/tanking/" target="_blank">https://github.com/RuneKyndal/tanking/</a>
+        <br>
+        Installation link:<br>
+        <a href="https://runekyndal.github.io/tanking/index.html" target="_blank">https://runekyndal.github.io/tanking/index.html</a>
+    </p>
 
     <div class="toc">
         <strong>Contents</strong>
         <ul>
-            <li><a href="#panel-test">Panel Test</a></li>
-            <li><a href="#light-colours">Light Colours Explained</a></li>
-            <li><a href="#aircraft-types">Aircraft Types</a></li>
-            <li><a href="#procedures">Viewing Procedures</a></li>
             <li><a href="#installation">Installation</a></li>
-            <li><a href="#aeronet">Aeronet Calculator &amp; Fuel Converter</a></li>
-            <li><a href="#refuel-calc">Refuel Calculator</a></li>
-            <li><a href="#lbsltr">LBS to Liters Converter</a></li>
+            <li><a href="#quickstart">Quick Start</a></li>
+            <li><a href="#aircraft">Aircraft &amp; Registration</a></li>
+            <li><a href="#setup">Setup Page</a></li>
+            <li><a href="#fuel-endurance">Fuel Endurance — Two Numbers Explained</a></li>
+            <li><a href="#fuelcalc">Fuel Calc Toggle</a></li>
+            <li><a href="#bingo">Bingo Fuel</a></li>
+            <li><a href="#warnings">Warning Colours</a></li>
             <li><a href="#mark-buttons">MARK Buttons — Quick POI Marking</a></li>
+            <li><a href="#gps">GPS</a></li>
+            <li><a href="#gsgauge">Ground Speed Gauge</a></li>
+            <li><a href="#flightlog">Flight Log</a></li>
             <li><a href="#caution-panel">Caution Panel Reference</a></li>
         </ul>
     </div>
-
-
-    <!-- ── PANEL TEST ── -->
-    <h2 id="panel-test">Panel Test</h2>
-
-    <p>Each caution/warning panel includes a <strong>TEST</strong> function that simulates the pre-start lamp test.</p>
-
-    <p>Tapping the TEST control toggles the displayed lamps <strong>on</strong> and <strong>off</strong>, showing which lights would normally be illuminated during a pre-start check.</p>
-
-    <h3>Bell 214ST</h3>
-    <p>On the C/W panel, tap the <span class="btn-label dark">TEST PNL</span> area in the center of the panel. This toggles the test illumination on/off.</p>
-
-    <h3>Bell 214B</h3>
-    <p>On the C/W panel, tap the round <span class="btn-label dark">TEST</span> push button at the lower right of the panel.</p>
-
-    <p class="note tip">
-        <strong>Tip:</strong> Use the panel test to familiarise yourself with the location of each light before you need them in an emergency.
-    </p>
-
-
-    <!-- ── LIGHT COLOURS EXPLAINED ── -->
-    <h2 id="light-colours">Light Colours Explained</h2>
-
-    <p>The caution panel uses standard aviation colour coding to convey urgency:</p>
-
-    <div class="light-legend">
-        <span class="light-legend-item"><span class="light-swatch warning"></span> RED — Warning (immediate action required)</span>
-        <span class="light-legend-item"><span class="light-swatch caution"></span> YELLOW — Caution (abnormal, monitor)</span>
-        <span class="light-legend-item"><span class="light-swatch amber"></span> AMBER — Caution (advisory, monitor)</span>
-        <span class="light-legend-item"><span class="light-swatch green"></span> GREEN — Advisory / Status (system active)</span>
-        <span class="light-legend-item"><span class="light-swatch master"></span> RED — Master Caution (press to reset)</span>
-    </div>
-
-    <table class="status-table">
-        <tr><th>Colour</th><th>Meaning</th><th>Action</th></tr>
-        <tr class="warning-row">
-            <td><span class="btn-label warning-red">RED</span></td>
-            <td><strong>Warning</strong> — Immediate danger or system failure</td>
-            <td>Immediate action required. Refer to emergency procedure.</td>
-        </tr>
-        <tr class="caution-row">
-            <td><span class="btn-label caution-yellow">YELLOW</span></td>
-            <td><strong>Caution</strong> — Abnormal condition</td>
-            <td>Monitor or take corrective action. Refer to abnormal procedure.</td>
-        </tr>
-        <tr class="caution-row">
-            <td><span class="btn-label amber">AMBER</span></td>
-            <td><strong>Caution</strong> — Advisory</td>
-            <td>Monitor. May indicate system status change.</td>
-        </tr>
-        <tr class="info-row">
-            <td><span class="btn-label green">GREEN</span></td>
-            <td><strong>Advisory / Status</strong></td>
-            <td>System is active or in a normal state. No action required.</td>
-        </tr>
-        <tr class="warning-row">
-            <td><span class="btn-label red">MASTER</span></td>
-            <td><strong>Master Caution</strong></td>
-            <td>Press to reset after identifying the triggering system.</td>
-        </tr>
-    </table>
-
-
-    <!-- ── AIRCRAFT TYPES ── -->
-    <h2 id="aircraft-types">Aircraft Types</h2>
-
-    <p>The app supports two Bell 214 variants:</p>
-
-    <table class="status-table">
-        <tr><th>Aircraft</th><th>Panel Layout</th><th>Procedures</th></tr>
-        <tr>
-            <td><strong>Bell 214ST</strong></td>
-            <td>Full C/W panel with FIRE, ENG OUT, MASTER CAUTION, and sub-panel</td>
-            <td>Complete emergency and abnormal procedures</td>
-        </tr>
-        <tr>
-            <td><strong>Bell 214B</strong></td>
-            <td>4-column × 10-row grid with overhead warning lights</td>
-            <td>Procedures from BHT-214B1-FM-1 Rev.8</td>
-        </tr>
-    </table>
-
-    <p>Select your aircraft type from the landing page. The panel will update to show the correct layout and lights for that type.</p>
-
-    <p class="note">
-        The <strong>214ST</strong> panel includes engine sub-panel lights (FUEL PRESS, ANTI-ICE, ECU LOCKOUT, OIL, BLOWER OFF, FUEL VALVE) and the chip indicator panel.
-    </p>
-
-
-    <!-- ── VIEWING PROCEDURES ── -->
-    <h2 id="procedures">Viewing Procedures</h2>
-
-    <p>Tap any light on the panel to view its associated procedure. Each procedure includes:</p>
-
-    <ul>
-        <li><strong>Procedure type</strong> — <span class="btn-label red">EMERGENCY</span> or <span class="btn-label orange">ABNORMAL</span></li>
-        <li><strong>Title</strong> — The system or failure name</li>
-        <li><strong>Indications</strong> — What to look for</li>
-        <li><strong>Corrective Action</strong> — Step-by-step checklist items</li>
-        <li><strong>Notes</strong> — Additional considerations or warnings</li>
-    </ul>
-
-    <p>Use the <span class="btn-label red">BACK</span> button on each procedure page to return to the panel. Use <span class="btn-label dark">MAIN PAGE</span> to return to the main app.</p>
-
-    <p class="note tip">
-        <strong>Tip:</strong> The Master Caution light resets after identifying the triggering system, but the individual caution light remains illuminated until the fault is cleared.
-    </p>
 
 
     <!-- ── INSTALLATION ── -->
@@ -290,6 +230,7 @@
         <li>Open the link in <strong>Safari</strong> (not Chrome or Firefox).</li>
         <li>Tap <strong>Share &rarr; Add to Home Screen</strong>. Ensure the <em>Web App</em> toggle is <strong>on</strong>.</li>
         <li>Close Safari and launch from your home screen to complete the download.</li>
+        <li>Grant location permission when prompted.</li>
     </ul>
 
     <h3>Android</h3>
@@ -297,79 +238,177 @@
         <li>Open the link in <strong>Chrome</strong>.</li>
         <li>Tap the menu and choose <strong>Add to Home Screen &rarr; Install</strong> (not "shortcut").</li>
         <li>Close Chrome and launch from your home screen to complete the download.</li>
+        <li>Grant location permission when prompted.</li>
     </ul>
 
     <p class="note warn">
-        <strong>Poor connection at startup?</strong> If the app stalls on launch while on a weak signal, enable <strong>Airplane Mode</strong> to force it to load from the offline cache. Once loaded, disable Airplane Mode.
+        <strong>Poor connection at startup?</strong> If the app stalls on launch while on a weak signal, enable <strong>Airplane Mode</strong> to force it to load from the offline cache. Once loaded, disable Airplane Mode if you need GPS.
     </p>
-
-
-    <!-- ── AERONET CALCULATOR ── -->
-    <h2 id="aeronet">Aeronet Calculator &amp; Fuel Converter</h2>
-
-    <p>The Aeronet calculator is a tool for tracking daily fuel usage and receipts, designed for operators who need to log fuel uplift and consumption.</p>
-
-    <p>Access it from the <span class="btn-label">&#9881; SETUP</span> page under <strong>Tools &rarr; Aeronet</strong>.</p>
-
-    <h3>Start &amp; End of Day Fuel</h3>
-    <ul>
-        <li>Set the <strong>Start of Day</strong> fuel quantity using the slider — the fuel gauge reading at the start of your shift.</li>
-        <li>Set the <strong>End of Day</strong> fuel quantity using the slider — the fuel gauge reading at the end of your shift.</li>
-        <li>Both values are displayed in <strong>LBS</strong> and <strong>LITERS</strong> simultaneously.</li>
-        <li>Values are saved automatically between sessions.</li>
-    </ul>
-
-    <h3>Fuel Receipts</h3>
-    <ul>
-        <li>Enter up to <strong>5 fuel receipt quantities</strong> in <strong>LITERS</strong> — the unit used by most refueling trucks.</li>
-        <li>The <strong>Total Fuel Added</strong> field sums all receipt entries automatically.</li>
-        <li>Tap <span class="btn-label">CLEAR</span> to reset all receipt fields to zero (Start/End Fuel sliders are not affected).</li>
-    </ul>
-
-    <p class="note tip">
-        <strong>Use case:</strong> An operator can track fuel added throughout the day (receipts) against the physical fuel gauge reading at start and end of shift to verify fuel usage and identify discrepancies.
-    </p>
-
-
-    <!-- ── REFUEL CALCULATOR ── -->
-    <h2 id="refuel-calc">Refuel Calculator</h2>
-
-    <p>The Refuel Calculator helps determine how much fuel to add to reach a desired fuel load.</p>
-
-    <p>Access it from the <span class="btn-label">&#9881; SETUP</span> page under <strong>Tools &rarr; Refuel Calc</strong>.</p>
-
-    <h3>How It Works</h3>
-    <ul>
-        <li><strong>DESIRED FUEL</strong> — Set the target fuel quantity you want on board after refueling.</li>
-        <li><strong>ACTUAL FUEL</strong> — Set the current fuel quantity in the tank (from the aircraft gauge).</li>
-        <li>The calculator shows the <strong>FUEL REQUIRED</strong> in both <strong>LBS</strong> and <strong>LITERS</strong>.</li>
-        <li>If the desired fuel is less than actual fuel, the display shows <strong>DEFUEL</strong> with the amount to remove.</li>
-        <li>Values are saved automatically between sessions.</li>
-    </ul>
 
     <p class="note">
-        The calculator uses <strong>Jet-A @ 20°C, 0.800 kg/L</strong> density for the LBS to Liters conversion. For certified weight and balance calculations, always use the density on the actual fuel slip/BOL.
+        The app checks for updates automatically at startup. To force an immediate update, use <strong>Update App</strong> in the Setup page.
     </p>
 
 
-    <!-- ── LBS TO LITERS CONVERTER ── -->
-    <h2 id="lbsltr">LBS to Liters Converter</h2>
-
-    <p>A standalone converter is included below the Refuel Calculator for quick unit conversion.</p>
-
+    <!-- ── QUICK START ── -->
+    <h2 id="quickstart">Quick Start</h2>
     <ul>
-        <li>Slide the range control to set the quantity in <strong>LBS</strong>.</li>
-        <li>The converter instantly displays the equivalent in <strong>LITERS</strong>.</li>
-        <li>Useful for converting fuel slip quantities or aircraft gauge readings.</li>
+        <li>Select your aircraft type (Bell 214B, Bell 214 ST) — generic weights load automatically.</li>
+        <li>Adjust weights and fuel load to match your aircraft.</li>
+        <li>Tap <span class="btn-label green">GO START</span> to move to the timer page.</li>
+        <li>Start the engine timer when you start engines. (optional)</li>
+        <li>Start the flight timer when you are ready. (optional)</li>
+        <li>Tap <span class="btn-label green">GO FLY</span> — this ALSO starts the flight timer and opens the flight page.</li>
     </ul>
 
     <p class="note tip">
-        <strong>Quick reference:</strong> 1 US gallon of Jet-A weighs approximately 6.8 lbs. 1 liter weighs approximately 0.8 kg (1.76 lbs).
+        Most inputs — aircraft type, gross weights, burn rate, ground speed target, and distance to fuel — are saved automatically and restored next time you open the app.
     </p>
 
-    <p class="note warn">
-        <strong>Note:</strong> Jet-A density varies with temperature. These conversions assume <strong>20°C (68°F)</strong>. For exact fuel calculations, use the density stated on your fuel delivery slip.
-    </p>
+
+    <!-- ── AIRCRAFT ── -->
+    <h2 id="aircraft">Aircraft &amp; Registration</h2>
+
+    <p>Select your aircraft type from the preset buttons on the calculator page. The app stores separate settings for each type:</p>
+
+    <table class="status-table">
+        <tr><th>Aircraft</th><th>Default Max Gross</th><th>Default Empty Weight</th><th>Default Fuel</th></tr>
+        <tr><td><strong>Bell 214B</strong></td><td>16,000 lbs</td><td>8,000 lbs</td><td>2,500 lbs</td></tr>
+        <tr><td><strong>Bell 214ST</strong></td><td>17,500 lbs</td><td>10,000 lbs</td><td>2,750 lbs</td></tr>
+    </table>
+
+    <p>When saving a flight log, you will be prompted to enter the aircraft registration. This is stored locally and reused for future saves.</p>
+
+
+    <!-- ── SETUP PAGE ── -->
+    <h2 id="setup">Setup Page</h2>
+
+    <p>Tap <span class="btn-label">&#9881; SETUP</span> from either the calculator page or the flight page to open the Setup page. Use the <span class="btn-label">&#8592; BACK</span> button to return to wherever you came from.</p>
+
+    <p>The Setup page is organised into sections:</p>
+
+    <h3>App</h3>
+    <table class="status-table">
+        <tr><th>Button</th><th>What it does</th></tr>
+        <tr>
+            <td><span class="btn-label">&#9432; Manual</span></td>
+            <td>Opens this manual.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label">&#9888; Caution Panel</span></td>
+            <td>Opens the Bell 214B/214ST Caution/Warning Panel quick reference.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label">&#8635; Update App</span></td>
+            <td>Clears the offline cache and downloads the latest version from the server. Your weights, settings, and flight log are not affected — only app files are updated.</td>
+        </tr>
+    </table>
+
+    <h3>Tools</h3>
+    <table class="status-table">
+        <tr><th>Button</th><th>What it does</th></tr>
+        <tr>
+            <td><span class="btn-label">&#9981; Refuel Calc</span></td>
+            <td>Calculates fuel required to reach a desired load based on current fuel. Includes LBS to Liters converter.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label">&#9981; Aeronet</span></td>
+            <td>Track daily fuel usage with Start/End of Day fuel quantities and receipt logging.</td>
+        </tr>
+    </table>
+
+    <h3>Display</h3>
+    <table class="status-table">
+        <tr><th>Button</th><th>What it does</th></tr>
+        <tr>
+            <td><span class="btn-label dark">🌙 Dark Mode</span></td>
+            <td>Toggles dark/light scheme. Preference is saved. Button label reflects current state.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label">&#9728; Keep Awake</span></td>
+            <td>Prevents screen auto-lock. Label shows <strong>Awake (ON)</strong> when active. Not supported on all browsers.</td>
+        </tr>
+    </table>
+
+    <h3>GPS</h3>
+    <table class="status-table">
+        <tr><th>Button</th><th>What it does</th></tr>
+        <tr>
+            <td><span class="btn-label">&#128205; GPS Permission</span></td>
+            <td>Attempts to trigger or repair the location permission dialog. If the permission was previously denied, this will show instructions to fix it in your device settings. See the <a href="#gps">GPS section</a> for full details.</td>
+        </tr>
+    </table>
+
+    <h3>Navigation</h3>
+    <table class="status-table">
+        <tr><th>Button</th><th>What it does</th></tr>
+        <tr>
+            <td><span class="btn-label">&#129517; Navigation</span></td>
+            <td>Toggles the MARK buttons and relative-bearing pointers on/off. When enabled, you can mark Points of Interest (POIs) directly from the flight page. Default: <strong>ON</strong>.</td>
+        </tr>
+    </table>
+
+
+    <!-- ── FUEL ENDURANCE ── -->
+    <h2 id="fuel-endurance">Fuel Endurance — Two Numbers Explained</h2>
+
+    <p>The flight page displays two endurance figures simultaneously. They serve different purposes and are both required on screen.</p>
+
+    <h3>Total Endurance</h3>
+    <p>Fuel on board divided by burn rate — no reserve deducted. This is the number passed to flight services for SAR purposes.</p>
+
+    <h3>Operational Endurance (+500 lb)</h3>
+    <p>Usable endurance to the 500 lb reserve. This is the planning number — transit, tasking, and bingo calculations are all based on this figure.</p>
+
+
+    <!-- ── FUEL CALC TOGGLE ── -->
+    <h2 id="fuelcalc">Fuel Calc Toggle</h2>
+
+    <p>The <span class="btn-label">FUEL CALC</span> button in the flight page top bar shows or hides the detailed planning section — Operational Endurance, Fuel Plan GS, Range, and Bingo-in countdown.</p>
+
+    <p><span class="btn-label green">FUEL CALC</span> green = planning section visible. Dark = collapsed, leaving fuel load slider, Total Endurance, and the always-visible Bingo-in summary. Useful when screen real estate is at a premium. Setting is saved.</p>
+
+
+    <!-- ── BINGO FUEL ── -->
+    <h2 id="bingo">Bingo Fuel</h2>
+
+    <p>Bingo fuel is the quantity at which you must turn for fuel immediately — calculated so you can cover the <strong>Distance to Fuel</strong> at the selected ground speed and burn rate, and still land with 500 lb remaining.</p>
+
+    <ul>
+        <li>Set <strong>Distance to Fuel</strong> to your routing distance to the fuel source before departure.</li>
+        <li><strong>Bingo In</strong> counts down the time remaining until you hit bingo fuel. It is visible both inside the Fuel Calc section and in the compact summary bar inside the fuel box — so it is always on screen even with Fuel Calc collapsed.</li>
+        <li>The <strong>Range</strong> figure shows how far you can travel from this point before reaching bingo — useful for judging whether a diversion to a closer fuel source is viable.</li>
+    </ul>
+
+
+    <!-- ── WARNING COLOURS ── -->
+    <h2 id="warnings">Warning Colours</h2>
+
+    <h3>Bingo Countdown</h3>
+    <table class="status-table">
+        <tr><th>Colour</th><th>Condition</th></tr>
+        <tr>
+            <td><span class="warn-box warn-yellow">YELLOW</span></td>
+            <td>Within 15 minutes of bingo fuel — advisory. Likely your last drop before heading for fuel.</td>
+        </tr>
+        <tr>
+            <td><span class="warn-box warn-red">RED</span></td>
+            <td>Bingo fuel reached — turn back now to land with 500 lb.</td>
+        </tr>
+    </table>
+
+    <h3>Fuel Quantity</h3>
+    <table class="status-table">
+        <tr><th>Colour</th><th>Condition</th></tr>
+        <tr>
+            <td><span class="warn-box warn-yellow">YELLOW</span></td>
+            <td>Fuel remaining at or below <strong>800 lb</strong> — advisory. Time to plan for fuel.</td>
+        </tr>
+        <tr>
+            <td><span class="warn-box warn-red">RED</span></td>
+            <td>Fuel remaining at or below <strong>500 lb</strong> — reserve reached. Land now.</td>
+        </tr>
+    </table>
 
 
     <!-- ── MARK BUTTONS ── -->
@@ -382,8 +421,7 @@
     <div class="mark-grid">
         <div class="mark-card blue">
             <span class="mark-icon">🔵</span>
-            <h4>Blue MARK</h4>
-            <p class="mark-color blue">&#9679; Blue Pointer</p>
+            <div class="mark-btn-demo blue">MARK</div>
             <ul>
                 <li>Water sources</li>
                 <li>Dip sites</li>
@@ -391,10 +429,9 @@
                 <li>Refuel points</li>
             </ul>
         </div>
-        <div class="mark-card amber">
-            <span class="mark-icon">🟠</span>
-            <h4>Amber MARK</h4>
-            <p class="mark-color amber">&#9679; Amber Pointer</p>
+        <div class="mark-card red">
+            <span class="mark-icon">🔴</span>
+            <div class="mark-btn-demo red">MARK</div>
             <ul>
                 <li>Fire locations</li>
                 <li>Hotspots / smoke</li>
@@ -402,10 +439,9 @@
                 <li>Drop zones</li>
             </ul>
         </div>
-        <div class="mark-card red">
-            <span class="mark-icon">🔴</span>
-            <h4>Red MARK</h4>
-            <p class="mark-color red">&#9679; Red Pointer</p>
+        <div class="mark-card amber">
+            <span class="mark-icon">🟠</span>
+            <div class="mark-btn-demo amber">MARK</div>
             <ul>
                 <li>Dozer locations</li>
                 <li>Ground crew</li>
@@ -423,8 +459,8 @@
         <li>Each MARK button has a distinct colour:
             <ul>
                 <li><span class="color-dot blue"></span> <strong>Blue</strong> — Water sources, dip sites</li>
-                <li><span class="color-dot amber"></span> <strong>Amber</strong> — Fires, hotspots</li>
-                <li><span class="color-dot red"></span> <strong>Red</strong> — Dozers, ground crew, LZs</li>
+                <li><span class="color-dot red"></span> <strong>Red</strong> — Fires, hotspots</li>
+                <li><span class="color-dot amber"></span> <strong>Amber</strong> — Dozers, ground crew, LZs</li>
             </ul>
         </li>
         <li>All three can be used simultaneously to track different types of POIs on the same sortie.</li>
@@ -451,21 +487,21 @@
             </g>
             <text x="70" y="48" font-size="12" font-weight="bold" fill="#0066ff" font-family="Arial,sans-serif">2.3 nm</text>
 
-            <!-- Amber pointer — bearing 0° (dead ahead) -->
+            <!-- Red pointer — bearing 0° (dead ahead) -->
             <g transform="translate(150, 28) rotate(0)">
-                <polygon points="0,-14 8,14 -8,14" fill="#ff8c00" stroke="#fff" stroke-width="1"/>
-            </g>
-            <text x="160" y="24" font-size="12" font-weight="bold" fill="#ff8c00" font-family="Arial,sans-serif">4.7 nm</text>
-
-            <!-- Red pointer — bearing 45° right -->
-            <g transform="translate(212, 52) rotate(45)">
                 <polygon points="0,-14 8,14 -8,14" fill="#cc0000" stroke="#fff" stroke-width="1"/>
             </g>
-            <text x="222" y="48" font-size="12" font-weight="bold" fill="#cc0000" font-family="Arial,sans-serif">1.8 nm</text>
+            <text x="160" y="24" font-size="12" font-weight="bold" fill="#cc0000" font-family="Arial,sans-serif">4.7 nm</text>
+
+            <!-- Amber pointer — bearing 45° right -->
+            <g transform="translate(212, 52) rotate(45)">
+                <polygon points="0,-14 8,14 -8,14" fill="#ff8c00" stroke="#fff" stroke-width="1"/>
+            </g>
+            <text x="222" y="48" font-size="12" font-weight="bold" fill="#ff8c00" font-family="Arial,sans-serif">1.8 nm</text>
 
             <!-- Labels -->
             <text x="150" y="145" text-anchor="middle" font-size="10" fill="#666" font-family="Arial,sans-serif">Arrows point to marked POIs — distance shown in nautical miles</text>
-            <text x="150" y="155" text-anchor="middle" font-size="9" fill="#888" font-family="Arial,sans-serif">Blue: water  |  Amber: fire  |  Red: dozer/crew</text>
+            <text x="150" y="155" text-anchor="middle" font-size="9" fill="#888" font-family="Arial,sans-serif">Blue: water  |  Red: fire  |  Amber: crew/equipment</text>
         </svg>
         <div class="pointer-demo-caption">Relative-bearing pointers around the gauge — bearing is relative to your heading, distance in nautical miles</div>
     </div>
@@ -489,11 +525,11 @@
         </tr>
         <tr>
             <td><strong>Fire Line</strong></td>
-            <td>Mark with <span class="btn-label amber">AMBER</span> — track the fire's location relative to your position.</td>
+            <td>Mark with <span class="btn-label red">RED</span> — track the fire's location relative to your position.</td>
         </tr>
         <tr>
             <td><strong>Dozer / Ground Crew</strong></td>
-            <td>Mark with <span class="btn-label red">RED</span> — maintain situational awareness of ground assets.</td>
+            <td>Mark with <span class="btn-label amber">AMBER</span> — maintain situational awareness of ground assets.</td>
         </tr>
         <tr>
             <td><strong>Multiple POIs</strong></td>
@@ -518,10 +554,123 @@
     </p>
 
 
+    <!-- ── GPS ── -->
+    <h2 id="gps">GPS</h2>
+
+    <p>Tap <span class="btn-label red">GPS OFF</span> on the flight page to start the GPS. The button changes colour to show status:</p>
+
+    <table class="status-table">
+        <tr><th>Button state</th><th>Meaning</th></tr>
+        <tr>
+            <td><span class="btn-label red">GPS OFF</span></td>
+            <td>GPS is not running. Tap to start.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label orange">GPS&hellip;</span></td>
+            <td>Acquiring a fix. Wait for it to turn green.</td>
+        </tr>
+        <tr>
+            <td><span class="btn-label green">GPS LIVE</span></td>
+            <td>GPS is active and feeding ground speed to the gauge.</td>
+        </tr>
+    </table>
+
+    <p>If GPS permission was previously denied, use <span class="btn-label">&#128205; GPS Permission</span> in the Setup page to attempt to repair it, or follow the instructions shown to fix it in your device settings manually.</p>
+
+    <p class="note warn">
+        <strong>iOS:</strong> Settings &rarr; Privacy &amp; Security &rarr; Location Services &rarr; find Safari or this app &rarr; set to <em>While Using</em>.<br>
+        <strong>Android:</strong> Settings &rarr; Apps &rarr; this app/browser &rarr; Permissions &rarr; Location &rarr; Allow.
+    </p>
+
+
+    <!-- ── GROUND SPEED GAUGE ── -->
+    <h2 id="gsgauge">Ground Speed Gauge</h2>
+
+    <p>The ground speed gauge is a <strong>deviation instrument</strong> — read it at a glance without focusing on numbers, the same way you read an airspeed indicator. Clockwise = faster; counter-clockwise = slower.</p>
+
+    <p>The target speed selector sits at <strong>12 o'clock</strong> on the gauge — tap it to change the value. That number defines the centre of the arc. Min and max (&plusmn;10&nbsp;kts) are shown at 9 and 3 o'clock. Outside that window the needle pegs. The green band at 12&nbsp;o'clock marks on-speed (&plusmn;3&nbsp;kts). The large central number is actual ground speed in knots.</p>
+
+    <ul>
+        <li><strong>Needle hard left</strong> — well below target speed.</li>
+        <li><strong>Needle climbing toward 12 o'clock</strong> — below target, accelerating.</li>
+        <li><strong>Needle in the green at 12 o'clock</strong> — on speed.</li>
+        <li><strong>Needle right of centre</strong> — above target.</li>
+        <li><strong>Needle hard right</strong> — pegged more than +10 kts above target.</li>
+    </ul>
+
+    <p>Choose target speed based on conditions, pilot preference, and sea-scoop configuration.</p>
+
+    <!-- ── INTERACTIVE GAUGE DEMO ── -->
+    <div class="gauge-demo">
+        <div class="gauge-demo-inner">
+            <svg id="demo-gs-svg" viewBox="0 8 200 137" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;">
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#ddd" stroke-width="14" stroke-linecap="round"/>
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#ffcc00" stroke-width="14" stroke-linecap="round"/>
+                <path d="M 100 30 A 80 80 0 0 1 143.2 41.8" fill="none" stroke="#00cc44" stroke-width="14" transform="rotate(-27 100 110)"/>
+                <path d="M 100 30 A 80 80 0 0 0  56.8 41.8" fill="none" stroke="#00cc44" stroke-width="14" transform="rotate(27 100 110)"/>
+                <g id="demo-tick-group"></g>
+                <text id="demo-min-val" x="8"   y="113" text-anchor="middle" font-size="9" font-weight="bold" fill="#000" font-family="Arial,sans-serif">--</text>
+                <text id="demo-max-val" x="194" y="113" text-anchor="middle" font-size="9" font-weight="bold" fill="#000" font-family="Arial,sans-serif">--</text>
+                <text id="demo-gs-readout" x="100" y="98" text-anchor="middle" font-size="48" font-weight="bold" fill="#000" font-family="Arial,sans-serif">0</text>
+                <g id="demo-needle-group" style="transform:rotate(0deg); transform-origin:100px 110px; transition:transform 0.2s linear;">
+                    <line x1="100" y1="110" x2="100" y2="30" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="100" cy="110" r="5" fill="#333"/>
+                </g>
+                <!-- 12 o'clock dropdown — matches app -->
+                <foreignObject x="80" y="9" width="52" height="14">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+                        <select id="demo-gs-target" onchange="updateDemoGauge()"
+                            style="font-size:9px;font-weight:bold;border:none;background:transparent;
+                                   font-family:Arial,sans-serif;padding:0;margin:0;cursor:pointer;
+                                   color:#000;text-align:center;text-align-last:center;
+                                   width:100%;-webkit-appearance:auto;appearance:auto;">
+                        </select>
+                    </div>
+                </foreignObject>
+                <text x="134" y="17" text-anchor="start" font-size="5" font-weight="bold" fill="#555" font-family="Arial,sans-serif">TARGET GS</text>
+            </svg>
+            <div class="gauge-sim-row">
+                <span style="white-space:nowrap;">Simulated GS</span>
+                <input type="range" id="demo-speed-slider" min="0" max="50" value="18" step="1" oninput="updateDemoGauge()">
+                <span class="gauge-sim-val" id="demo-speed-val">18 kts</span>
+            </div>
+            <p class="gauge-sim-caption">Tap the number at 12 o'clock to change target speed, then drag the slider.</p>
+        </div>
+    </div>
+
+
+    <!-- ── FLIGHT LOG ── -->
+    <h2 id="flightlog">Flight Log</h2>
+    <ul>
+        <li>After a flight, tap <span class="btn-label">BACK</span> on the flight page to return to the timer page.</li>
+        <li>Stop engine and flight timers.</li>
+        <li>Tap <span class="btn-label blue">SAVE</span> to record the entry — this stores date, registration, engine block time, and flight time.</li>
+        <li>Enter the aircraft registration if you haven't already.</li>
+        <li>Tap <span class="btn-label">LOGS</span> to view saved entries, or export them as <strong>.CSV</strong> or <strong>.TXT</strong>.</li>
+    </ul>
+
+    <p class="note">
+        Log entries are stored locally on the device. Exporting to CSV or TXT is the only way to back them up — no cloud sync is performed.
+    </p>
+
+
     <!-- ── CAUTION PANEL REFERENCE ── -->
     <h2 id="caution-panel">Caution Panel Reference</h2>
 
     <p>The Caution Panel app replicates the physical Bell 214 caution/warning panel layout. Tap any light to view its procedure.</p>
+
+    <p>Access it from the <span class="btn-label">&#9888; Caution Panel</span> button in the Setup page.</p>
+
+    <h3>Panel Test</h3>
+    <p>Each caution/warning panel includes a <strong>TEST</strong> function:</p>
+    <ul>
+        <li><strong>Bell 214ST</strong> — Tap the <span class="btn-label dark">TEST PNL</span> area in the center of the panel. This toggles the displayed lamps on/off.</li>
+        <li><strong>Bell 214B</strong> — Tap the round <span class="btn-label dark">TEST</span> push button at the lower right of the panel.</li>
+    </ul>
+    <p class="note caution">The test displays the lights that would normally be illuminated during pre-start checks.</p>
+
+    <h3>Aircraft Selection</h3>
+    <p>The landing page allows you to switch between <strong>Bell 214B</strong> and <strong>Bell 214ST</strong> panels. Each aircraft has its own unique caution light layout and procedures specific to that type.</p>
 
     <!-- PANEL PICTURE (Bell 214B) -->
     <div class="panel-picture">
@@ -690,39 +839,9 @@
 
             <rect x="386" y="330" width="110" height="24" fill="#1a1a1a" stroke="#ffcc00" stroke-width="1.5" rx="2"/>
             <text x="441" y="346" text-anchor="middle" font-size="7" fill="#ffcc00" font-weight="bold" font-family="Arial,sans-serif">HYDR SYS 2</text>
-
         </svg>
         <div class="panel-picture-caption">Bell 214B Caution/Warning Panel — tap any light to view its procedure</div>
     </div>
-
-    <h3>Using the Caution Panel</h3>
-    <ul>
-        <li>Tap any light to view its procedure — emergency or abnormal checklist steps.</li>
-        <li>Each procedure page includes a <span class="btn-label red">BACK</span> button to return to the panel.</li>
-        <li>Use <span class="btn-label dark">MAIN PAGE</span> to return to the main app.</li>
-        <li>Select <strong>Bell 214B</strong> or <strong>Bell 214ST</strong> from the landing page to switch aircraft types.</li>
-    </ul>
-
-    <h3>Colour Reference</h3>
-    <table class="status-table">
-        <tr><th>Colour</th><th>Meaning</th></tr>
-        <tr class="warning-row">
-            <td><span class="btn-label warning-red">RED</span></td>
-            <td><strong>Warning</strong> — Immediate action required</td>
-        </tr>
-        <tr class="caution-row">
-            <td><span class="btn-label caution-yellow">YELLOW</span></td>
-            <td><strong>Caution</strong> — Abnormal condition, monitor or take corrective action</td>
-        </tr>
-        <tr class="caution-row">
-            <td><span class="btn-label amber">AMBER</span></td>
-            <td><strong>Caution</strong> — Advisory, monitor</td>
-        </tr>
-        <tr class="info-row">
-            <td><span class="btn-label green">GREEN</span></td>
-            <td><strong>Advisory / Status</strong> — System active, no action required</td>
-        </tr>
-    </table>
 
     <p class="note warn">
         <strong>Disclaimer:</strong> This C/W reference is intended as a <strong>memory aid only</strong>. It is not to be relied upon for in-flight critical decision making. Always refer to the approved Aircraft Manual — these must always take precedence.
@@ -739,6 +858,44 @@
                 else { window.location.href = 'index.html'; }
             }
         });
+
+        /* ── Build Target GS selector ── */
+        var gsSelect = document.getElementById('demo-gs-target');
+        for (var i = 0; i <= 30; i++) {
+            var o = document.createElement('option');
+            o.value = i; o.textContent = i;
+            if (i === 18) o.selected = true;
+            gsSelect.appendChild(o);
+        }
+
+        /* ── Build tick marks (pivot at 110) ── */
+        (function drawTicks() {
+            var g = document.getElementById('demo-tick-group');
+            for (var i = -90; i <= 90; i += 9) {
+                var l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                l.setAttribute('x1', '100'); l.setAttribute('y1', '23');
+                l.setAttribute('x2', '100'); l.setAttribute('y2', '37');
+                l.setAttribute('stroke', '#000');
+                l.setAttribute('stroke-width', '1.5');
+                l.setAttribute('transform', 'rotate(' + i + ' 100 110)');
+                g.appendChild(l);
+            }
+        })();
+
+        /* ── Update demo gauge ── */
+        function updateDemoGauge() {
+            var tgt   = parseFloat(document.getElementById('demo-gs-target').value);
+            var speed = parseFloat(document.getElementById('demo-speed-slider').value);
+            document.getElementById('demo-min-val').textContent = Math.max(0, tgt - 10);
+            document.getElementById('demo-max-val').textContent = tgt + 10;
+            document.getElementById('demo-gs-readout').textContent = Math.round(speed);
+            document.getElementById('demo-speed-val').textContent  = Math.round(speed) + ' kts';
+            var diff = speed - tgt;
+            var deg  = Math.min(90, Math.max(-90, diff * 9));
+            document.getElementById('demo-needle-group').style.transform = 'rotate(' + deg + 'deg)';
+        }
+
+        updateDemoGauge();
     </script>
 
 </body>
